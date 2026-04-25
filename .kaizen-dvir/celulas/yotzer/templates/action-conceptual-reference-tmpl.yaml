@@ -1,0 +1,37 @@
+# REFERENCE ONLY. Este template documenta a forma de uma Action para
+# raciocinio do agente. NAO gera arquivos action-*.md em runtime.
+# Referencia: D-v1.3-04, AC-119. Publisher validator no M4.5
+# revalida que NENHUM arquivo action-*.md sai em runtime.
+#
+# Action e a camada mais atomica da hierarquia RC-21:
+# Role > Workflow > Task > Action.
+#
+# Action e descrita como instrucao markdown INLINE dentro do arquivo
+# da Task, na secao "## Actions". NUNCA como arquivo separado.
+#
+# Formato YAML primeiro (D-v1.1-06). Toda legenda em pt-BR segue
+# diretrizes-escrita.md: frases curtas, presente, voz ativa, sem
+# adverbios.
+
+# name — nome curto em pt-BR descrevendo comportamento observavel.
+# Adjetivo inferencial dispara FAIL (AC-108B).
+# PASS: "levante o tom de voz", "aumente 20% a velocidade".
+# FAIL: "seja carismatico", "mostre confianca".
+name: "comportamento observavel em pt-BR"
+
+# observable_behavior — descricao do comportamento que um observador
+# externo pode julgar PASS ou FAIL ao ver o executor.
+observable_behavior: "descricao curta em pt-BR do que o observador detecta"
+
+# estimated_duration — duracao tipica em segundos. Action e atomica:
+# cerca de 30s e referencia.
+estimated_duration: "30s"
+
+# Forma de uso:
+# - O agente task-granulator consulta este template para raciocinar
+#   sobre o formato de uma Action ao escrever a secao "## Actions" no
+#   corpo da Task.
+# - Este template NAO vira arquivo no diretorio tasks/ da celula
+#   gerada.
+# - Qualquer arquivo action-*.md detectado em runtime dispara FAIL no
+#   Quality Gate F8 (AC-119, D-v1.3-04).

@@ -1,0 +1,126 @@
+name: "yotzer"
+version: "1.0.0"
+slashPrefix: "Kaizen:Yotzer"
+description: "Meta-celula Yotzer. Gera celulas novas em 10 fases, 3 Atos. Chief conduz, especialistas executam, expert julga."
+kaizen:
+  minVersion: "1.0.0"
+  type: "celula"
+  category: "meta"
+boot:
+  - "README.md"
+  - "MEMORY.md"
+  - "refs/ikigai/quem-sou.md"
+  - "refs/ikigai/o-que-faco.md"
+  - "refs/ikigai/para-quem.md"
+  - "refs/ikigai/como-faco.md"
+tiers:
+  tier_1:
+    role: "coordinator"
+    chief: true
+    agents:
+      - "chief"
+  tier_2:
+    role: "discovery"
+    agents:
+      - "archaeologist"
+  tier_3:
+    role: "specialists"
+    agents:
+      - "stress-tester"
+      - "risk-mapper"
+      - "prioritizer"
+      - "task-granulator"
+      - "contract-builder"
+      - "progressive-systemizer"
+      - "publisher"
+commands:
+  - name: "*novo"
+    description: "inicia geracao de uma celula nova via 10 fases"
+    triggers: "tasks/start.md"
+    agent: "chief"
+  - name: "*editar"
+    description: "edita uma celula existente no modo de edicao"
+    triggers: "tasks/edit-celula.md"
+    agent: "chief"
+  - name: "*metodo"
+    description: "explica o metodo das 10 fases em 3 Atos"
+    triggers: "tasks/explain-method.md"
+    agent: "chief"
+  - name: "*modo"
+    description: "alterna entre modo interativo e automatico"
+    triggers: "tasks/switch-mode.md"
+    agent: "chief"
+  - name: "*resume"
+    description: "retoma trabalho a partir do ultimo handoff"
+    triggers: "tasks/resume.md"
+    agent: "chief"
+  - name: "*status"
+    description: "relata fase atual, ultimo veredito e gates pendentes"
+    triggers: "tasks/status.md"
+    agent: "chief"
+components:
+  agents:
+    - "chief"
+    - "archaeologist"
+    - "stress-tester"
+    - "risk-mapper"
+    - "prioritizer"
+    - "task-granulator"
+    - "contract-builder"
+    - "progressive-systemizer"
+    - "publisher"
+  tasks:
+    - "start"
+    - "edit-celula"
+    - "explain-method"
+    - "switch-mode"
+    - "resume"
+    - "status"
+    - "phase-1-objective"
+    - "phase-2-sources-and-examples"
+    - "phase-3-as-is"
+    - "phase-4-stress-test"
+    - "phase-5-risk-map"
+    - "phase-6-to-be"
+    - "phase-7-prioritize"
+    - "phase-8-granulate"
+    - "phase-9-contracts"
+    - "phase-10-publication"
+  workflows:
+    - "wf-yotzer-generate-celula"
+    - "wf-yotzer-edit-celula"
+  templates:
+    - "welcome-message-tmpl"
+    - "pu-tmpl"
+    - "process-map-tmpl"
+    - "task-tmpl"
+    - "action-conceptual-reference-tmpl"
+    - "celula-blueprint-tmpl"
+    - "contracts-tmpl"
+    - "success-examples-tmpl"
+    - "ost-tmpl"
+    - "agent-tmpl"
+    - "workflow-tmpl"
+  checklists:
+    - "playback-completeness"
+    - "pu-reduction-justified"
+    - "action-observability"
+    - "progressive-levels-coherence"
+    - "mvp-vs-roadmap-separation"
+  kbs:
+    - "kbs/yotzer"
+  internal_helpers:
+    - id: "ost-writer"
+      path: "agents/_shared/ost-writer.js"
+      type: "shared_utility"
+      purpose: "Escreve e atualiza OST.md das celulas geradas. Cria a raiz, anexa Opportunities, anexa Solutions, liga solucao a oportunidade e registra Change Log. Modulo interno sem persona, sem fases, sem autoridade. Consumido pelo archaeologist (F1/F3/F6), risk-mapper (F5), task-granulator (F8) e publisher (F10)."
+authorities:
+  exclusive:
+    - "generate-celula"
+    - "apply-method-phases"
+dependencies:
+  celulas: []
+critical_invariants:
+  - "phase-1-objective"
+  - "phase-2-sources-and-examples"
+  - "phase-10-publication"

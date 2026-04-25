@@ -1,0 +1,99 @@
+# PRIORITY FOR KAIZEN CONDITIONS ABOVE ADDITIONAL REFERENCES
+#
+# External references serve ONLY as conceptual shape inspiration —
+# never as literal source or authority of convention. KaiZen
+# conventions (Commandments I-VII, D-v1.1-* through D-v1.4-*,
+# YAML-first, kebab-case, paths .kaizen-dvir/ and refs/ikigai/,
+# Language Policy D-v1.4-06) prevail in any conflict. (D-v1.4-08)
+#
+# Template do manifesto da celula gerada pelo metodo Yotzer.
+# Publisher (F10) carrega este blueprint, substitui placeholders e
+# valida o resultado contra `celula-schema.json` via M3.4 Schema
+# Gate sob 500ms (NFR-003).
+#
+# Politica de linguagem D-v1.4-06: chaves YAML em ingles; prosa
+# narrativa em pt-BR. Toda prosa segue diretrizes-escrita.md:
+# frases curtas, presente, voz ativa, sem adverbios.
+#
+# Sequencia de renderizacao do publisher:
+# 1. carrega este blueprint
+# 2. substitui placeholders <NOME-DA-CELULA>, <DESCRICAO>, <AGENTES>,
+#    <TASKS>, <TEMPLATES>, <CHECKLISTS>, <KBS>, <CRITICAL-INVARIANTS>
+#    com os valores derivados das fases F1 a F9 e do plano F10a
+# 3. valida o YAML resultante via Schema Gate
+# 4. em PASS, escreve `celula.yaml` na raiz de `celulas/{nome}/`
+
+# name — nome unico da celula em kebab-case.
+name: "<NOME-DA-CELULA>"
+
+# version — semver da celula. Publisher inicia em 1.0.0 (FR-115).
+version: "1.0.0"
+
+# slashPrefix — prefixo do comando slash da celula no Claude Code.
+slashPrefix: "Kaizen:<NomeDaCelula>"
+
+# description — descricao curta em pt-BR (1-2 frases).
+description: "<DESCRICAO-CURTA-EM-PT-BR>"
+
+# kaizen — metadado do framework.
+kaizen:
+  minVersion: "1.0.0"
+  type: "celula"
+  category: "<categoria>"
+
+# boot — arquivos carregados na ativacao da celula.
+boot:
+  - "README.md"
+  - "MEMORY.md"
+  - "OST.md"
+
+# tiers — camadas hierarquicas dos agentes da celula.
+tiers:
+  tier_1:
+    role: "coordinator"
+    chief: true
+    agents:
+      - "<chief-agent-id>"
+  tier_2:
+    role: "discovery"
+    agents:
+      - "<discovery-agent-id>"
+  tier_3:
+    role: "specialists"
+    agents:
+      - "<specialist-agent-id>"
+
+# commands — comandos slash da celula.
+commands:
+  - name: "*novo"
+    description: "<DESCRICAO-DO-COMANDO-EM-PT-BR>"
+    triggers: "tasks/start.md"
+    agent: "<chief-agent-id>"
+
+# components — declaracao de componentes da celula.
+components:
+  agents:
+    - "<AGENTES>"
+  tasks:
+    - "<TASKS>"
+  workflows:
+    - "<WORKFLOWS>"
+  templates:
+    - "<TEMPLATES>"
+  checklists:
+    - "<CHECKLISTS>"
+  kbs:
+    - "<KBS>"
+
+# authorities — autoridades exclusivas da celula.
+authorities:
+  exclusive:
+    - "<AUTORIDADE-EXCLUSIVA>"
+
+# dependencies — celulas referenciadas.
+dependencies:
+  celulas: []
+
+# critical_invariants — fases que sempre pausam (AC-102).
+critical_invariants:
+  - "<CRITICAL-INVARIANTS>"

@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kaizen.synkra/handoff-schema.json",
+  "title": "KaiZen Handoff Artifact",
+  "description": "Strict schema for the cell-to-cell / sub-agent-to-sub-agent Handoff Artifact (FR-008, FR-034). Authored and persisted in YAML 1.2 strict mode at .kaizen/handoffs/handoff-{from}-to-{to}-{timestamp}.yaml. NO IMPLICIT TYPING (R-015 mitigation): consumers MUST quote any ambiguous scalar (no, yes, on, off, 1.0) on write and refuse implicit type coercion on read. Caps: decisions <= 5, files_modified <= 10, blockers <= 3. Hard ceiling enforced separately at generation time: 500 tokens (FR-008). Required fields per 06-memory-ikigai.md § Handoff Protocol. Draft-07, strict types, no additionalProperties at root or in handoff envelope. Forward-compatible: future fields add additively without breaking M4 Yotzer consumers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["handoff"],
+  "properties": {
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "work_context",
+        "decisions",
+        "files_modified",
+        "blockers",
+        "next_action"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "work_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "artifact_id",
+            "artifact_path",
+            "current_phase",
+            "branch"
+          ],
+          "properties": {
+            "artifact_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "artifact_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "current_phase": {
+              "type": "string",
+              "minLength": 1
+            },
+            "branch": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "decisions": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "files_modified": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

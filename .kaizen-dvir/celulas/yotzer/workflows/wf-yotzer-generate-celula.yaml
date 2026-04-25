@@ -1,0 +1,127 @@
+# PRIORITY FOR KAIZEN CONDITIONS ABOVE ADDITIONAL REFERENCES
+#
+# External references serve ONLY as conceptual shape inspiration —
+# never as literal source or authority of convention. KaiZen
+# conventions (Commandments I-VII, D-v1.1-* through D-v1.4-*,
+# YAML-first, kebab-case, paths .kaizen-dvir/ and refs/ikigai/,
+# Language Policy D-v1.4-06) prevail in any conflict. (D-v1.4-08)
+#
+# Workflow Yotzer — geracao de celula nova em 10 fases.
+# Encadeia phase-1 a phase-10 em ordem fixa. Cada step declara o
+# agente executor, o tipo de gate, a flag de invariante critico,
+# o schema do handoff, e as pre/post-condicoes.
+#
+# F1, F2 e F10 sao invariantes criticos (AC-102). Modo automatico
+# nao auto-aprova invariante critico — playback-gate sempre pausa.
+#
+# Politica de linguagem: chaves YAML em ingles; comentarios em
+# pt-BR. D-v1.4-06.
+
+id: "wf-yotzer-generate-celula"
+name: "Yotzer — gerar celula nova"
+description: "Encadeia as 10 fases do metodo Yotzer em ordem fixa. F1, F2 e F10 sao invariantes criticos."
+
+inputs:
+  - name: "cell_request"
+    type: "object"
+    description: "pedido inicial do expert: nome candidato, tipo, contexto"
+    required: true
+  - name: "mode"
+    type: "string"
+    description: "modo da sessao: interativo ou automatico"
+    required: true
+
+outputs:
+  - name: "published_path"
+    type: "string"
+    description: "path da celula publicada em celulas/{nome}/"
+  - name: "version"
+    type: "string"
+    description: "versao registrada no manifesto da celula gerada"
+
+error_handling:
+  policy: "halt_on_critical_invariant_fail"
+  description: "FAIL em invariante critico (F1, F2, F10) ou em qualquer Schema Gate dispara HALT. Expert decide retomar via /Kaizen:Yotzer resume."
+
+steps:
+  - id: "phase-1-objective"
+    agent: "archaeologist"
+    gate_type: "playback"
+    critical_invariant: true
+    handoff_schema: "phase-1-handoff-v1"
+    pre_condition: "session opened with mode selected"
+    post_condition: "outcome root written in OST.md"
+
+  - id: "phase-2-sources-and-examples"
+    agent: "archaeologist"
+    gate_type: "playback"
+    critical_invariant: true
+    handoff_schema: "phase-2-handoff-v1"
+    pre_condition: "phase-1 PASS"
+    post_condition: "kbs/success-examples.md populated with 3+ entries"
+
+  - id: "phase-3-as-is"
+    agent: "archaeologist"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "phase-3-handoff-v1"
+    pre_condition: "phase-2 PASS"
+    post_condition: "as-is mapped, opportunities appended"
+
+  - id: "phase-4-stress-test"
+    agent: "stress-tester"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "phase-4-handoff-v1"
+    pre_condition: "phase-3 PASS"
+    post_condition: "stress test report produced"
+
+  - id: "phase-5-risk-map"
+    agent: "risk-mapper"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "phase-5-handoff-v1"
+    pre_condition: "phase-4 PASS"
+    post_condition: "residual opportunities and solutions appended"
+
+  - id: "phase-6-to-be"
+    agent: "archaeologist"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "phase-6-handoff-v1"
+    pre_condition: "phase-5 PASS"
+    post_condition: "solutions consolidated and linked to opportunities"
+
+  - id: "phase-7-prioritize"
+    agent: "prioritizer"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "phase-7-handoff-v1"
+    pre_condition: "phase-6 PASS"
+    post_condition: "mvp and roadmap separated; OST marked"
+
+  - id: "phase-8-granulate"
+    agent: "task-granulator"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "phase-8-handoff-v1"
+    pre_condition: "phase-7 PASS"
+    post_condition: "tasks with inline actions; ost task->solution links"
+
+  - id: "phase-9-contracts"
+    agent: "contract-builder"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "phase-9-handoff-v1"
+    pre_condition: "phase-8 PASS"
+    post_condition: "contracts/*.yaml written, schema gate PASS"
+
+  - id: "phase-10-publication"
+    agents:
+      - "progressive-systemizer"
+      - "publisher"
+    gate_type: "playback"
+    critical_invariant: true
+    handoff_schema: "phase-10-handoff-v1"
+    pre_condition: "phase-9 PASS"
+    post_condition: "celulas/{nome}/ materialized with AC-118 structure; CHANGELOG initialized at 1.0.0"

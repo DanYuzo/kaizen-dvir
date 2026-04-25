@@ -1,0 +1,17 @@
+version: "1.4.0"
+
+boundary:
+  frameworkProtection: off
+
+paths:
+  L1:
+    - bin/
+  L2:
+    - .kaizen-dvir/instructions/
+  L3:
+    - .claude/
+  L4:
+    - celulas/
+
+cli:
+  command: kaizen

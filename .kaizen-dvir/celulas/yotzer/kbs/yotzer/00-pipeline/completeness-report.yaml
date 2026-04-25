@@ -1,0 +1,590 @@
+# Completeness Report — KaiZen v1.0.0
+# Gerado na Fase 3 do pipeline ETLmaker (Integração)
+
+kb:
+  slug: kaizen
+  name: KaiZen
+  version: "1.0.0"
+  generated_at: "2026-04-21"
+  pipeline_version: "ETLmaker v3.0"
+
+metrics:
+  total_volumes: 10
+  total_lines: 7771
+  average_lines_per_volume: 777
+  min_volume_lines: 614  # VOL-08
+  max_volume_lines: 1043 # VOL-09
+  estimated_lines: "4700-5850"
+  delivered_vs_estimated: "+32%"  # Acima da estimativa
+
+sources:
+  total: 18
+  external: 4
+  local: 14
+  breakdown:
+    external:
+      - ext-01-lilianweng-prompt-engineering.md
+      - ext-02-lilianweng-llm-agents.md
+      - ext-03-langchain-agent-builder-memory.md
+      - ext-04-langchain-state-of-agent-engineering-2026.md
+    local:
+      - loc-00-leia-me.md
+      - loc-01-danilo-metodo.md
+      - loc-01-danilo-oferta.md
+      - loc-01-danilo-posicionamento.md
+      - loc-01-danilo-proposito.md
+      - loc-01-danilo-publico-alvo.md
+      - loc-01-danilo-tom-de-voz.md
+      - loc-01-danilo-diretrizes-escrita.md
+      - loc-02-metodo-forge-exploracao.md
+      - loc-03-framework-7-artefatos.md
+      - loc-04-squad-forge-auroq/ (recursive)
+      - loc-05-squad-creator-aiox/ (recursive)
+      - loc-06-blueprint-info-produtor.md
+
+volumes:
+  vol-01:
+    title: "Fundamentos e Arquitetura"
+    lines: 627
+    domain: D1
+    sections: 15
+    threshold_met: true  # >=300
+    coverage:
+      - Taxonomia de agentes (Companion/Minds/Workers/Squads)
+      - Framework 7 artefatos
+      - Arquitetura 7 camadas
+      - Framework Boundary L1-L4
+      - DNA operacional
+      - Task-first architecture
+      - Hierarquia meta-squad + macro orchestrator (insight #1)
+      - Relação KaiZen ↔ Moreh
+      - Mapeamento AIOX → Info-Produtor
+      - Skill vs Agent
+      - Monolito Craft vs Multi-agente Forge
+
+  vol-02:
+    title: "Extração de Processo (Fase 1)"
+    lines: 795
+    domain: D2
+    sections: 14
+    threshold_met: true
+    coverage:
+      - Goldratt/Ohno/Gawande inspiration
+      - 8 Lentes L1-L8
+      - Process Units (8 tipos)
+      - Rounds iterativos (R1-R3-RN)
+      - 7 técnicas especiais
+      - Gap detection
+      - Playback validation (RC-15 KaiZen-level)
+      - Regras globais
+      - QG-SF-001
+
+  vol-03:
+    title: "Arquitetura e Design de Squads (Fase 2)"
+    lines: 881
+    domain: D3
+    sections: 18
+    threshold_met: true
+    coverage:
+      - Analisar process map
+      - Identificar clusters
+      - Definir agentes (1-7)
+      - Executor classification
+      - Dual mapping PU → Task + KB
+      - Planejar KB
+      - Workflow design
+      - Agent design (persona 6-níveis)
+      - Output examples (3+)
+      - Immune system (3+ triggers)
+      - Squad blueprint
+      - QG-SF-003
+      - Catálogo 9 agentes core
+      - Exemplo completo "montar oferta"
+
+  vol-04:
+    title: "Estrutura Nuclear e Contratos (Fase 3)"
+    lines: 920
+    domain: D4
+    sections: 16
+    threshold_met: true
+    coverage:
+      - squad.yaml manifest
+      - TASK-FORMAT-SPECIFICATION-V1 (8 campos)
+      - Agent format
+      - JSON Schema validation
+      - Schema feedback loop (RC-16)
+      - 3 templates (basic/etl/agent-only)
+      - Directory task-first
+      - squad-validator.js
+      - squad-analyzer.js
+      - squad-loader.js
+      - Squad migration
+      - QG-SF-004
+
+  vol-05:
+    title: "KB como Cérebro"
+    lines: 676
+    domain: D5
+    sections: 17
+    threshold_met: true
+    coverage:
+      - KB como artefato primário (RC-06)
+      - Anti-padrão histórico
+      - 6 seções essenciais
+      - Template completo
+      - ETL integration
+      - 3 camadas de contexto
+      - Progressive disclosure (Anthropic)
+      - CrewAI Knowledge Sources
+      - Gate de cobertura 80% (RC-13)
+      - Skill vs Agent revisited
+      - Exemplo squad tráfego
+
+  vol-06:
+    title: "Quality Gates e Self-Healing"
+    lines: 702
+    domain: D6
+    sections: 20
+    threshold_met: true
+    coverage:
+      - 5 QGs do Squad-Forge
+      - 6 QGs do ETLmaker
+      - PASS/CONCERNS/FAIL/WAIVED
+      - Self-healing loop (RC-16)
+      - QA Loop iterativo (max 5)
+      - CodeRabbit multi-estágio
+      - Smoke tests (3 cenários)
+      - squad-validator.js + squad-analyzer.js
+      - Blind A/B comparison
+      - Evals quantitativos
+      - Separação executor/juíza (RC-05)
+      - Human-in-loop (RC-15)
+      - Observability desde dia 1 (RC-17)
+      - LLM-as-judge
+
+  vol-07:
+    title: "Memória, Aprendizado e Handoff"
+    lines: 685
+    domain: D7
+    sections: 19
+    threshold_met: true
+    coverage:
+      - COALA (3 tiers)
+      - Escopo MVP (procedural+semantic, defer episodic — insight #2)
+      - 3 camadas temporais
+      - 6 triggers de salvamento
+      - Exocortex structure
+      - Filesystem-based memory (LangChain)
+      - Markdown-first + DB runtime (insight #3)
+      - AGENTS.md pattern
+      - MEMORY.md por agente
+      - Self-improvement via correções
+      - Schema validation em memória
+      - Human-in-loop em edições
+      - Handoff artifact (~379 tokens)
+      - Decision Recorder (ADR)
+      - MIPS/ANN algorithms
+
+  vol-08:
+    title: "Orquestração e Sistema Nervoso"
+    lines: 614
+    domain: D8
+    sections: 15
+    threshold_met: true
+    coverage:
+      - Hooks (5 tipos)
+      - SYNAPSE 8-layer injection
+      - Companion pattern (6 camadas)
+      - Modus operandi (3 ciclos)
+      - Session management + PreCompact
+      - Sistema de Projetos (Cockpit max 3)
+      - Weekly review
+      - Multi-model routing per-squad (insight #7)
+      - Observability dia 1 (RC-17)
+
+  vol-09:
+    title: "Padrões de IA (Reasoning + Prompting + Tool Use)"
+    lines: 1043
+    domain: D9
+    sections: 34
+    threshold_met: true
+    coverage:
+      - Agent system architecture (Weng)
+      - Task decomposition: CoT, ToT, LLM+P
+      - Self-reflection: ReAct, Reflexion, CoH, AD, STaR
+      - Prompting: zero-shot, few-shot, instruction, self-consistency
+      - Automatic prompt design: APE, auto-CoT
+      - Tool use: MRKL, TALM, Toolformer, HuggingGPT, API-Bank
+      - MCP governance (Auroq)
+      - 3-tier tool registry
+      - Case studies: ChemCrow, Boiko, Generative Agents, AutoGPT, GPT-Engineer
+      - RAG patterns
+      - Code-augmented: PAL, PoT
+      - Self-Ask, IRCoT
+
+  vol-10:
+    title: "Governance, Evolução e Meta-Squads"
+    lines: 828
+    domain: D10
+    sections: 19
+    threshold_met: true
+    coverage:
+      - Constitution formal (6 artigos)
+      - Severity levels
+      - Agent Authority Matrix
+      - Delegation matrix
+      - Anti-emulation
+      - Natural Language First
+      - REUSE > ADAPT > CREATE (IDS)
+      - 6 gates G1-G6
+      - Entity Registry
+      - Forges (5 meta-squads)
+      - Migration e versionamento
+      - Staged rollout (RC-18)
+      - State of Agent Engineering 2026
+      - Lente autoral Danilo (método 8 fases)
+      - Decisões abertas do Moreh
+
+cardinal_rules:
+  total: 18
+  by_severity:
+    non_negotiable: 3  # RC-01, RC-05, RC-15
+    must: 13
+    should: 2
+  new_from_insights: 4  # RC-15 a RC-18
+  details:
+    RC-01: "Zero inferência"
+    RC-02: "Vocabulário do usuário"
+    RC-03: "Task-first architecture"
+    RC-04: "Pipeline unidirecional"
+    RC-05: "Separação de papéis"
+    RC-06: "KB primária"
+    RC-07: "Qualidade > velocidade"
+    RC-08: "Documentar = investir"
+    RC-09: "REUSE > ADAPT > CREATE"
+    RC-10: "Playback antes de construir"
+    RC-11: "3+ examples + immune"
+    RC-12: "QGs bloqueantes"
+    RC-13: "Cobertura KB 80%+"
+    RC-14: "Anti-viagem"
+    RC-15: "Human-in-loop em mutações de specs"  # NEW insight #4
+    RC-16: "Schema feedback loop"                # NEW insight #5
+    RC-17: "Observability dia 1"                 # NEW insight #6
+    RC-18: "Staged rollout"                      # NEW insight #8
+
+insights_integrated:
+  total: 8
+  details:
+    "#1":
+      insight: "Hierarquia meta-squad + macro orchestrator é padrão validado"
+      source: "Weng LLM Agents"
+      volume: "VOL-01"
+    "#2":
+      insight: "Memória em tiers (procedural + semantic, defer episodic)"
+      source: "LangChain Memory + COALA"
+      volume: "VOL-07"
+    "#3":
+      insight: "Virtual filesystem sobre DB (markdown-first + DB runtime)"
+      source: "LangChain Memory"
+      volume: "VOL-07"
+    "#4":
+      insight: "Human-in-loop obrigatório em toda mutação de specs"
+      source: "LangChain Memory"
+      volume: "VOL-02, VOL-06"
+      regra_cardinal: "RC-15"
+    "#5":
+      insight: "Schema validation com feedback loop pro LLM"
+      source: "LangChain + AIOX"
+      volume: "VOL-04, VOL-06"
+      regra_cardinal: "RC-16"
+    "#6":
+      insight: "Observability = infraestrutura, não afterthought (89% adoção)"
+      source: "LangChain 2025"
+      volume: "VOL-06, VOL-08"
+      regra_cardinal: "RC-17"
+    "#7":
+      insight: "Multi-model routing é padrão (75%+ empresas)"
+      source: "LangChain 2025"
+      volume: "VOL-08"
+    "#8":
+      insight: "Rollout staged interno → cliente é best practice"
+      source: "LangChain 2025"
+      volume: "VOL-10"
+      regra_cardinal: "RC-18"
+
+glossary:
+  terms_total: 110  # aproximado
+  alphabetical_coverage: "A-Z completo"
+
+repertorio:
+  frameworks_referenced: 20
+  squad_patterns: 2  # Craft monolítico + Forge multi-agente
+  reasoning_patterns: 7  # CoT, ToT, LLM+P, ReAct, Reflexion, CoH, AD, STaR
+  prompting_patterns: 8  # zero-shot, few-shot, instruction, self-consistency, APE, auto-CoT, in-context, clustering
+  tool_use_patterns: 6   # MRKL, TALM, Toolformer, HuggingGPT, API-Bank, function calling
+  memory_patterns: 5     # COALA, 3 camadas temporais, filesystem, MIPS/ANN, AGENTS.md
+  governance_patterns: 5 # Constitution, Authority Matrix, Anti-emulation, IDS, staged rollout
+
+cross_references:
+  regras_por_volume: "Mapa completo em REGRAS-CARDINAIS.md"
+  frameworks_por_volume: "Índice em REPERTORIO.md seção 20.2"
+  insights_por_volume: "Índice em REPERTORIO.md seção 20.3"
+
+integration_artifacts:
+  - README.md          # Overview do pacote
+  - REGRAS-CARDINAIS.md # 18 regras consolidadas
+  - REPERTORIO.md       # Frameworks + padrões consolidados
+  - GLOSSARIO.md        # Vocabulário completo
+  - 00-pipeline/completeness-report.yaml  # este arquivo
+
+open_decisions:
+  total: 3  # #3 resolvida pela RC-18
+  remaining:
+    "#1":
+      topic: "Unidade atômica"
+      options: ["PU (recomendado)", "conceito próprio"]
+      affects: "toda fase 2 do Moreh"
+    "#2":
+      topic: "Output canônico"
+      options: ["YAML humanizado", "JSON Schema formal", "híbrido (recomendado)"]
+      affects: "fase 6 (contratos) e fase 8 (feedback loop)"
+    "#4":
+      topic: "Lente dos 5 agentes novos"
+      options: ["internos", "entregáveis pro cliente"]
+      resolved_by_RC_18: "Staged rollout — etapa 1 internos, etapa 2+ se entregar polir"
+      affects: "nível de polimento, UX, documentação"
+  resolved:
+    "#3":
+      topic: "Cliente do método-forge"
+      original_options: ["só Danilo interno", "self-service pro cliente"]
+      resolution: "Staged rollout (RC-18) — interno primeiro, cliente depois"
+      source: "LangChain 2025 insight #8"
+
+contradictions_between_sources:
+  total: 3
+  resolved:
+    - item: "AIOX Craft monolítico vs Auroq 3-agentes"
+      resolution: "Trade-off arquitetural documentado em VOL-01 seção 12. Ambos válidos em contextos diferentes."
+    - item: "Auroq playback obrigatório vs AIOX docs prontos"
+      resolution: "Dois pontos de entrada diferentes. Ambos cabem como patterns distintos."
+    - item: "creator: processos não voltam vs squad-forge: rounds iterativos"
+      resolution: "Rounds dentro de fase. Workflow macro unidirecional. Compatíveis."
+
+gaps_identified:
+  source_gaps:
+    - "Scripts JS do squad-creator (7K+ linhas) — referenciados mas não incluídos no pacote"
+    - "Tasks restantes do squad-creator (extend, list, download, publish, sync) — nem todas lidas"
+    - "Constitution completa do Auroq — resumida no CLAUDE.md, detalhes em blueprint"
+  kb_scope_gaps:
+    - "Integração com MCP específicos (Slack, GitHub, Notion) — não aprofundado"
+    - "Deploy em produção além de local Claude Code"
+    - "Monetização/distribuição (Synkra marketplace, GitHub Releases) — tangenciado"
+
+quality_gates_status:
+  QG-ETL-000_ingestion: PASS  # 18 fontes ingeridas sem erros
+  QG-ETL-001_territorial_mapping: PASS  # 10 domínios, 18 regras, 18 volumes mapeados
+  QG-ETL-002_plan_approved: PASS  # Aprovado pelo expert em 2026-04-21
+  QG-ETL-003_volume_richness: PASS  # Todos 10 volumes >= 300 linhas
+  QG-ETL-004_package_integration: PASS  # README + REGRAS + REPERTORIO + GLOSSARIO + completeness
+  QG-ETL-005_final_validation: PENDING  # Fase 4 (Camada 2 + Camada 3) ainda pendente
+
+next_step: |
+  Fase 4 — Validação Final:
+  - Camada 2: Auditoria exaustiva (aderência a fontes, consistência entre volumes, cobertura)
+  - Camada 3: 6-passes estatísticos (completeness, fidelity score)
+  - Target: Aggregate ≥90% + Zero invenções + Camada 2 PASS
+
+# ═══════════════════════════════════════════════════════════════
+# v1.1.0 — Merge (2026-04-22)
+# ═══════════════════════════════════════════════════════════════
+
+v1_1_merge:
+  kb:
+    version: "1.1.0"
+    generated_at: "2026-04-22"
+    type: "merge enrichment (2 parallel explorations)"
+    base: "KaiZen v1.0.0 (aprovada 2026-04-21)"
+
+  explorations:
+    A:
+      name: "Re-análise squad-forge + squad-creator"
+      method: "Lens meta-pattern (procurar o que NÃO foi capturado em v1.0)"
+      output: "7 meta-patterns + 7 heurísticas + 5 trade-offs + 4 padrões AIOX + 17 termos"
+    B:
+      name: "Extração das 5 refs externas"
+      sources: [100M.txt, continuous.txt, elon.txt, ai-vision.txt, hooked.txt]
+      method: "Mapping ref → passo do método Danilo + mapeamento livre"
+      output: "7 frameworks + 8 insights colaterais + 15 termos + 6 RCs candidatas"
+
+  delta_metrics:
+    volumes:
+      v1_0: 10
+      v1_1: 11  # VOL-11 novo
+      delta: "+1 (VOL-11 Descoberta, Oferta e Engajamento)"
+    lines_total_approx:
+      v1_0: 7771
+      v1_1: "~9600-10000"
+      delta: "+1800-2200 (VOL-11 ~780 + 9 appendix ~1000-1400)"
+    sources:
+      v1_0: 18
+      v1_1: 23  # 18 originais + 5 knowledge-refs
+      delta: "+5 externas em docs/kaizen/knowledge-refs/"
+    cardinal_rules:
+      v1_0: 18
+      v1_1: 21
+      delta: "+3 (RC-20, RC-21, RC-22)"
+      rejected_candidates: [RC-19 Market Validation, RC-23 Hook Design, RC-24 Variable Reward]
+      rejected_fate: "Conteúdo mantido como frameworks operacionais em VOL-11, sem status de regra"
+    frameworks_referenced:
+      v1_0: 20
+      v1_1: 33  # 20 + 13 v1.1
+      delta: "+13 frameworks externos (Grand Slam, Value Equation, OST, Assumption Testing, 5-Step Musk, Workflow Decomposition, Hook Model, Variable Reward, Trio Pattern, Market Validation, Niche Lock, Story-Based Interview, KB→Skill→Agent Pipeline, Guarantee)"
+    meta_patterns:
+      v1_0: 0  # não catalogados
+      v1_1: 12
+      delta: "+12 meta-patterns (Complexity Routing, Bottleneck→Gate, State Persistence, Dual Mapping, Executor Hint, Confidence tracking, Handoff Artifact, Dry-Run, Backup Strategy, Story Traceability, Greenfield Detection, Playback Artifact)"
+    glossary_terms:
+      v1_0: 110  # aproximado
+      v1_1: 143  # +33
+      delta: "+33 termos (seção v1.1 no final)"
+
+  new_volume_vol_11:
+    title: "Descoberta, Oferta e Engajamento"
+    lines: 780
+    domain: D11
+    sections: 19
+    threshold_met: true
+    coverage:
+      - "Market Validation Checklist (4 indicadores Hormozi)"
+      - "Opportunity-Solution Tree (Torres)"
+      - "Assumption Testing Canvas (Torres)"
+      - "Grand Slam Offer + Value Equation (Hormozi)"
+      - "5-Step Musk Algorithm (Musk/Clear)"
+      - "Workflow Decomposition 4 níveis (Hormozi AI Vision)"
+      - "KB → Skill → Agent Pipeline"
+      - "Hook Model (Eyal)"
+      - "Variable Reward Schedule (Eyal)"
+      - "Trio Pattern (Torres)"
+      - "Niche Lock Protocol (Hormozi)"
+      - "Story-Based Interviewing (Torres)"
+      - "Guarantee as Risk Reversal (Hormozi)"
+      - "Integração com volumes existentes"
+      - "3 RCs adotadas: RC-20, RC-21, RC-22"
+
+  appendix_per_volume:
+    vol_01:
+      patch_lines: ~90
+      topics: [Hierarquia Role>Workflow>Task>Action, Mercado>Oferta>Persuasão, Greenfield Detection]
+    vol_02:
+      patch_lines: ~160
+      topics: [Round Structure, Gap-Driven Questions, Confidence Tracking, 5-Step Musk, KPI deleção, Story-Based Interviewing]
+    vol_03:
+      patch_lines: ~190
+      topics: [Bottleneck→Gate, Dual Mapping, Executor Hint Refinement, PU:Task 1:1, Decision Tree Materialization, Modos Interação, Reconciliação RC-21]
+    vol_04:
+      patch_lines: ~80
+      topics: [Guarantee as Risk Reversal em squad.yaml, Skill Markdown estágio formal (RC-22)]
+    vol_05:
+      patch_lines: ~70
+      topics: [Dual Mapping lado KB, KB evolui pós-launch (RC-20), Preferences separadas]
+    vol_06:
+      patch_lines: ~120
+      topics: [Confidence em QG, PU-EXCEPTION→Immune System, Playback Artifact Template, Anti-injection]
+    vol_07:
+      patch_lines: ~70
+      topics: [Handoff Artifact casos operacionais, pre-compact checkpoint, token budget check]
+    vol_08:
+      patch_lines: ~170
+      topics: [State Persistence, Complexity Routing, Handoff Protocol operacional, Trio Pattern, Greenfield Detection, Dashboard mínimo]
+    vol_09:
+      patch_lines: 0
+      topics: "nenhum patch — domínio autossuficiente"
+    vol_10:
+      patch_lines: ~150
+      topics: [5 trade-offs adicionais, Dry-Run, Backup Strategy, Story Traceability, Niche Lock Protocol]
+
+  new_cardinal_rules:
+    RC-20:
+      regra: "KB evolui pós-launch"
+      severity: "MUST"
+      fonte: "Torres Continuous Discovery Habits"
+      volume: "VOL-05 Appendix, VOL-08 Appendix, VOL-11 §11"
+    RC-21:
+      regra: "Role > Workflow > Task > Action (hierarquia 4 níveis)"
+      severity: "MUST"
+      fonte: "Hormozi AI Vision"
+      volume: "VOL-01 Appendix, VOL-03 Appendix, VOL-11 §7"
+      nota: "Reconcilia com RC-03 (task-first) sem contradição"
+    RC-22:
+      regra: "KB → Skill → Agent Pipeline (3 estágios sequenciais)"
+      severity: "MUST"
+      fonte: "Hormozi AI Vision"
+      volume: "VOL-04 Appendix, VOL-11 §8"
+
+  quality_gates_v1_1:
+    QG-ETL-000_ingestion_v1_1: PASS  # 5 refs externas lidas integralmente
+    QG-ETL-001_territorial_mapping_v1_1: PASS  # MAPA-ENRIQUECIMENTO-v1.1.md produzido
+    QG-ETL-002_plan_approved_v1_1: PASS  # aprovado em 2026-04-22 pelo expert (VOL-11 + RC-20/21/22)
+    QG-ETL-003_volume_richness_v1_1: PASS  # VOL-11 ~780 linhas, 19 seções; todos appendix >=60 linhas
+    QG-ETL-004_package_integration_v1_1: PASS  # README, REGRAS, REPERTORIO, GLOSSARIO, completeness atualizados
+    QG-ETL-005_final_validation_v1_1: PENDING  # Camada 2 + Camada 3 do delta
+
+  new_sources:
+    - path: "docs/kaizen/knowledge-refs/100M.txt"
+      author: "Alex Hormozi"
+      title: "100M Leads"
+      role: "Frameworks: Grand Slam Offer, Value Equation, Market Validation, Niche Lock"
+    - path: "docs/kaizen/knowledge-refs/continuous.txt"
+      author: "Teresa Torres"
+      title: "Continuous Discovery Habits"
+      role: "Frameworks: OST, Assumption Testing, Trio Pattern, Story-Based Interviewing"
+    - path: "docs/kaizen/knowledge-refs/elon.txt"
+      author: "Elon Musk via James Clear"
+      title: "First Principles + 5-Step Algorithm"
+      role: "Framework: Stress test sequencial"
+    - path: "docs/kaizen/knowledge-refs/ai-vision.txt"
+      author: "Alex Hormozi + Eva Juergens"
+      title: "AI Vision (podcast)"
+      role: "Frameworks: Workflow Decomposition 4 níveis, KB→Skill→Agent Pipeline"
+    - path: "docs/kaizen/knowledge-refs/hooked.txt"
+      author: "Nir Eyal"
+      title: "Hooked"
+      role: "Frameworks: Hook Model, Variable Reward Schedule"
+
+  contradictions_v1_1:
+    - item: "Task-first (RC-03) vs Role>Workflow>Task>Action (FW-05/RC-21)"
+      resolution: "Não é contradição. RC-03 diz Tasks são primárias em SQUAD level. RC-21 explicita níveis contextuais (Role/Workflow) e operacional (Action). Task continua unidade primária na execução."
+    - item: "Qualidade > Velocidade (RC-07) vs land offer fast (Hormozi)"
+      resolution: "Não é contradição. Hormozi fala MVP de oferta comercial; KaiZen fala construção de squad. Fases diferentes."
+    - item: "Auroq incremental vs AIOX upfront (TA-06)"
+      resolution: "Trade-off arquitetural documentado. Não-exclusivos — Moreh combina incremental na extração + upfront no schema final."
+
+  rejected_rc_candidates:
+    - id: "RC-19 (proposta)"
+      topic: "Market Validation Before Offer Design"
+      razao_rejeicao: "Expert: 'suficiente como framework em VOL-11 §2'"
+      destino: "VOL-11 §2 — Market Validation Checklist (framework operacional)"
+    - id: "RC-23 (proposta)"
+      topic: "Every Output Has Hook Design"
+      razao_rejeicao: "Expert: 'agressivo demais como regra, aplica por contexto'"
+      destino: "VOL-11 §9 — Hook Model (framework operacional)"
+    - id: "RC-24 (proposta)"
+      topic: "Squad Engagement via Variable Reward Cadence"
+      razao_rejeicao: "Expert: 'framework ok, regra não'"
+      destino: "VOL-11 §10 — Variable Reward Schedule (framework operacional)"
+
+  next_step_v1_1: |
+    Fase 4 — Validação Final do DELTA (2026-04-22):
+    - Camada 2: Auditoria exaustiva do delta (VOL-11 + 9 appendix + docs transversais)
+      - Verificar aderência a fontes (5 refs externas + re-análise)
+      - Verificar consistência com volumes v1.0
+      - Verificar proveniência (citações com linha)
+      - Verificar coerência conceitual (contradições resolvidas)
+    - Camada 3: 6-passes estatísticos sobre o delta
+      - Completeness (PUs novos cobertos?)
+      - Fidelity (quotes literais batem com fonte?)
+      - Cross-reference integrity
+      - RC integration (as 3 RCs novas tem aplicação nos volumes?)
+      - Glossary coverage
+      - Aggregate score
+    - Target: Aggregate ≥90% + Zero invenções + Zero contradições internas não-resolvidas

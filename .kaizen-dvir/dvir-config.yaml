@@ -1,0 +1,26 @@
+# dvir-config.yaml — configuração base do KaiZen v1.4
+# Consulte .kaizen-dvir/commandments.md para as regras fundamentais.
+version: "1.4.0"
+
+boundary:
+  frameworkProtection: true  # true = deny rules ativas em L1/L2
+
+paths:
+  L1:
+    - .kaizen-dvir/dvir/
+    - .kaizen-dvir/commandments.md
+    - bin/
+  L2:
+    - .kaizen-dvir/instructions/
+    - .kaizen-dvir/celulas/
+    - .kaizen-dvir/infra/
+  L3:
+    - .claude/
+    - .kaizen-dvir/dvir-config.yaml
+  L4:
+    - celulas/
+    - refs/
+    - .kaizen/
+
+cli:
+  command: kaizen

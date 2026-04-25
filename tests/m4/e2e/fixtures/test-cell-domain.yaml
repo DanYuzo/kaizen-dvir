@@ -1,0 +1,36 @@
+# test-cell-domain.yaml — Synthetic Yotzer e2e test fixture (M4.6).
+#
+# Bounded synthetic domain. Exercises all 10 phases without bloating
+# elicitation depth. Designed to keep CI walls under 60s while the
+# deterministic clock simulates ~10 minutes of cumulative active-expert
+# time (well under the 4h SM-01 budget).
+#
+# CON-002 / CON-003 — read by tests, never executed at runtime.
+
+name: "test-cell"
+purpose: "celula sintetica para validar geracao end-to-end no e2e harness do M4.6."
+outcome: "reduzir 30% do tempo de coleta de dados."
+opportunity: "gargalo na coleta manual."
+solution: "trocar coleta manual por importador automatizado."
+task: "instalar importador no painel admin."
+mode_default: "interativo"
+expert_interactions_per_phase: 1
+interaction_ms: 60000
+idle_ms: 30000
+
+# Active-expert-time budget per phase (ms) — sums to ~10 min for the
+# full 10-phase walk. Critical phases F1, F2, F10 carry slightly heavier
+# elicitation cost in the fixture; non-critical phases are lighter.
+phase_costs:
+  F1: 60000
+  F2: 60000
+  F3: 30000
+  F4: 30000
+  F5: 30000
+  F6: 30000
+  F7: 30000
+  F8: 30000
+  F9: 30000
+  F10: 60000
+
+critical_invariants: ["F1", "F2", "F10"]

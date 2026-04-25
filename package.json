@@ -1,0 +1,21 @@
+{
+  "name": "kaizen",
+  "version": "1.4.0",
+  "description": "KaiZen — macro framework that orchestrates células (MVP v1.4 / M1 Foundation)",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "kaizen": "bin/kaizen.js",
+    "kaizen-init": "bin/kaizen-init.js"
+  },
+  "scripts": {
+    "lint": "node -e \"process.exit(0)\"",
+    "typecheck": "node -e \"process.exit(0)\"",
+    "test": "node tests/run.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,38 @@
+# Template de Unidade de Processo (PU).
+# Archaeologist preenche em F3 (As-is) e F6 (To-be).
+# Formato YAML primeiro (D-v1.1-06). Toda legenda em pt-BR segue
+# diretrizes-escrita.md: frases curtas, presente, voz ativa, sem adverbios.
+
+# id — identificador unico da PU. Use prefixo "PU-" seguido de numero.
+id: "PU-001"
+
+# name — nome curto em pt-BR.
+name: "nome da PU em frase curta"
+
+# phase — fase em que esta PU existe. Valores validos: as-is, to-be.
+phase: "as-is"
+
+# description — uma frase em pt-BR que descreve o que a PU faz.
+description: "descricao curta do que a PU faz"
+
+# inputs — lista de entradas que a PU consome.
+inputs:
+  - "entrada 1"
+  - "entrada 2"
+
+# outputs — lista de saidas que a PU produz.
+outputs:
+  - "saida 1"
+
+# dependencies — lista de ids de outras PUs que precisam estar prontas.
+dependencies:
+  - "PU-000"
+
+# executor_hint — quem executa esta PU hoje. Pode ser humano, sistema ou agente.
+executor_hint: "humano"
+
+# estimated_effort — estimativa de esforco. Use rotulo curto (baixo, medio, alto).
+estimated_effort: "medio"
+
+# status — estado atual da PU. Valores validos: rascunho, validada, cortada, mitigada.
+status: "rascunho"

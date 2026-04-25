@@ -1,0 +1,64 @@
+# Template de Task (RC-21).
+# Task-granulator escreve em F8 como tasks/<task-id>.md no markdown da
+# celula gerada. Este YAML documenta a forma do frontmatter da Task.
+# Actions sao instrucoes markdown INLINE no corpo da Task — nenhum
+# arquivo action-*.md sai em runtime (AC-119, D-v1.3-04).
+# Formato YAML primeiro (D-v1.1-06). Toda legenda em pt-BR segue
+# diretrizes-escrita.md: frases curtas, presente, voz ativa, sem adverbios.
+
+# id — identificador unico da Task. Use prefixo "TASK-" seguido de numero.
+id: "TASK-001"
+
+# pu_pai — id da PU do MVP backlog que esta Task implementa. Obrigatorio.
+pu_pai: "PU-001"
+
+# solution_id — id da Solution no OST que esta Task realiza. Obrigatorio.
+# F8 fecha a cadeia Task -> Solution -> Opportunity -> Outcome (AC-117).
+solution_id: "SOL-001"
+
+# name — nome curto em pt-BR.
+name: "nome curto da Task em pt-BR"
+
+# description — uma frase em pt-BR que descreve o que a Task faz.
+description: "descricao curta em pt-BR do escopo executavel"
+
+# inputs — lista de entradas que a Task consome.
+inputs:
+  - "entrada 1"
+  - "entrada 2"
+
+# outputs — lista de saidas que a Task produz.
+outputs:
+  - "saida 1"
+
+# executor_hint — quem executa esta Task. Pode ser humano, sistema ou
+# sub-agente da celula gerada.
+executor_hint: "humano"
+
+# estimated_effort — estimativa de esforco. Use rotulo curto (5min, 10min).
+estimated_effort: "5min"
+
+# gates — gates aplicaveis a Task. Inclua quality_gate ou schema_gate
+# conforme o escopo.
+gates:
+  - "quality_gate"
+
+# actions — instrucoes markdown INLINE no corpo da Task.
+# Esta chave existe para fins de documentacao do template; o conteudo
+# real fica no markdown abaixo do frontmatter, na secao "## Actions".
+# NENHUM arquivo action-*.md e criado em runtime (AC-119, D-v1.3-04).
+actions: "ver secao ## Actions no corpo do markdown da Task"
+
+# Exemplo de secao Actions inline (no markdown da Task):
+# ## Actions
+#
+# 1. levante o tom de voz ao apresentar o beneficio.
+# 2. aumente 20% a velocidade ao descrever a oferta.
+# 3. pause 2 segundos antes de revelar o preco.
+# 4. faca contato visual ao fechar.
+# 5. confirme entendimento com pergunta direta.
+#
+# Granularidade: 5 a 7 Actions por Task. Mais de 7 vira split em duas
+# Tasks OU extracao de skill reusavel. Cada Action descreve
+# comportamento observavel (AC-108B). Adjetivo inferencial dispara
+# FAIL.

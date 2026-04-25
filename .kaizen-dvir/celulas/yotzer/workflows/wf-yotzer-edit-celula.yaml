@@ -1,0 +1,108 @@
+# PRIORITY FOR KAIZEN CONDITIONS ABOVE ADDITIONAL REFERENCES
+#
+# External references serve ONLY as conceptual shape inspiration —
+# never as literal source or authority of convention. KaiZen
+# conventions (Commandments I-VII, D-v1.1-* through D-v1.4-*,
+# YAML-first, kebab-case, paths .kaizen-dvir/ and refs/ikigai/,
+# Language Policy D-v1.4-06) prevail in any conflict. (D-v1.4-08)
+#
+# Workflow Yotzer — edicao escopada de celula existente.
+#
+# Quando usar este workflow:
+# - ajuste em uma persona (agents/*.md): escopo persona
+# - ajuste em uma task (tasks/*.md) sem mudar contrato: escopo task
+# - ajuste em template (templates/*) sem mudar shape do manifesto:
+#   escopo template
+# - ajuste em checklist (checklists/*.md): escopo checklist
+#
+# Quando NAO usar este workflow (escalar para
+# wf-yotzer-generate-celula.yaml):
+# - mudanca estrutural no manifesto (componentes novos, tiers,
+#   commands)
+# - adicao ou remocao de fase
+# - mudanca em contrato de Task (re-roda F9 e F10)
+# - mudanca de outcome ou opportunities (re-roda F1, F3, F5, F6)
+# - qualquer mudanca que invalide um invariante critico
+#
+# Politica de linguagem: chaves YAML em ingles; comentarios em
+# pt-BR. D-v1.4-06.
+
+id: "wf-yotzer-edit-celula"
+name: "Yotzer — editar celula existente (escopo limitado)"
+description: "Permite edicoes escopadas em celulas ja publicadas. Mudancas estruturais escalam para wf-yotzer-generate-celula.yaml."
+
+inputs:
+  - name: "celula_path"
+    type: "string"
+    description: "path da celula a editar (celulas/{nome}/)"
+    required: true
+  - name: "edit_scope"
+    type: "string"
+    description: "escopo da edicao: persona, task, template, checklist"
+    required: true
+  - name: "mode"
+    type: "string"
+    description: "modo da sessao: interativo ou automatico"
+    required: true
+
+outputs:
+  - name: "edited_path"
+    type: "string"
+    description: "path do artefato editado"
+  - name: "version"
+    type: "string"
+    description: "nova versao registrada no CHANGELOG da celula (1.0.x)"
+
+error_handling:
+  policy: "escalate_on_structural_change"
+  description: "Mudanca estrutural detectada (manifesto, fase, contrato, outcome) escala para wf-yotzer-generate-celula.yaml. CLI emite pt-BR explicando o motivo."
+
+escalation_rule:
+  trigger: "structural_change_detected"
+  target_workflow: "wf-yotzer-generate-celula"
+  message_pt_br: "edicao escopada nao cobre mudanca estrutural. rode wf-yotzer-generate-celula para regerar a celula."
+
+steps:
+  - id: "edit-persona"
+    agent: "task-granulator"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "edit-persona-handoff-v1"
+    applies_when: "edit_scope == persona"
+    pre_condition: "celula publicada e localizavel em celulas_path"
+    post_condition: "persona atualizada respeitando agent-tmpl.yaml"
+
+  - id: "edit-task"
+    agent: "task-granulator"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "edit-task-handoff-v1"
+    applies_when: "edit_scope == task"
+    pre_condition: "task existe e contrato F9 nao muda"
+    post_condition: "task atualizada com Actions inline"
+
+  - id: "edit-template"
+    agent: "task-granulator"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "edit-template-handoff-v1"
+    applies_when: "edit_scope == template"
+    pre_condition: "template nao altera shape do manifesto"
+    post_condition: "template atualizado, prosa em pt-BR"
+
+  - id: "edit-checklist"
+    agent: "task-granulator"
+    gate_type: "schema"
+    critical_invariant: false
+    handoff_schema: "edit-checklist-handoff-v1"
+    applies_when: "edit_scope == checklist"
+    pre_condition: "checklist existe na celula"
+    post_condition: "checklist atualizado em pt-BR"
+
+  - id: "publish-edit"
+    agent: "publisher"
+    gate_type: "playback"
+    critical_invariant: false
+    handoff_schema: "edit-publish-handoff-v1"
+    pre_condition: "edicao escopada em PASS"
+    post_condition: "CHANGELOG da celula atualizado com nova linha 1.0.x; nenhum validador critico falhou"

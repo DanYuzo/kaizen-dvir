@@ -1,0 +1,45 @@
+# Template de contrato YAML por Task.
+# Contract-builder escreve em F9 como contracts/<task-id>.yaml na
+# celula gerada. M3.4 Schema Gate valida o YAML diretamente contra
+# task-contract-schema.json em .kaizen-dvir/dvir/schemas/.
+# SEM conversao YAML para JSON intermediaria (FR-020, D-v1.1-06).
+# Sob 500ms por contrato (NFR-003).
+# Erro por campo em pt-BR em FAIL (AC-104, NFR-101, NFR-102).
+# Formato YAML primeiro (D-v1.1-06). Toda legenda em pt-BR segue
+# diretrizes-escrita.md.
+
+# task_id — id da Task que este contrato descreve. Liga a tasks/<id>.md.
+task_id: "TASK-001"
+
+# description — descricao curta em pt-BR do contrato.
+description: "descricao curta em pt-BR do contrato da Task"
+
+# inputs — lista de entradas tipadas. Cada entrada nomeia, tipa e
+# descreve a entrada em pt-BR. Tipos validos: string, number, boolean,
+# object, array.
+inputs:
+  - name: "input1"
+    type: "string"
+    description: "descricao curta em pt-BR"
+    required: true
+  - name: "input2"
+    type: "object"
+    description: "descricao curta em pt-BR"
+    required: false
+
+# outputs — lista de saidas esperadas. Cada saida nomeia, tipa e
+# descreve a saida em pt-BR.
+outputs:
+  - name: "output1"
+    type: "string"
+    description: "descricao curta em pt-BR"
+
+# gates — gates aplicaveis a Task. Inclua quality_gate, schema_gate,
+# playback_gate conforme o escopo.
+gates:
+  - "quality_gate"
+
+# schema_reference — caminho para o schema JSON consumido por Schema
+# Gate. Schema Gate valida YAML diretamente contra este schema, sem
+# conversao YAML para JSON intermediaria (FR-020, D-v1.1-06).
+schema_reference: ".kaizen-dvir/dvir/schemas/task-contract-schema.json"

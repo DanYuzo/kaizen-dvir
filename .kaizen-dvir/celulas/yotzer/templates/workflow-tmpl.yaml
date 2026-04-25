@@ -1,0 +1,83 @@
+# PRIORITY FOR KAIZEN CONDITIONS ABOVE ADDITIONAL REFERENCES
+#
+# External references serve ONLY as conceptual shape inspiration —
+# never as literal source or authority of convention. KaiZen
+# conventions (Commandments I-VII, D-v1.1-* through D-v1.4-*,
+# YAML-first, kebab-case, paths .kaizen-dvir/ and refs/ikigai/,
+# Language Policy D-v1.4-06) prevail in any conflict. (D-v1.4-08)
+#
+# Esta clausula e load-bearing. Externas (AIOX workflow-template e
+# similares) entram como inspiracao de forma conceitual. Em qualquer
+# conflito de convencao — paths, nomenclatura, identificadores,
+# politica de linguagem — KaiZen prevalece.
+#
+# Template de workflow para celulas geradas pelo metodo Yotzer.
+# Publisher (F10) consome este template ao materializar o diretorio
+# `workflows/` da celula gerada (D-v1.4-07 — diretorio sempre presente).
+# Frontmatter EN para identificadores de maquina; corpo pt-BR para o
+# expert.
+# YAML-first (D-v1.1-06). CLI-first (Comandamento I). Sem dependencias
+# externas (CON-003).
+# Politica de linguagem D-v1.4-06: chaves YAML em ingles; prosa
+# narrativa em pt-BR. Toda prosa segue diretrizes-escrita.md: frases
+# curtas, presente, voz ativa, sem adverbios.
+#
+# Exemplo de uso pelo publisher:
+# 1. publisher detecta que a celula gerada declara workflows
+# 2. publisher carrega este template uma vez por workflow declarado
+# 3. publisher substitui placeholders <ID>, <NAME>, <STEPS>, etc.
+# 4. publisher escreve `celulas/{nome}/workflows/<id>.yaml`
+# 5. quando a celula nao declara workflows, publisher cria o diretorio
+#    `workflows/` com `README.md` explicando o proposito (D-v1.4-07
+#    aceita diretorio vazio com README.md)
+#
+# Disciplina absorvida do squad-creator (D-v1.4-08): semantica
+# `validate`, `analyze`, `extend` aplicada apenas como nomenclatura dos
+# gates de pre-publicacao do publisher (validateActionsInline,
+# analyzeOstClosure, validateWorkflowsDir, validateSuccessExamples).
+# Nenhum path externo (.aiox-core/) ou nome de campo entra no manifesto
+# da celula gerada.
+
+# id — identificador unico do workflow em kebab-case.
+id: "<workflow-id-em-kebab-case>"
+
+# name — nome legivel do workflow.
+name: "<NOME-DO-WORKFLOW-EM-PT-BR>"
+
+# description — descricao curta em pt-BR (1-2 frases).
+description: "<DESCRICAO-DO-WORKFLOW-EM-PT-BR>"
+
+# inputs — entradas esperadas pelo workflow.
+inputs:
+  - name: "<input-name>"
+    type: "<string|number|boolean|object|array>"
+    description: "<descricao-em-pt-BR>"
+    required: true
+
+# outputs — saidas produzidas pelo workflow.
+outputs:
+  - name: "<output-name>"
+    type: "<string|number|boolean|object|array>"
+    description: "<descricao-em-pt-BR>"
+
+# error_handling — politica de tratamento de erro.
+error_handling:
+  policy: "<halt_on_critical_invariant_fail|escalate_to_workflow|continue_on_warn>"
+  description: "<descricao-em-pt-BR>"
+
+# steps — passos do workflow em ordem.
+steps:
+  - id: "<step-id>"
+    agent: "<agent-id>"
+    gate_type: "<playback|schema|quality>"
+    critical_invariant: false
+    handoff_schema: "<handoff-schema-id>"
+    pre_condition: "<descricao-em-pt-BR>"
+    post_condition: "<descricao-em-pt-BR>"
+
+# Notas para o autor do workflow gerado:
+# - F1, F2 e F10 sao invariantes criticos por convencao (AC-102).
+# - Em modo automatico, playback-gate honra `critical_invariant: true`
+#   e sempre pausa.
+# - Cada handoff entre steps fica abaixo de 500 tokens (FR-008).
+# - Valores ambiguos (yes, no, on, off) precisam de aspas (R-015).

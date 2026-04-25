@@ -1,0 +1,70 @@
+# PRIORITY FOR KAIZEN CONDITIONS ABOVE ADDITIONAL REFERENCES
+#
+# External references serve ONLY as conceptual shape inspiration —
+# never as literal source or authority of convention. KaiZen
+# conventions (Commandments I-VII, D-v1.1-* through D-v1.4-*,
+# YAML-first, kebab-case, paths .kaizen-dvir/ and refs/ikigai/,
+# Language Policy D-v1.4-06) prevail in any conflict. (D-v1.4-08)
+#
+# Esta clausula e load-bearing. Externas (AIOX agent-template e
+# similares) entram como inspiracao de forma conceitual. Em qualquer
+# conflito de convencao — paths, nomenclatura, identificadores,
+# politica de linguagem — KaiZen prevalece.
+#
+# Template de persona de agente para celulas geradas pelo metodo
+# Yotzer. Task-granulator (F8) consome este template ao materializar
+# personas na celula gerada. Frontmatter EN para identificadores de
+# maquina; corpo pt-BR para o expert.
+# Formato YAML primeiro (D-v1.1-06). Toda legenda em pt-BR segue
+# diretrizes-escrita.md: frases curtas, presente, voz ativa, sem
+# adverbios.
+# Politica de linguagem D-v1.4-06: chaves YAML em ingles; prosa
+# narrativa em pt-BR.
+
+# agent_id — identificador unico do agente em kebab-case.
+agent_id: "agent-id-em-kebab-case"
+
+# tier — camada hierarquica do agente.
+# 1 = coordinator, 2 = discovery, 3 = specialist.
+tier: 3
+
+# role — papel funcional do agente.
+role: "specialist"
+
+# phases — fases em que o agente atua. Use ids inteiros.
+phases:
+  - 1
+
+# tasks — tasks que o agente executa.
+tasks:
+  - "task-id.md"
+
+# authorities — autoridades exclusivas do agente. Use snake_case.
+authorities:
+  - "exclusive_authority_1"
+  - "exclusive_authority_2"
+
+# delegation — matriz de delegacao. Cada chave aponta para o destino
+# em situacoes que escapam do escopo.
+delegation:
+  out_of_scope: "expert"
+  phase_progression: "chief"
+
+# system_prompt_refs — referencias obrigatorias no system prompt.
+# diretrizes-escrita.md fica obrigatorio em toda persona.
+system_prompt_refs:
+  - "arquivos-relevantes/01-contexto-danilo/diretrizes-escrita.md"
+
+# Estrutura do corpo markdown da persona (apos frontmatter):
+# ## Papel — descricao curta em pt-BR (frase de impacto + funcao)
+# ## Responsabilidades — tabela com itens e como faz
+# ## Autoridades — autoridades exclusivas em pt-BR
+# ## Matriz de delegacao — situacao -> destino
+# ## Veto conditions — limites do agente
+# ## pt-BR — mensagens padrao — mensagens reusadas pelo agente
+# ## Referencia de escrita — referencia obrigatoria a
+#    diretrizes-escrita.md
+#
+# Toda saida ao expert segue
+# arquivos-relevantes/01-contexto-danilo/diretrizes-escrita.md.
+# Frases curtas. Presente. Voz ativa. Sem adverbios.

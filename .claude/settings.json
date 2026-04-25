@@ -1,0 +1,65 @@
+{
+  "permissions": {
+    "deny": [
+      "Write(.kaizen-dvir/dvir/**)",
+      "Write(.kaizen-dvir/commandments.md)",
+      "Write(bin/**)",
+      "Write(.kaizen-dvir/instructions/**)",
+      "Write(.kaizen-dvir/infra/**)",
+      "Edit(.kaizen-dvir/dvir/**)",
+      "Edit(.kaizen-dvir/commandments.md)",
+      "Edit(bin/**)",
+      "Edit(.kaizen-dvir/instructions/**)",
+      "Edit(.kaizen-dvir/infra/**)"
+    ],
+    "allow": [
+      "Write(.kaizen-dvir/celulas/*/MEMORY.md)",
+      "Edit(.kaizen-dvir/celulas/*/MEMORY.md)",
+      "Write(.claude/**)",
+      "Edit(.claude/**)",
+      "Write(.kaizen-dvir/dvir-config.yaml)",
+      "Edit(.kaizen-dvir/dvir-config.yaml)",
+      "Write(celulas/**)",
+      "Edit(celulas/**)",
+      "Write(refs/**)",
+      "Edit(refs/**)",
+      "Write(.kaizen/**)",
+      "Edit(.kaizen/**)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/UserPromptSubmit.js"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/PreCompact.js"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/PreToolUse.js"
+          }
+        ]
+      }
+    ]
+  }
+}

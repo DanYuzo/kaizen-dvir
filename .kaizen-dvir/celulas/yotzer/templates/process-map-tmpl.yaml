@@ -1,0 +1,36 @@
+# Template de process map (As-is ou To-be).
+# Archaeologist escreve em F3 como process-map-as-is.yaml e em F6 como
+# process-map-to-be.yaml. Formato YAML primeiro (D-v1.1-06). Toda legenda
+# em pt-BR segue diretrizes-escrita.md: frases curtas, presente, voz
+# ativa, sem adverbios.
+
+# version — versao do process map. Incrementa em cada rodada.
+version: "0.1.0"
+
+# phase — a qual fase este mapa pertence. Valores validos: as-is, to-be.
+phase: "as-is"
+
+# pus — lista de PUs no mapa. Cada entrada segue pu-tmpl.yaml.
+pus:
+  - id: "PU-001"
+    name: "nome da PU"
+    description: "descricao curta"
+    inputs: []
+    outputs: []
+    executor_hint: "humano"
+    estimated_effort: "medio"
+    status: "rascunho"
+
+# dependencies — pares direcionais de dependencia.
+# Cada entrada: from (PU de origem), to (PU de destino).
+dependencies:
+  - from: "PU-001"
+    to: "PU-002"
+
+# mermaid_render — bloco mermaid embutido no artefato final com rotulos pt-BR.
+mermaid_render: |
+  graph TD
+    PU-001[nome curto em pt-BR] --> PU-002[proximo passo em pt-BR]
+
+# notes — notas livres em pt-BR. Opcional.
+notes: ""
