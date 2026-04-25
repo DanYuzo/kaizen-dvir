@@ -1,0 +1,2 @@
+{"timestamp":"2026-04-24T18:59:03.803Z","event_type":"gate","hook_name":"schema-gate","session_id":"pid-18788-default","gate_id":"schema-gate","artifact_id":"./.kaizen-dvir/celulas/yotzer/celula.yaml","verdict":"PASS","durationMs":4,"error_count":0}
+{"timestamp":"2026-04-24T19:03:36.422Z","event_type":"gate","hook_name":"schema-gate","session_id":"pid-16940-default","gate_id":"schema-gate","artifact_id":"./.kaizen-dvir/celulas/yotzer/celula.yaml","verdict":"PASS","durationMs":1,"error_count":0}

@@ -1,11 +1,16 @@
-# KaiZen runtime directory — ephemeral, never committed (CON-004)
-.kaizen/
+# KaiZen runtime — ephemeral cell state ignored, mas .kaizen/logs/ é tracked
+# (logs = histórico append-only do framework: gate verdicts, decisões)
+# Padrão: ignora subdirs de .kaizen/ EXCETO logs/. Não usar `.kaizen/` sozinho
+# porque parent-ignored bloqueia negação de filhos.
+.kaizen/*/
+!.kaizen/logs/
 
 # Node.js
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # Editor / OS artifacts
 .DS_Store
@@ -18,5 +23,7 @@ Thumbs.db
 
 # Build / distribution
 *.tarball
-*.log
 dist/
+
+# Tests — não distribuídos via tarball (CON-100)
+tests/
