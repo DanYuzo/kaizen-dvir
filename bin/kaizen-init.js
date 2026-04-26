@@ -46,6 +46,12 @@ const COPY_MANIFEST = [
   ['.kaizen-dvir/dvir/boundary-toggle.js', '.kaizen-dvir/dvir/boundary-toggle.js'],
   ['.claude/settings.json', '.claude/settings.json'],
   ['.claude/README.md', '.claude/README.md'],
+  // M6.1.2 fix: ship .claude/hooks/ shim scripts referenced by settings.json.
+  // Without these, every PreToolUse/UserPromptSubmit/PreCompact event fails
+  // with cjs/loader Cannot-find-module errors after `npx kaizen-dvir init`.
+  ['.claude/hooks/PreCompact.js', '.claude/hooks/PreCompact.js'],
+  ['.claude/hooks/PreToolUse.js', '.claude/hooks/PreToolUse.js'],
+  ['.claude/hooks/UserPromptSubmit.js', '.claude/hooks/UserPromptSubmit.js'],
   ['package.json', 'package.json'],
   ['bin/kaizen.js', 'bin/kaizen.js'],
   ['bin/kaizen-init.js', 'bin/kaizen-init.js'],
@@ -71,6 +77,7 @@ const DIRS_TO_CREATE = [
   '.kaizen-dvir/infra',
   '.kaizen-dvir/refs',
   '.claude',
+  '.claude/hooks',
   '.claude/rules',
   '.claude/commands',
   '.claude/commands/Kaizen',

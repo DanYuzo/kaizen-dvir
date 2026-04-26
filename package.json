@@ -1,6 +1,6 @@
 {
   "name": "kaizen-dvir",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "KaiZen — macro framework that orchestrates células (v1.5 / M6 Distribution & Update)",
   "license": "MIT",
   "type": "commonjs",
@@ -44,7 +44,8 @@
     ".kaizen-dvir/infra/",
     ".kaizen-dvir/refs/",
     ".claude/settings.json",
-    ".claude/README.md"
+    ".claude/README.md",
+    ".claude/hooks/"
   ],
   "scripts": {
     "lint": "node -e \"process.exit(0)\"",
