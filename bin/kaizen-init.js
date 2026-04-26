@@ -69,6 +69,8 @@ const DIRS_TO_CREATE = [
   '.kaizen-dvir/refs',
   '.claude',
   '.claude/rules',
+  '.claude/commands',
+  '.claude/commands/Kaizen',
   '.kaizen',
   'bin',
   'refs',
@@ -331,6 +333,111 @@ function installYotzer(targetRoot) {
   return { copied: copied, skipped: skipped, warning: warning };
 }
 
+// -- Bundled-cell skill registration (Story M8.3, FR-047, AC-025) ---------
+// After the Yotzer scaffold lands, walk `.kaizen-dvir/celulas/{*}/` and call
+// the M8.2 `registerCellSkills()` helper for each cell that has a
+// `celula.yaml` on disk. Generic per D-v1.5-05: today the iteration set is
+// `{yotzer}`, but ANY future first-party cell bundled under
+// `.kaizen-dvir/celulas/` auto-registers without a code change here.
+//
+// Errors thrown by `registerCellSkills()` (malformed manifest, missing chief
+// persona, etc.) are caught by `init()` and converted into a pt-BR stderr
+// message + non-zero exit. Soft warnings (`warnings[]` from the helper) are
+// printed to stdout in pt-BR as part of the post-init summary block.
+
+const CELL_REGISTRY_REL = path.join('.kaizen-dvir', 'dvir', 'cell-registry.js');
+
+/**
+ * Enumerate bundled cells under `<targetRoot>/.kaizen-dvir/celulas/`.
+ *
+ * Returns one entry per direct subdirectory of `celulas/` whose `celula.yaml`
+ * file exists on disk. The iteration order is stable (sorted by directory
+ * name) so the post-init summary is deterministic across runs.
+ *
+ * @param {string} targetRoot
+ * @returns {Array<{ name: string, cellRoot: string }>}
+ */
+function enumerateBundledCells(targetRoot) {
+  const celulasDir = path.join(targetRoot, '.kaizen-dvir', 'celulas');
+  if (!fs.existsSync(celulasDir)) return [];
+  let entries;
+  try {
+    entries = fs.readdirSync(celulasDir, { withFileTypes: true });
+  } catch (_) {
+    return [];
+  }
+  const out = [];
+  for (const ent of entries) {
+    if (!ent.isDirectory()) continue;
+    const cellRoot = path.join(celulasDir, ent.name);
+    const manifestAbs = path.join(cellRoot, 'celula.yaml');
+    if (!fs.existsSync(manifestAbs)) continue;
+    out.push({ name: ent.name, cellRoot });
+  }
+  out.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  return out;
+}
+
+/**
+ * Register Claude Code slash skills for every bundled cell at
+ * `.kaizen-dvir/celulas/{*}/`. Generic per D-v1.5-05.
+ *
+ * @param {string} targetRoot
+ * @returns {{
+ *   perCell: Array<{ name: string, entryWritten: boolean,
+ *                    specialistsCount: number, warnings: string[] }>,
+ *   warnings: string[],
+ * }}
+ *
+ * @throws {Error} pt-BR error message when any cell's manifest is malformed
+ *   or the chief persona is missing — caller (init) aborts the run with
+ *   exit 1 to avoid leaving a half-registered state.
+ */
+function registerSkillsForCells(targetRoot) {
+  // Load the helper from INSTALL_ROOT (where the framework code actually
+  // lives — either the dev tree or `node_modules/@DanYuzo/kaizen-dvir/`).
+  // The helper is L1 framework code and is not copied into the target
+  // project by `kaizen init`; only the cells under `.kaizen-dvir/celulas/`
+  // are copied. The helper reads cell manifests from `targetRoot` (read-
+  // only) and writes skills under `targetRoot/.claude/commands/`.
+  const { registerCellSkills } = require(
+    path.join(INSTALL_ROOT, CELL_REGISTRY_REL)
+  );
+  const commandsDir = path.join(targetRoot, '.claude', 'commands');
+  const cells = enumerateBundledCells(targetRoot);
+  const perCell = [];
+  const aggregatedWarnings = [];
+  for (const cell of cells) {
+    let result;
+    try {
+      result = registerCellSkills(cell.cellRoot, commandsDir);
+    } catch (err) {
+      // Re-throw with the cell name prefixed so the caller can build a
+      // pt-BR stderr message that names the offending cell.
+      const inner = (err && err.message) || String(err);
+      const e = new Error(
+        "celula '" + cell.name + "': " + inner
+      );
+      e.cellName = cell.name;
+      e.cellRoot = cell.cellRoot;
+      e.cause = err;
+      throw e;
+    }
+    perCell.push({
+      name: cell.name,
+      entryWritten: !!result.entryWritten,
+      specialistsCount: Array.isArray(result.specialistsWritten)
+        ? result.specialistsWritten.length
+        : 0,
+      warnings: Array.isArray(result.warnings) ? result.warnings.slice() : [],
+    });
+    for (const w of (result.warnings || [])) {
+      aggregatedWarnings.push("[" + cell.name + "] " + w);
+    }
+  }
+  return { perCell, warnings: aggregatedWarnings };
+}
+
 function init(args) {
   const targetRoot = process.cwd();
   ensureDirs(targetRoot);
@@ -359,12 +466,48 @@ function init(args) {
     return 1;
   }
 
+  // Register Claude Code slash skills for every bundled cell (Story M8.3).
+  // Runs AFTER `installYotzer()` so the cell scaffold is on disk, and
+  // BEFORE the post-init summary so the summary can name the registered
+  // skills. Errors abort with exit 1 — no half-registered state.
+  let skillsResult = { perCell: [], warnings: [] };
+  try {
+    skillsResult = registerSkillsForCells(targetRoot);
+  } catch (err) {
+    const reason = (err && err.message) || 'desconhecido';
+    process.stderr.write(
+      'erro ao registrar skills das celulas: ' + reason + '\n' +
+      'Init abortado para preservar estado consistente. ' +
+      'Corrija o manifesto da celula e rode \'kaizen init\' novamente.\n'
+    );
+    return 1;
+  }
+
   const total = plan.length;
   const created = missing.length;
   const skipped = identical.length;
 
   const warningBlock = yotzerResult.warning
     ? '\n' + yotzerResult.warning + '\n'
+    : '';
+
+  // Per-cell skill summary lines (pt-BR; NFR-102).
+  const skillsLines = skillsResult.perCell.map(function (entry) {
+    // entryWritten is always true on success (helper returns true even when
+    // content was already up-to-date). `specialistsCount` is the total
+    // number of `.md` files written under `<cell>/` and includes the chief
+    // sub-skill (so /<prefix>:<chief-id> works for direct re-activation).
+    return '  Skills: ' + entry.name +
+      ' (1 entry + ' + entry.specialistsCount + ' specialists)';
+  });
+  const skillsBlock = skillsLines.length > 0
+    ? skillsLines.join('\n') + '\n'
+    : '';
+
+  // Surface non-fatal skill warnings in pt-BR (NFR-101).
+  const skillWarningsBlock = skillsResult.warnings.length > 0
+    ? '\nAvisos durante registro de skills:\n' +
+      skillsResult.warnings.map((w) => '  - ' + w).join('\n') + '\n'
     : '';
 
   const summary =
@@ -374,7 +517,9 @@ function init(args) {
     '  Total no esqueleto: ' + total + ' arquivo(s)\n' +
     '  Yotzer: ' + yotzerResult.copied + ' arquivo(s) copiados; ' +
     yotzerResult.skipped + ' conjunto(s) preservados.\n' +
+    skillsBlock +
     warningBlock +
+    skillWarningsBlock +
     '\n' +
     'Próximos passos:\n' +
     '  - Leia os Commandments: .kaizen-dvir/commandments.md\n' +
@@ -408,12 +553,31 @@ module.exports.walkSourceTree = walkSourceTree;
 module.exports.YOTZER_SOURCE_REL = YOTZER_SOURCE_REL;
 module.exports.YOTZER_TARGET_REL = YOTZER_TARGET_REL;
 module.exports.RULE_SEED_NAMES = RULE_SEED_NAMES;
+module.exports.enumerateBundledCells = enumerateBundledCells;
+module.exports.registerSkillsForCells = registerSkillsForCells;
 // NOTE: ETLMAKER_KBS_SOURCE_REL / YOTZER_KBS_TARGET_REL exports removed —
 // the symbols were never declared in this module and threw ReferenceError on
 // every load (blocked all `kaizen init` invocations regardless of channel).
 // Surfaced and resolved in scope by M6.6 channel smoke tests (FR-052).
 
 // --- Change Log -----------------------------------------------------------
+// 2026-04-25 — @dev (Dex) — M8.3: wired init to call registerCellSkills()
+//   from .kaizen-dvir/dvir/cell-registry.js (M8.2) for every bundled cell at
+//   .kaizen-dvir/celulas/{*}/ after installYotzer() returns. Added
+//   `.claude/commands` and `.claude/commands/Kaizen` to DIRS_TO_CREATE so the
+//   namespace folder exists before registration. New `enumerateBundledCells`
+//   walks `celulas/` and filters subdirectories that contain `celula.yaml` —
+//   generic per D-v1.5-05 so future first-party cells auto-register without
+//   code changes here. New `registerSkillsForCells` invokes the helper per
+//   cell, aggregates `warnings[]` and per-cell counts. Errors thrown by the
+//   helper (malformed manifest, missing chief persona) are caught and
+//   converted into a pt-BR stderr message + exit 1; init never leaves a
+//   half-registered state. Post-init summary block (pt-BR) gains one line
+//   per cell ("Skills: <name> (1 entry + N specialists)") and an optional
+//   "Avisos durante registro de skills" block when the helper returned
+//   non-empty `warnings[]`. No new external dependencies (CON-003), CommonJS
+//   preserved (CON-002). Existing M4.1 installYotzer() body, COPY_MANIFEST,
+//   GITKEEP_TARGETS, INLINE_TEMPLATES, and CLAUDE_MD_SCAFFOLD untouched.
 // 2026-04-25 — @dev (Dex) — M7.3: wired init to write .claude/CLAUDE.md +
 //   .claude/rules/. Replaced the 17-line v1.4 CLAUDE_MD_SCAFFOLD constant
 //   with a require of bin/lib/claude-md-scaffold.js (M7.2 — single source of
