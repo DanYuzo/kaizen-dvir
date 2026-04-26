@@ -6,6 +6,37 @@ const path = require('node:path');
 
 const INSTALL_ROOT = path.resolve(__dirname, '..');
 
+// CLAUDE.md scaffold body (M7.2). Authored as a separate module so the same
+// bytes feed both the init wiring and the M6.5 cross-milestone migration
+// path. See bin/lib/claude-md-scaffold.js for delimiter contract notes.
+const { CLAUDE_MD_SCAFFOLD } = require('./lib/claude-md-scaffold.js');
+
+// Rule template seeds (M7.1). Source bodies live at
+// `.kaizen-dvir/instructions/templates/rules/{name}.md` (L2 — shipped via the
+// package `files` whitelist). Init copies them into `.claude/rules/` (L3 —
+// expert-mutable) so the expert can edit local copies without touching L2.
+// Reading from disk at runtime keeps a single source of truth and avoids
+// duplicating ~28 KB of pt-BR rule prose inside this CLI entry point.
+const RULE_SEED_NAMES = [
+  'boundary',
+  'cells',
+  'yotzer',
+  'doctor',
+  'language-policy',
+  'commit-conventions',
+];
+
+function readRuleSeed(name) {
+  const sourceRel = path.join(
+    '.kaizen-dvir',
+    'instructions',
+    'templates',
+    'rules',
+    name + '.md'
+  );
+  return fs.readFileSync(path.join(INSTALL_ROOT, sourceRel));
+}
+
 // Files copied verbatim from the canonical installation into the target.
 // Tuple: [source-relative-to-INSTALL_ROOT, target-relative-to-process.cwd()]
 const COPY_MANIFEST = [
@@ -37,6 +68,7 @@ const DIRS_TO_CREATE = [
   '.kaizen-dvir/infra',
   '.kaizen-dvir/refs',
   '.claude',
+  '.claude/rules',
   '.kaizen',
   'bin',
   'refs',
@@ -54,25 +86,8 @@ const GITKEEP_TARGETS = [
 ];
 
 // Inline pt-BR scaffolds (user-facing). See story M1.5 § Dev Notes.
-const CLAUDE_MD_SCAFFOLD =
-  '# CLAUDE.md — Projeto KaiZen\n' +
-  '\n' +
-  'Este projeto usa o framework **KaiZen v1.4**.\n' +
-  '\n' +
-  '## Leis do framework\n' +
-  '\n' +
-  'Leia e respeite os 7 Commandments antes de qualquer mudança:\n' +
-  '`.kaizen-dvir/commandments.md`\n' +
-  '\n' +
-  '## Comandos de entrada\n' +
-  '\n' +
-  '- `kaizen doctor` — diagnostica o projeto (disponível em M2/M3)\n' +
-  '- `/Kaizen:Yotzer` — célula de orientação (disponível após M4)\n' +
-  '\n' +
-  '## Espaço do expert (customização)\n' +
-  '\n' +
-  '<!-- Edite livremente abaixo — esta área é L3 (mutável). -->\n';
-
+// CLAUDE_MD_SCAFFOLD is sourced from bin/lib/claude-md-scaffold.js (M7.2);
+// see top-of-file require for the wiring.
 const IKIGAI_SCAFFOLDS = {
   'refs/ikigai/quem-sou.md':
     '# Quem sou\n' +
@@ -92,9 +107,28 @@ const IKIGAI_SCAFFOLDS = {
     '<!-- Processo, esteira, roteiro, etapas de entrega. -->\n',
 };
 
-const INLINE_TEMPLATES = Object.assign({}, IKIGAI_SCAFFOLDS, {
-  '.claude/CLAUDE.md': CLAUDE_MD_SCAFFOLD,
-});
+// Build .claude/rules/*.md entries by reading the L2 seed templates from
+// disk at module-load time. The seed files are shipped via the package
+// `files` whitelist (.kaizen-dvir/instructions/) and live under INSTALL_ROOT
+// in both dev and installed contexts. Reading at module-load (rather than
+// embedding the bodies inline) keeps a single source of truth in L2 and
+// shrinks the bin/ footprint by ~28 KB. M7.3 § Dev Notes.
+const RULE_TEMPLATES = (function buildRuleTemplates() {
+  const out = {};
+  for (const name of RULE_SEED_NAMES) {
+    out['.claude/rules/' + name + '.md'] = readRuleSeed(name);
+  }
+  return out;
+})();
+
+const INLINE_TEMPLATES = Object.assign(
+  {},
+  IKIGAI_SCAFFOLDS,
+  RULE_TEMPLATES,
+  {
+    '.claude/CLAUDE.md': CLAUDE_MD_SCAFFOLD,
+  }
+);
 
 function bufferFromContent(content) {
   return Buffer.isBuffer(content) ? content : Buffer.from(content);
@@ -344,10 +378,13 @@ function init(args) {
     '\n' +
     'Próximos passos:\n' +
     '  - Leia os Commandments: .kaizen-dvir/commandments.md\n' +
-    '  - Customize seu espaço em .claude/CLAUDE.md (área L3, mutável)\n' +
+    '  - Revise .claude/CLAUDE.md (ponte com o Claude Code, atualizada para v1.5)\n' +
+    '  - Explore .claude/rules/ — 6 arquivos de referência do framework ' +
+    '(boundary, cells, yotzer, doctor, language-policy, commit-conventions)\n' +
+    '  - Customize a área expert do .claude/CLAUDE.md (bloco KAIZEN:EXPERT, L3)\n' +
     '  - Preencha refs/ikigai/ com sua identidade e entrega\n' +
     '  - Ative o Yotzer com /Kaizen:Yotzer\n' +
-    '  - Rode \'kaizen doctor\' (disponível em M2/M3)\n';
+    '  - Rode \'kaizen doctor\' para diagnosticar o projeto\n';
   process.stdout.write(summary);
   return 0;
 }
@@ -370,7 +407,21 @@ module.exports.compareSemver = compareSemver;
 module.exports.walkSourceTree = walkSourceTree;
 module.exports.YOTZER_SOURCE_REL = YOTZER_SOURCE_REL;
 module.exports.YOTZER_TARGET_REL = YOTZER_TARGET_REL;
+module.exports.RULE_SEED_NAMES = RULE_SEED_NAMES;
 // NOTE: ETLMAKER_KBS_SOURCE_REL / YOTZER_KBS_TARGET_REL exports removed —
 // the symbols were never declared in this module and threw ReferenceError on
 // every load (blocked all `kaizen init` invocations regardless of channel).
 // Surfaced and resolved in scope by M6.6 channel smoke tests (FR-052).
+
+// --- Change Log -----------------------------------------------------------
+// 2026-04-25 — @dev (Dex) — M7.3: wired init to write .claude/CLAUDE.md +
+//   .claude/rules/. Replaced the 17-line v1.4 CLAUDE_MD_SCAFFOLD constant
+//   with a require of bin/lib/claude-md-scaffold.js (M7.2 — single source of
+//   truth shared with the M6.5 migration). Added '.claude/rules' to
+//   DIRS_TO_CREATE and six rule seed entries to INLINE_TEMPLATES. Rule
+//   bodies are read from .kaizen-dvir/instructions/templates/rules/{name}.md
+//   under INSTALL_ROOT at module-load time (single source of truth, smaller
+//   bin/ footprint). Init summary block updated in pt-BR to mention the new
+//   .claude/rules/ directory and the v1.5 CLAUDE.md. Existing diffScan
+//   idempotency path automatically covers the new INLINE_TEMPLATES entries.
+//   No new dependencies (CON-003), CommonJS preserved (CON-002).
