@@ -58,8 +58,10 @@ test('registerCellSkills writes entry + 9 specialist skills for Yotzer', () => {
       ),
       'entry body must contain the slash-vs-shell distinction phrase verbatim (D-v1.5-06)'
     );
-    assert.ok(/Persona do chief: `.+\/agents\/chief\.md`/.test(entryBody),
-      'entry body must reference the chief persona file');
+    // Persona path is relative POSIX under cellRoot (M8.7 hotfix of M6.7 §6.1
+    // backlog item — was absolute before, broke channel-hash byte equality).
+    assert.ok(/Persona do chief: `agents\/chief\.md`/.test(entryBody),
+      'entry body must reference the chief persona file (relative POSIX)');
 
     // 9 specialist files under .claude/commands/Kaizen/Yotzer/
     const specialistsDir = path.join(claudeDir, 'Kaizen', 'Yotzer');
@@ -84,15 +86,15 @@ test('registerCellSkills writes entry + 9 specialist skills for Yotzer', () => {
     const chiefBody = H.readFileUtf8(path.join(specialistsDir, 'chief.md'));
     assert.ok(/Reativa o \*\*chief\*\* \(chief\)/.test(chiefBody),
       'chief sub-skill must mark itself as the re-activation entry');
-    assert.ok(/Persona: `.+\/agents\/chief\.md`/.test(chiefBody),
-      'chief sub-skill must reference the chief persona');
+    assert.ok(/Persona: `agents\/chief\.md`/.test(chiefBody),
+      'chief sub-skill must reference the chief persona (relative POSIX)');
 
     // Spot-check a regular specialist.
     const archBody = H.readFileUtf8(path.join(specialistsDir, 'archaeologist.md'));
     assert.ok(/Ativa o especialista \*\*archaeologist\*\*/.test(archBody),
       'archaeologist body must identify itself');
-    assert.ok(/Persona: `.+\/agents\/archaeologist\.md`/.test(archBody),
-      'archaeologist body must reference its persona file');
+    assert.ok(/Persona: `agents\/archaeologist\.md`/.test(archBody),
+      'archaeologist body must reference its persona file (relative POSIX)');
   } finally {
     H.rmRf(cellRoot);
     H.rmRf(claudeDir);

@@ -681,12 +681,18 @@ function _yamlScalar(s) {
 }
 
 function _personaRelPath(cellRoot, agentId) {
-  // Render a forward-slash path for portability inside the markdown body.
-  // Skill files may live outside the repo (e.g., installed under a project's
-  // node_modules), so we use the absolute path normalized to forward slashes
-  // — the body is informational, not consumed by tooling.
-  const abs = path.join(cellRoot, 'agents', agentId + '.md');
-  return abs.split(path.sep).join('/');
+  // Render a POSIX path RELATIVE to `cellRoot` so the rendered skill body is
+  // independent of the absolute install location. Two channels (npx-github
+  // and github-packages) install the package under different temp roots; if
+  // we embed absolute paths here the generated `.claude/commands/Kaizen/*.md`
+  // diverges between channels and breaks the byte-equality contract asserted
+  // by tests/m6/test-channel-*.js (D-v1.5-09).
+  //
+  // Backlog item from M6.7 gate verdict §6.1 — fixed in M8.7 closeout.
+  // The reference is informational (markdown body, not tooling-consumed); the
+  // expert resolves it relative to the cell that owns the skill, which is
+  // implicit in the `/Kaizen:Yotzer` prefix and the documented L2 layout.
+  return 'agents/' + agentId + '.md';
 }
 
 function _writeIfChanged(absPath, desiredContent) {

@@ -1,6 +1,6 @@
 {
   "version": "1.5.0-rc.0",
-  "generatedAt": "2026-04-26T17:05:30.679Z",
+  "generatedAt": "2026-04-26T17:24:19.129Z",
   "generator": "build-canonical-manifest@1",
   "files": {
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
@@ -694,9 +694,9 @@
       "size": 5391
     },
     ".kaizen-dvir/dvir/cell-registry.js": {
-      "hash": "sha256:2e3a9153f84e2a6aed71827d8f0d6bc657da316cadaa13d465491ec3a9683dbb",
+      "hash": "sha256:d14c22060844581848445fd4bd3f1777d2051f90db6d058ee12f27f50e7cec2c",
       "layer": "L1",
-      "size": 26009
+      "size": 26404
     },
     ".kaizen-dvir/dvir/config-loader.js": {
       "hash": "sha256:1c09a7a8dcc03152b8ed7830d33f665adce0b803990befe8c17fcf415033a078",

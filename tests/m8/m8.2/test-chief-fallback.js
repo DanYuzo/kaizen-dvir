@@ -46,10 +46,11 @@ test('chief fallback: first tier_1 agent when no chief flag is present', () => {
     assert.ok(result.specialistsWritten.includes('archaeologist'));
 
     // Entry skill body must reference chief persona file.
+    // Path is relative POSIX under cellRoot (M8.7 hotfix of M6.7 §6.1).
     const entryBody = H.readFileUtf8(path.join(claudeDir, 'Kaizen', 'Yotzer.md'));
     assert.ok(
-      /Persona do chief: `.+\/agents\/chief\.md`/.test(entryBody),
-      'entry skill must reference chief.md as the persona'
+      /Persona do chief: `agents\/chief\.md`/.test(entryBody),
+      'entry skill must reference chief.md as the persona (relative POSIX)'
     );
   } finally {
     H.rmRf(cellRoot);
