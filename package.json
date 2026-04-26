@@ -1,20 +1,41 @@
 {
-  "name": "kaizen",
-  "version": "1.4.0",
-  "description": "KaiZen — macro framework that orchestrates células (MVP v1.4 / M1 Foundation)",
+  "name": "@DanYuzo/kaizen-dvir",
+  "version": "1.5.0-rc.0",
+  "description": "KaiZen — macro framework that orchestrates células (v1.5 / M6 Distribution & Update)",
   "license": "MIT",
   "private": true,
+  "type": "commonjs",
   "engines": {
     "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanYuzo/kaizen-dvir.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "bin": {
     "kaizen": "bin/kaizen.js",
     "kaizen-init": "bin/kaizen-init.js"
   },
+  "files": [
+    "bin/",
+    ".kaizen-dvir/dvir/",
+    ".kaizen-dvir/commandments.md",
+    ".kaizen-dvir/dvir-config.yaml",
+    ".kaizen-dvir/manifest.json",
+    ".kaizen-dvir/instructions/",
+    ".kaizen-dvir/celulas/",
+    ".kaizen-dvir/infra/",
+    ".kaizen-dvir/refs/"
+  ],
   "scripts": {
     "lint": "node -e \"process.exit(0)\"",
     "typecheck": "node -e \"process.exit(0)\"",
-    "test": "node tests/run.js"
+    "test": "node tests/run.js",
+    "build:manifest": "node bin/build-canonical-manifest.js"
   },
   "dependencies": {},
   "devDependencies": {}

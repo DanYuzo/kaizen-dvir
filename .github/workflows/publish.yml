@@ -1,0 +1,125 @@
+# KaiZen npm publish workflow
+#
+# Triggers:
+#   - Push of a version tag matching v[0-9]+.[0-9]+.[0-9]+* (e.g., v1.5.0,
+#     v1.5.0-rc.0, v1.6.0-beta.1).
+#   - Manual dispatch (workflow_dispatch) for break-glass releases.
+#
+# Pipeline (M6.1 — Commandment IV / Quality First):
+#   1. Checkout the tagged commit.
+#   2. Set up Node.js (version pinned to engines.node from package.json).
+#   3. Install dependencies (no production deps, but devDeps may be added later).
+#   4. Quality gate sequence: lint -> typecheck -> test. Any failure aborts.
+#   5. Build canonical manifest (Q1 clarification — M6.1 deliverable).
+#      The canonical manifest is what `kaizen update` (M6.2) reads from
+#      node_modules/@DanYuzo/kaizen-dvir/.kaizen-dvir/manifest.json.
+#   6. Whitelist drift guard (KZ-M6-R5): npm pack --dry-run output must match
+#      tests/m6/expected-package-contents.txt byte-for-byte. CI fails on any
+#      diff. Updating the whitelist requires conscious update of the baseline.
+#   7. Publish to GitHub Packages with --access=restricted (D-v1.5-01).
+#
+# Auth:
+#   GITHUB_TOKEN is provided by GitHub Actions and has packages:write inside
+#   the upstream repository. Forks do not get write access — the workflow is
+#   only meaningful when triggered on the canonical repo.
+
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Manual publish reason (logged in workflow summary)'
+        required: false
+        default: 'break-glass manual release'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    name: build, gate, publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@DanYuzo'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts || npm install --ignore-scripts
+
+      - name: Quality gate — lint
+        run: npm run lint
+
+      - name: Quality gate — typecheck
+        run: npm run typecheck
+
+      - name: Quality gate — test
+        run: npm test
+
+      - name: Build canonical manifest (Q1)
+        run: node bin/build-canonical-manifest.js
+
+      - name: Whitelist drift guard (KZ-M6-R5)
+        run: |
+          set -euo pipefail
+          node -e "
+            const cp = require('child_process');
+            const out = cp.execSync('npm pack --dry-run --json', { encoding: 'utf8' });
+            const paths = JSON.parse(out)[0].files.map(f => f.path).sort();
+            process.stdout.write(paths.join('\n') + '\n');
+          " > /tmp/actual-package-contents.txt
+          if ! diff -u tests/m6/expected-package-contents.txt /tmp/actual-package-contents.txt; then
+            echo "::error title=Whitelist drift::npm pack contents diverged from tests/m6/expected-package-contents.txt. Update the baseline if this is intentional."
+            exit 1
+          fi
+          echo "Whitelist guard PASS — package contents match baseline."
+
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # npm requires an explicit dist-tag when publishing a prerelease.
+          # We publish prereleases under `next` and stable releases under
+          # `latest`. The version field of package.json is the source of
+          # truth — if it contains a hyphen (e.g. 1.5.0-rc.0) it is a
+          # prerelease.
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [[ "$PKG_VERSION" == *-* ]]; then
+            DIST_TAG="next"
+          else
+            DIST_TAG="latest"
+          fi
+          if npm publish --access=restricted --tag "$DIST_TAG"; then
+            echo "::notice title=publish::Published @DanYuzo/kaizen-dvir@$PKG_VERSION under dist-tag $DIST_TAG."
+          else
+            echo "::error title=publish-failed::npm publish exited non-zero. Check token scope (packages:write) and registry URL."
+            exit 1
+          fi
+
+      - name: Workflow summary
+        if: always()
+        run: |
+          {
+            echo "## KaiZen publish summary"
+            echo ""
+            echo "| Step | Status |"
+            echo "| --- | --- |"
+            echo "| Lint | ${{ steps['Quality gate — lint'].outcome || 'n/a' }} |"
+            echo "| Typecheck | ${{ steps['Quality gate — typecheck'].outcome || 'n/a' }} |"
+            echo "| Test | ${{ steps['Quality gate — test'].outcome || 'n/a' }} |"
+            echo "| Manifest build | ${{ steps['Build canonical manifest (Q1)'].outcome || 'n/a' }} |"
+            echo "| Whitelist guard | ${{ steps['Whitelist drift guard (KZ-M6-R5)'].outcome || 'n/a' }} |"
+            echo "| Publish | ${{ steps['Publish to GitHub Packages'].outcome || 'n/a' }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
