@@ -150,6 +150,28 @@ function loadMigrationsModule(projectRoot) {
   throw new Error('migrations module not found.');
 }
 
+// M7.4 — delimiter-aware merge for `.claude/CLAUDE.md`. Loaded with the same
+// "framework-first / project-fallback" candidate strategy as the other libs
+// so the dev checkout and an installed package both find the module.
+function loadDelimiterMergeModule(projectRoot) {
+  const candidates = [
+    path.join(__dirname, '..', '.kaizen-dvir', 'dvir', 'update', 'delimiter-merge.js'),
+    path.join(projectRoot, '.kaizen-dvir', 'dvir', 'update', 'delimiter-merge.js'),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      delete require.cache[require.resolve(p)];
+      return require(p);
+    }
+  }
+  throw new Error('delimiter-merge module not found.');
+}
+
+// M7.4 — the single L3 path subject to the delimiter contract. Centralized
+// here so test harnesses and downstream tooling can reference the same
+// constant without duplicating the literal.
+const CLAUDE_MD_DELIMITER_PATH = '.claude/CLAUDE.md';
+
 // -- CLI argument parsing --------------------------------------------------
 
 function parseArgs(args) {
@@ -407,6 +429,7 @@ function processMerge3(args) {
     snapshotPath,
     dryRun,
     mergeLib,
+    delimiterMergeLib,
   } = args;
   const canonAbs = absInCanonical(canonicalRoot, relPath);
   const localAbs = absInProject(pr, relPath);
@@ -418,6 +441,63 @@ function processMerge3(args) {
   const ours = fs.existsSync(localAbs)
     ? fs.readFileSync(localAbs, 'utf8')
     : '';
+
+  // M7.4 — delimiter-aware merge for `.claude/CLAUDE.md` only. The contract
+  // (CON-007) requires byte-exact preservation of the EXPERT block from
+  // `ours` and wholesale replacement of the FRAMEWORK block from `theirs`.
+  // Generic line-based merge3 cannot guarantee this when the expert drifts
+  // inside the FRAMEWORK region, so this single L3 path uses a dedicated
+  // helper. All other L3 paths fall through to the generic merge3 below.
+  //
+  // Activation gate: the contract is enforced only when the CANONICAL
+  // (`theirs`) file ships all four delimiters. A pre-v1.5 canonical that
+  // lacks delimiters falls back to generic merge3 — this preserves M6.2
+  // backward compatibility for fixtures and update paths that pre-date
+  // the delimiter contract. The M6.5 migration `v1.4-to-v1.5.js` is the
+  // single bootstrap path that wraps a legacy ours into the delimiter
+  // shape before this gate ever runs against a v1.5+ canonical.
+  if (
+    relPath === CLAUDE_MD_DELIMITER_PATH &&
+    delimiterMergeLib &&
+    delimiterMergeLib.hasAllDelimiters(theirs)
+  ) {
+    // If `ours` does not yet contain delimiters (e.g. the M6.5 migration
+    // has not yet run, or the expert manually deleted them), we BLOCK
+    // with a pt-BR reproducer — the contract does not permit silent
+    // fallback to generic merge3, because that would risk overwriting
+    // expert content that lacks delimiter protection.
+    const dmResult = delimiterMergeLib.mergeClaudeMdWithDelimiters({
+      ours: ours,
+      theirs: theirs,
+      path: relPath,
+    });
+    if (dmResult.status === 'merged') {
+      // Idempotency short-circuit: if the merged content equals the existing
+      // local content byte-for-byte, treat as a clean merge with no write.
+      if (dmResult.content === ours) {
+        return { action: 'merged_clean', relPath: relPath };
+      }
+      if (!dryRun) {
+        fs.mkdirSync(path.dirname(localAbs), { recursive: true });
+        fs.writeFileSync(localAbs, dmResult.content, 'utf8');
+      }
+      return {
+        action: 'merged_applied',
+        relPath: relPath,
+        bytes: dmResult.content.length,
+      };
+    }
+    // status === 'block' — surface as a delimiter contract violation. The
+    // caller emits `dmResult.errorPtBR` to stderr and halts.
+    return {
+      action: 'delimiter_block',
+      relPath: relPath,
+      reason: dmResult.reason,
+      missing: dmResult.missing || [],
+      errorPtBR: dmResult.errorPtBR || '',
+    };
+  }
+
   let base = ours; // safe default — leads to "adopt theirs" or "preserve ours"
   if (snapshotPath) {
     const baseAbs = path.join(snapshotPath, relPath.split('/').join(path.sep));
@@ -701,6 +781,7 @@ function runUpdate(args) {
   const snapshotLib = loadSnapshotModule(root);
   const mergeLib = loadMergeModule(root);
   const migrationsLib = loadMigrationsModule(root);
+  const delimiterMergeLib = loadDelimiterMergeModule(root);
 
   // Step 0 — handle --continue first.
   if (opts.continue) {
@@ -960,7 +1041,24 @@ function runUpdate(args) {
         snapshotPath: snapshotResult ? snapshotResult.snapshotPath : null,
         dryRun: opts.dryRun,
         mergeLib: mergeLib,
+        delimiterMergeLib: delimiterMergeLib,
       });
+      // M7.4 — delimiter contract violation. Surface pt-BR reproducer to
+      // stderr, log structured event, and halt the update with a non-zero
+      // exit so the expert can correct the file before retrying. The
+      // snapshot already created in step 4 acts as the rollback target.
+      if (r.action === 'delimiter_block') {
+        process.stderr.write(r.errorPtBR);
+        logger.append(
+          'l3_delimiter_block',
+          rel +
+            ' — contrato de delimiters violado (' +
+            (r.reason || 'desconhecido') +
+            '); update interrompido.'
+        );
+        logger.flush();
+        return 1;
+      }
       if (r.action === 'merged_clean') {
         logger.append('l3_clean', rel + ' — merge limpo (sem mudanca).');
       } else if (r.action === 'merged_applied') {
@@ -1126,6 +1224,10 @@ function runUpdate(args) {
  */
 function runContinue(ctx) {
   const { root, opts, manifestLib, mergeLib } = ctx;
+  // M7.4 — load delimiter-merge for the `.claude/CLAUDE.md` re-attempt.
+  // Continue may be called against a project where the expert resolved a
+  // CLAUDE.md conflict; we honor the same delimiter contract on resume.
+  const delimiterMergeLib = loadDelimiterMergeModule(root);
   const state = readUpdateState(root);
   if (!state) {
     process.stderr.write(
@@ -1199,12 +1301,36 @@ function runContinue(ctx) {
     const ours = fs.existsSync(localAbs)
       ? fs.readFileSync(localAbs, 'utf8')
       : '';
-    const result = mergeLib.merge3({
-      base: ours, // approximate base — ours is the resolved state
-      ours: ours,
-      theirs: theirs,
-      path: rel,
-    });
+
+    // M7.4 — apply delimiter-aware merge for `.claude/CLAUDE.md` on resume,
+    // gated on the canonical carrying all four delimiters (same activation
+    // condition as the primary update path).
+    let result;
+    if (
+      rel === CLAUDE_MD_DELIMITER_PATH &&
+      delimiterMergeLib.hasAllDelimiters(theirs)
+    ) {
+      const dm = delimiterMergeLib.mergeClaudeMdWithDelimiters({
+        ours: ours,
+        theirs: theirs,
+        path: rel,
+      });
+      if (dm.status === 'merged') {
+        result = { status: 'merged', content: dm.content };
+      } else {
+        // Resume hit the same delimiter violation — keep the file in the
+        // remaining list so the expert sees it again.
+        result = { status: 'conflict' };
+        process.stderr.write(dm.errorPtBR);
+      }
+    } else {
+      result = mergeLib.merge3({
+        base: ours, // approximate base — ours is the resolved state
+        ours: ours,
+        theirs: theirs,
+        path: rel,
+      });
+    }
     if (result.status === 'clean' || result.status === 'merged') {
       // Accept the local file as-is when status is clean (ours == theirs)
       // or when merge3 produced a clean merge string.
@@ -1332,6 +1458,7 @@ module.exports = {
   isMemoryMdException: isMemoryMdException,
   HELP_TEXT_PT_BR: HELP_TEXT_PT_BR,
   UPDATE_STATE_REL: UPDATE_STATE_REL,
+  CLAUDE_MD_DELIMITER_PATH: CLAUDE_MD_DELIMITER_PATH,
 };
 
 if (require.main === module) {
@@ -1340,6 +1467,18 @@ if (require.main === module) {
 }
 
 // --- Change Log -----------------------------------------------------------
+// 2026-04-25 — @dev (Dex) — M7.4: wired delimiter-aware merge for the
+//   single L3 path `.claude/CLAUDE.md`. The processMerge3 dispatcher now
+//   consults `delimiter-merge.js` when the relPath matches that file and
+//   uses generic merge3 for every other L3 path. Honors CON-007: EXPERT
+//   block bytes preserved verbatim from `ours`, FRAMEWORK block (and the
+//   surrounding file shape) sourced from `theirs`. Missing/malformed
+//   delimiters on either side surface a pt-BR reproducer (NFR-101) on
+//   stderr and halt the update with exit 1; the snapshot from step 4
+//   acts as the rollback target. runContinue applies the same delimiter
+//   contract on the --continue resume path. New module export:
+//   CLAUDE_MD_DELIMITER_PATH. No new external dependencies; new helper
+//   module is stdlib-only and pure (CON-002, CON-003).
 // 2026-04-25 — @dev (Dex) — M8.4: wired `kaizen update` to call
 //   registerSkillsForCells() (shared helper at bin/lib/register-cells.js)
 //   AFTER the layered policy step completes and BEFORE the manifest refresh,

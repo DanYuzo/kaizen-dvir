@@ -1,10 +1,10 @@
 {
-  "measuredAt": "2026-04-26T16:45:00.527Z",
+  "measuredAt": "2026-04-26T17:05:29.243Z",
   "environment": "M6.7 integration gate; node v24.11.1; win32",
-  "rollbackTime_ms": 187,
+  "rollbackTime_ms": 460,
   "rollbackTime_threshold_ms": 5000,
   "initManifestPresent": 0,
   "initManifestPresent_threshold_ms": 1,
-  "initTime_ms": 429,
+  "initTime_ms": 780,
   "initTime_ms_threshold_ms": 30000
 }

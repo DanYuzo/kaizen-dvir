@@ -1,6 +1,6 @@
 {
   "version": "1.5.0-rc.0",
-  "generatedAt": "2026-04-26T16:33:33.752Z",
+  "generatedAt": "2026-04-26T17:05:30.679Z",
   "generator": "build-canonical-manifest@1",
   "files": {
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
@@ -858,6 +858,11 @@
       "layer": "L1",
       "size": 6667
     },
+    ".kaizen-dvir/dvir/update/delimiter-merge.js": {
+      "hash": "sha256:681cda6f77dc941d4430e4cf291b76836b0640a54cf7407aaca99ff89df3a288",
+      "layer": "L1",
+      "size": 18803
+    },
     ".kaizen-dvir/dvir/update/manifest.js": {
       "hash": "sha256:87967df84709edfa00474874b848580fb8eb30722ea30a18d1491e5115b0c4da",
       "layer": "L1",
@@ -894,9 +899,9 @@
       "size": 1217
     },
     ".kaizen-dvir/instructions/templates/rules/boundary.md": {
-      "hash": "sha256:c2865706c1a390d5d7461f3d2b280d3236afe8754174b0d807fe24b7811eb4f1",
+      "hash": "sha256:2655437e910127469e9d70be577721f166caf5245ff0704110eb41f7d5127435",
       "layer": "L2",
-      "size": 3801
+      "size": 6629
     },
     ".kaizen-dvir/instructions/templates/rules/cells.md": {
       "hash": "sha256:e61d1502f92c5976e3f0a52461df9248a7674e72290a31fab1d46af88d1376de",
@@ -934,9 +939,9 @@
       "size": 22763
     },
     "bin/kaizen-update.js": {
-      "hash": "sha256:60d31568f18ff7e109b6948d73f750bebfdfdebf3bac640b49b60d5fb263d007",
+      "hash": "sha256:9b0a0e99012a01258f32e75e273d6bddb9acbd84214b4c736d4bad6c8b3c0c11",
       "layer": "L1",
-      "size": 47208
+      "size": 53550
     },
     "bin/kaizen.js": {
       "hash": "sha256:13166948ab8baaaee013690cb5a0e112d0f1be0b5e76da1f6a63f874ac2a4309",

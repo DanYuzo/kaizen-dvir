@@ -23,7 +23,7 @@
 
 A exceção rastreia ao Commandment V (Documentação Contínua, prática 3 — Memória por célula). Nenhum outro path em L2 tem comportamento equivalente.
 
-## Delimiters do `CLAUDE.md`
+## Delimiters do `CLAUDE.md` — Contrato de Merge (CON-007)
 
 `.claude/CLAUDE.md` é o único arquivo L3 que tem **bloco framework-managed embutido**. Os delimiters separam as duas regiões:
 
@@ -37,7 +37,46 @@ A exceção rastreia ao Commandment V (Documentação Contínua, prática 3 — 
 <!-- KAIZEN:EXPERT:END -->
 ```
 
-Os delimiters `KAIZEN:FRAMEWORK:START/END` e `KAIZEN:EXPERT:START/END` são contratos do framework. `kaizen update` substitui apenas conteúdo entre `KAIZEN:FRAMEWORK:*` e preserva tudo entre `KAIZEN:EXPERT:*`. Não edite estes comments manualmente — quebrar a sintaxe abortará o próximo update com erro orientando a correção.
+### Contrato byte-exato
+
+Os delimiters `KAIZEN:FRAMEWORK:START/END` e `KAIZEN:EXPERT:START/END` são **contrato byte-exato** do framework. As quatro strings literais — incluindo os espaços dentro do comentário HTML — são tratadas como assinatura imutável dentro de uma linha MAJOR do KaiZen. As quatro linhas exatas são:
+
+```
+<!-- KAIZEN:FRAMEWORK:START -->
+<!-- KAIZEN:FRAMEWORK:END -->
+<!-- KAIZEN:EXPERT:START -->
+<!-- KAIZEN:EXPERT:END -->
+```
+
+### Comportamento do `kaizen update`
+
+| Região | O que `kaizen update` faz |
+|--------|--------------------------|
+| Antes de `KAIZEN:FRAMEWORK:START` | Sobrescreve com a versão canônica (cabeçalho gerenciado pelo framework). |
+| Entre `KAIZEN:FRAMEWORK:START` e `KAIZEN:FRAMEWORK:END` | **Substitui inteiramente** pelo conteúdo canônico da nova versão. Drift do expert nesta região é descartado. |
+| Entre `KAIZEN:FRAMEWORK:END` e `KAIZEN:EXPERT:START` | Sobrescreve com o separador canônico (linha em branco). |
+| Entre `KAIZEN:EXPERT:START` e `KAIZEN:EXPERT:END` | **Preserva byte-a-byte** o conteúdo local. Os bytes do expert sobrevivem ao update intactos, mesmo que o framework declare conteúdo diferente nesta região na sua versão canônica. |
+| Após `KAIZEN:EXPERT:END` | Sobrescreve com o rodapé canônico (geralmente uma quebra de linha final). |
+
+### Regras de operação
+
+1. **Não edite os quatro comentários HTML.** Quebrar a sintaxe (renomear, remover, duplicar, alterar espaços) faz o próximo `kaizen update` abortar com erro em pt-BR orientando a correção, antes de aplicar qualquer mudança.
+2. **Drift dentro do bloco FRAMEWORK não é preservado.** Notas adicionadas no meio dessa seção serão sobrescritas. Use a seção EXPERT para qualquer customização local.
+3. **A seção EXPERT é livre.** Markdown, comentários, listas, tabelas, prosa — qualquer conteúdo dentro dos delimiters EXPERT sobrevive ao update sem alteração.
+4. **Os delimiters em si vêm do framework.** Mesmo que sua versão local tenha espaços ou variações tolerantes, o pós-update usa as quatro strings literais acima — o framework reescreve as linhas dos delimiters com os bytes oficiais.
+
+### Erros possíveis
+
+`kaizen update` valida os delimiters em ambos os arquivos (local e canônico) antes de tocar disco. Quatro condições produzem `BLOCK` com reproducer pt-BR:
+
+- `missing_delimiters_ours` — algum dos quatro delimiters está ausente no arquivo local
+- `malformed_delimiters_ours` — os quatro delimiters existem mas estão fora da ordem canônica
+- `missing_delimiters_theirs` — pacote canônico inválido (bug do framework, não do expert)
+- `malformed_delimiters_theirs` — pacote canônico inválido (bug do framework, não do expert)
+
+Para corrigir um arquivo local quebrado, restaure os delimiters faltantes ou use `kaizen rollback` para voltar ao último snapshot e tentar de novo.
+
+> Referências: CON-007 (PRD v1.5), D-v1.5-07 (decisão de delimiter-based merge), Story M7.4 (validação cross-milestone do contrato), Story M7.5 (gate de integração que exercita o round-trip).
 
 ## Toggle de Proteção
 
