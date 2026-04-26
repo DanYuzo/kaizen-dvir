@@ -168,11 +168,14 @@
 .kaizen-dvir/dvir/memory/memory-writer.js
 .kaizen-dvir/dvir/memory/pattern-promoter.js
 .kaizen-dvir/dvir/memory/token-counter.js
+.kaizen-dvir/dvir/migrations/README-MACHINE.md
+.kaizen-dvir/dvir/migrations/v1.4-to-v1.5.js
 .kaizen-dvir/dvir/schemas/celula-schema.json
 .kaizen-dvir/dvir/schemas/handoff-schema.json
 .kaizen-dvir/dvir/schemas/task-contract-schema.json
 .kaizen-dvir/dvir/schemas/validator.js
 .kaizen-dvir/dvir/update/merge.js
+.kaizen-dvir/dvir/update/migrations.js
 .kaizen-dvir/dvir/update/snapshot.js
 .kaizen-dvir/dvir/yotzer/time-budget.js
 .kaizen-dvir/infra/.gitkeep
