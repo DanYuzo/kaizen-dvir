@@ -35,10 +35,14 @@ tests/m1.3/
 tests/m2/
 tests/m3/
 tests/m4/
-tests/run.js
 # Exception (M6.1): the M6 acceptance test suite IS tracked in git.
 # Story M6.1 declares `tests/m6/expected-package-contents.txt` as a
 # committed baseline (AC8 / KZ-M6-R5 mitigation) and four M6 acceptance
 # tests (`tests/m6/test-*.js`) verify the published package shape. These
 # must be reproducible across maintainers — they are NOT in the npm
 # tarball because the package.json `files` whitelist excludes `tests/`.
+#
+# Exception (CI fix v1.5.0-rc.1): tests/run.js is the canonical test
+# runner referenced by package.json "scripts.test". It must be tracked
+# so CI (publish workflow quality gate) can execute the M6/M7/M8 suites.
+# Excluded from npm tarball via package.json `files` whitelist.
