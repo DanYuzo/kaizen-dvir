@@ -141,6 +141,7 @@
 .kaizen-dvir/dvir-config.yaml
 .kaizen-dvir/dvir/.gitkeep
 .kaizen-dvir/dvir/boundary-toggle.js
+.kaizen-dvir/dvir/cell-registry.js
 .kaizen-dvir/dvir/config-loader.js
 .kaizen-dvir/dvir/doctor/cells-reporter.js
 .kaizen-dvir/dvir/doctor/gates-reporter.js
@@ -172,11 +173,18 @@
 .kaizen-dvir/dvir/schemas/task-contract-schema.json
 .kaizen-dvir/dvir/schemas/validator.js
 .kaizen-dvir/dvir/update/merge.js
+.kaizen-dvir/dvir/update/snapshot.js
 .kaizen-dvir/dvir/yotzer/time-budget.js
 .kaizen-dvir/infra/.gitkeep
 .kaizen-dvir/instructions/.gitkeep
 .kaizen-dvir/instructions/note.txt
 .kaizen-dvir/instructions/templates/memory-tmpl.md
+.kaizen-dvir/instructions/templates/rules/boundary.md
+.kaizen-dvir/instructions/templates/rules/cells.md
+.kaizen-dvir/instructions/templates/rules/commit-conventions.md
+.kaizen-dvir/instructions/templates/rules/doctor.md
+.kaizen-dvir/instructions/templates/rules/language-policy.md
+.kaizen-dvir/instructions/templates/rules/yotzer.md
 .kaizen-dvir/manifest.json
 .kaizen-dvir/refs/.gitkeep
 bin/build-canonical-manifest.js
