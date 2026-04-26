@@ -25,7 +25,7 @@ const HELP_TEXT = [
   '  --hooks                   Estado dos hooks (load, circuit breaker, últimas entradas)',
   '  --gates                   Veredictos por tipo de gate (últimos 100)',
   '  --memory                  Ikigai, MEMORY.md, handoffs, waivers',
-  '  --cells                   Células instaladas com versão e status',
+  '  --cells                   Células instaladas com versão, status e skills Claude Code registradas',
   '  --promotion               Lista candidatos de promoção',
   '  --promotion approve <id>  Promove um padrão (alvo padrão: rules)',
   '       [--target rules|commandments]    Define o alvo da promoção',

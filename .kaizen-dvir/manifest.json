@@ -1,6 +1,6 @@
 {
   "version": "1.5.0-rc.0",
-  "generatedAt": "2026-04-26T16:20:00.771Z",
+  "generatedAt": "2026-04-26T16:33:33.752Z",
   "generator": "build-canonical-manifest@1",
   "files": {
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
@@ -704,9 +704,9 @@
       "size": 13724
     },
     ".kaizen-dvir/dvir/doctor/cells-reporter.js": {
-      "hash": "sha256:d3149149852a6be2857eab187f008ab513af3ad5a317516a119bd180a0720c8b",
+      "hash": "sha256:c5fa388b5d502b8ae7213c53d3237294ed81d6a75be7bb4d44271dbeeadb939f",
       "layer": "L1",
-      "size": 6200
+      "size": 18546
     },
     ".kaizen-dvir/dvir/doctor/gates-reporter.js": {
       "hash": "sha256:929c265191d3bcf88842f26854df4c3a7f05e9b2b638c20e3fbacaf0482aefe2",
@@ -939,9 +939,9 @@
       "size": 47208
     },
     "bin/kaizen.js": {
-      "hash": "sha256:4520197bf9cf2493993569e62020fbb5f3a1f897e2bb6add52f8451ef1e6688c",
+      "hash": "sha256:13166948ab8baaaee013690cb5a0e112d0f1be0b5e76da1f6a63f874ac2a4309",
       "layer": "L1",
-      "size": 47595
+      "size": 47627
     },
     "bin/lib/claude-md-scaffold.js": {
       "hash": "sha256:2466a8b63e45735161de63cf26560d6e112a4288a19bc7adf3078f6c5bbe342d",

@@ -177,6 +177,361 @@ function _padRight(s, w) {
   return s.length >= w ? s : s + ' '.repeat(w - s.length);
 }
 
+// --- M8.6 — skill-check section -------------------------------------------
+//
+// For every cell under `.kaizen-dvir/celulas/{*}/`, the doctor checks whether
+// the corresponding entry skill at `.claude/commands/<segments[0..n-2]>/<segments[n-1]>.md`
+// exists. The path resolution mirrors `cell-registry.js` (M8.2):
+//   slashPrefix "Kaizen:Yotzer" → entry  Kaizen/Yotzer.md
+//                                 specialists Kaizen/Yotzer/<agent>.md
+// Doctor is read-only (Story M8.6 Scope OUT, line 105) — never writes,
+// renames, or deletes anything under `.claude/commands/`.
+//
+// The section reports three outcomes per cell:
+//   - OK     entry skill present → "OK: {cellName} -> /{slashPrefix}"
+//   - AVISO  entry skill missing → "AVISO: celula em {cellPath} sem skill
+//                                  registrada em {expectedSkillPath}. Rode
+//                                  'kaizen update' ou 'kaizen init' para
+//                                  registrar."
+//   - AVISO  manifest unreadable  → "AVISO: celula em {cellPath} com
+//                                  manifesto invalido ({reason}). Skill
+//                                  check ignorado."
+//
+// Plus a separate orphan scan: top-level `.md` files under
+// `.claude/commands/Kaizen/` whose basename does not match any installed
+// cell's expected entry filename. Reported as:
+//   - AVISO  orphan skill        → "AVISO: skill orfa em {orphanPath} sem
+//                                  celula correspondente. Remova o arquivo
+//                                  ou registre a celula."
+//
+// Specialist sub-skill drift detection (per spawn-prompt directive that
+// supersedes story Scope OUT line 106 for this wave): for cells whose
+// entry is present, doctor lists declared agents from `celula.yaml`'s
+// `tiers.tierN.agents[]` arrays and checks each `<segments...>/{agent}.md`
+// file. Missing specialists emit:
+//   - AVISO  specialist missing  → "AVISO: especialista '{agentId}' da
+//                                  celula '{cellName}' sem skill
+//                                  registrada em {expectedSkillPath}.
+//                                  Rode 'kaizen update' ou 'kaizen init'
+//                                  para registrar."
+//
+// Exit code is unchanged — WARN lines do not flip status (M2/M3 doctor
+// semantics preserved).
+
+function _claudeCommandsDir() {
+  if (process.env.KAIZEN_CLAUDE_COMMANDS_DIR) {
+    return process.env.KAIZEN_CLAUDE_COMMANDS_DIR;
+  }
+  return path.join(PROJECT_ROOT, '.claude', 'commands');
+}
+
+/**
+ * Read raw `slashPrefix` from a cell manifest using the M2.5 schema-gate
+ * parser. Returns `null` when the manifest is unreadable or malformed.
+ *
+ * @param {string} manifestPath
+ * @param {function} parseYaml
+ * @returns {{ slashPrefix: string|null, error: string|null, parsed: object|null }}
+ */
+function _readManifestForSkillCheck(manifestPath, parseYaml) {
+  if (!fs.existsSync(manifestPath)) {
+    return { slashPrefix: null, error: 'celula.yaml ausente.', parsed: null };
+  }
+  let raw;
+  try {
+    raw = fs.readFileSync(manifestPath, 'utf8');
+  } catch (err) {
+    return {
+      slashPrefix: null,
+      error: 'falha ao ler manifesto: ' + (err && err.message ? err.message : String(err)),
+      parsed: null,
+    };
+  }
+  let parsed;
+  try {
+    parsed = parseYaml(raw);
+  } catch (err) {
+    return {
+      slashPrefix: null,
+      error: err && err.message ? err.message : String(err),
+      parsed: null,
+    };
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return { slashPrefix: null, error: 'manifesto nao e objeto.', parsed: null };
+  }
+  const sp = parsed.slashPrefix;
+  if (typeof sp !== 'string' || sp.length === 0) {
+    return {
+      slashPrefix: null,
+      error: 'campo slashPrefix ausente ou vazio.',
+      parsed: parsed,
+    };
+  }
+  return { slashPrefix: sp, error: null, parsed: parsed };
+}
+
+/**
+ * Split a slashPrefix string ("Kaizen:Yotzer") into path segments
+ * (["Kaizen","Yotzer"]) using the same split rule as cell-registry.js.
+ * Returns null when the prefix is structurally invalid (leading/trailing
+ * colon, empty segment).
+ *
+ * @param {string} slashPrefix
+ * @returns {string[]|null}
+ */
+function _slashPrefixSegments(slashPrefix) {
+  if (
+    typeof slashPrefix !== 'string' ||
+    slashPrefix.length === 0 ||
+    slashPrefix.startsWith(':') ||
+    slashPrefix.endsWith(':') ||
+    slashPrefix.indexOf('::') !== -1
+  ) {
+    return null;
+  }
+  const segs = slashPrefix.split(':');
+  for (const s of segs) {
+    if (s.length === 0) return null;
+  }
+  return segs;
+}
+
+/**
+ * Collect declared specialist agent ids from a parsed manifest's tiers.
+ * Iterates `tiers.tier_*` (any key under `tiers`) and concatenates the
+ * `agents[]` arrays in declaration order. Returns an empty array when no
+ * tiers/agents are declared (specialist-check is skipped for that cell).
+ *
+ * @param {object} manifest
+ * @returns {string[]}
+ */
+function _collectDeclaredAgents(manifest) {
+  const out = [];
+  const seen = new Set();
+  const tiers = manifest && manifest.tiers;
+  if (!tiers || typeof tiers !== 'object' || Array.isArray(tiers)) return out;
+  for (const tierKey of Object.keys(tiers)) {
+    const tier = tiers[tierKey];
+    if (!tier || typeof tier !== 'object') continue;
+    const agents = tier.agents;
+    if (!Array.isArray(agents)) continue;
+    for (const a of agents) {
+      if (typeof a !== 'string' || a.length === 0) continue;
+      if (seen.has(a)) continue;
+      seen.add(a);
+      out.push(a);
+    }
+  }
+  return out;
+}
+
+function _relPath(abs) {
+  // Render paths relative to PROJECT_ROOT for readability when they sit
+  // inside the project tree; fall back to the absolute path otherwise.
+  const rel = path.relative(PROJECT_ROOT, abs);
+  if (rel.startsWith('..') || path.isAbsolute(rel)) return abs;
+  return rel.split(path.sep).join('/');
+}
+
+/**
+ * Build per-cell skill-check rows.
+ *
+ * @returns {Array<{
+ *   name: string,
+ *   cellPath: string,
+ *   manifestError: string|null,
+ *   slashPrefix: string|null,
+ *   entrySkillPath: string|null,
+ *   entryPresent: boolean,
+ *   specialists: Array<{ agentId: string, skillPath: string, present: boolean }>,
+ * }>}
+ */
+function listCellSkillStatuses() {
+  const root = _celulasRoot();
+  const commandsDir = _claudeCommandsDir();
+  const out = [];
+  if (!fs.existsSync(root)) return out;
+
+  let entries;
+  try {
+    entries = fs.readdirSync(root, { withFileTypes: true });
+  } catch (_) {
+    return out;
+  }
+  entries.sort((a, b) => a.name.localeCompare(b.name));
+
+  let parseYaml = null;
+  try {
+    parseYaml = _loadParser();
+  } catch (_) {
+    parseYaml = null;
+  }
+
+  for (const ent of entries) {
+    if (!ent.isDirectory()) continue;
+    const cellDir = path.join(root, ent.name);
+    const manifestPath = path.join(cellDir, 'celula.yaml');
+    const row = {
+      name: ent.name,
+      cellPath: cellDir,
+      manifestError: null,
+      slashPrefix: null,
+      entrySkillPath: null,
+      entryPresent: false,
+      specialists: [],
+    };
+    if (!parseYaml) {
+      row.manifestError = 'parser indisponivel.';
+      out.push(row);
+      continue;
+    }
+    const m = _readManifestForSkillCheck(manifestPath, parseYaml);
+    if (m.error) {
+      row.manifestError = m.error;
+      out.push(row);
+      continue;
+    }
+    const segs = _slashPrefixSegments(m.slashPrefix);
+    if (!segs) {
+      row.manifestError =
+        "slashPrefix '" + m.slashPrefix + "' invalido (segmentos vazios ou ':' inicial/final).";
+      out.push(row);
+      continue;
+    }
+    row.slashPrefix = m.slashPrefix;
+    const lastSeg = segs[segs.length - 1];
+    const folderSegs = segs.slice(0, -1);
+    const entryPath = path.join(commandsDir, ...folderSegs, lastSeg + '.md');
+    row.entrySkillPath = entryPath;
+    row.entryPresent = fs.existsSync(entryPath);
+
+    // Specialist sub-skills — only meaningful when entry is present.
+    const declared = _collectDeclaredAgents(m.parsed);
+    const specialistsDir = path.join(commandsDir, ...segs);
+    for (const agentId of declared) {
+      const spath = path.join(specialistsDir, agentId + '.md');
+      row.specialists.push({
+        agentId: agentId,
+        skillPath: spath,
+        present: fs.existsSync(spath),
+      });
+    }
+    out.push(row);
+  }
+  return out;
+}
+
+/**
+ * List orphan top-level entry skills under `<commandsDir>/Kaizen/` — i.e.,
+ * `.md` files whose basename (without `.md`) does not match the last
+ * segment of any installed cell's slashPrefix that lives under the same
+ * folder.
+ *
+ * Scope: the orphan scan walks ONLY the `Kaizen/` folder (the canonical
+ * KaiZen namespace). Files under nested specialist folders are not scanned
+ * here — specialist drift is reported per-cell in `listCellSkillStatuses`.
+ *
+ * @param {Array<{slashPrefix:string|null}>} statuses — rows from
+ *   `listCellSkillStatuses()` (used to compute the expected entry-name set).
+ * @returns {string[]} absolute paths of orphan files (sorted).
+ */
+function listOrphanEntrySkills(statuses) {
+  const commandsDir = _claudeCommandsDir();
+  const kaizenDir = path.join(commandsDir, 'Kaizen');
+  if (!fs.existsSync(kaizenDir)) return [];
+
+  // Build the expected set: for every cell whose slashPrefix splits as
+  // ["Kaizen", X, ...], the entry filename is X + '.md' under Kaizen/.
+  // Cells outside the Kaizen/ namespace are not scanned for orphans here.
+  const expected = new Set();
+  for (const row of statuses) {
+    if (!row.slashPrefix) continue;
+    const segs = _slashPrefixSegments(row.slashPrefix);
+    if (!segs || segs.length < 2) continue;
+    if (segs[0] !== 'Kaizen') continue;
+    expected.add(segs[1] + '.md');
+  }
+
+  let dirEntries;
+  try {
+    dirEntries = fs.readdirSync(kaizenDir, { withFileTypes: true });
+  } catch (_) {
+    return [];
+  }
+  const orphans = [];
+  for (const ent of dirEntries) {
+    if (!ent.isFile()) continue;
+    if (!ent.name.endsWith('.md')) continue;
+    if (expected.has(ent.name)) continue;
+    orphans.push(path.join(kaizenDir, ent.name));
+  }
+  orphans.sort();
+  return orphans;
+}
+
+function _renderSkillCheckSection() {
+  const lines = [];
+  lines.push('Skills Claude Code:');
+  const statuses = listCellSkillStatuses();
+  if (statuses.length === 0) {
+    lines.push('  nenhuma celula instalada.');
+    lines.push('');
+    return lines;
+  }
+
+  for (const row of statuses) {
+    if (row.manifestError) {
+      lines.push(
+        '  AVISO: celula em ' +
+          _relPath(row.cellPath) +
+          ' com manifesto invalido (' +
+          row.manifestError +
+          '). Skill check ignorado.'
+      );
+      continue;
+    }
+    if (!row.entryPresent) {
+      lines.push(
+        '  AVISO: celula em ' +
+          _relPath(row.cellPath) +
+          ' sem skill registrada em ' +
+          _relPath(row.entrySkillPath) +
+          ". Rode 'kaizen update' ou 'kaizen init' para registrar."
+      );
+      continue;
+    }
+    lines.push('  OK: ' + row.name + ' -> /' + row.slashPrefix);
+
+    // Specialist sub-skill drift — per spawn-prompt requirement.
+    for (const sp of row.specialists) {
+      if (sp.present) continue;
+      lines.push(
+        "  AVISO: especialista '" +
+          sp.agentId +
+          "' da celula '" +
+          row.name +
+          "' sem skill registrada em " +
+          _relPath(sp.skillPath) +
+          ". Rode 'kaizen update' ou 'kaizen init' para registrar."
+      );
+    }
+  }
+
+  // Orphan scan — separate sub-section.
+  const orphans = listOrphanEntrySkills(statuses);
+  for (const orphan of orphans) {
+    lines.push(
+      '  AVISO: skill orfa em ' +
+        _relPath(orphan) +
+        ' sem celula correspondente. Remova o arquivo ou registre a celula.'
+    );
+  }
+
+  lines.push('');
+  return lines;
+}
+
 /**
  * Render the `--cells` report. Returns a string ending with `\n`.
  *
@@ -188,22 +543,30 @@ function render() {
   const cells = listCells();
   if (cells.length === 0) {
     lines.push(messages.EMPTY_CELLS);
-    lines.push('');
-    return lines.join('\n') + '\n';
-  }
-  for (const c of cells) {
-    const name = _padRight(c.name, 20);
-    const ver = _padRight(c.version, 10);
-    lines.push('  ' + name + ' ' + ver + ' ' + c.status);
-    if (c.status === messages.STATUS_ERROR && c.reason) {
-      lines.push('    motivo: ' + c.reason);
+  } else {
+    for (const c of cells) {
+      const name = _padRight(c.name, 20);
+      const ver = _padRight(c.version, 10);
+      lines.push('  ' + name + ' ' + ver + ' ' + c.status);
+      if (c.status === messages.STATUS_ERROR && c.reason) {
+        lines.push('    motivo: ' + c.reason);
+      }
     }
   }
   lines.push('');
+
+  // M8.6 — skill-check section appended after the existing cells report.
+  const skillLines = _renderSkillCheckSection();
+  for (const l of skillLines) {
+    lines.push(l);
+  }
+
   return lines.join('\n') + '\n';
 }
 
 module.exports = {
   render: render,
   listCells: listCells,
+  listCellSkillStatuses: listCellSkillStatuses,
+  listOrphanEntrySkills: listOrphanEntrySkills,
 };
