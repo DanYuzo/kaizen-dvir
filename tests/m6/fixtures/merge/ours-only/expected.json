@@ -1,0 +1,5 @@
+{
+  "status": "merged",
+  "contentSource": "ours",
+  "rationale": "theirs == base; only the expert (ours) changed; trivial case C preserves ours."
+}

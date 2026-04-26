@@ -1,0 +1,6 @@
+{
+  "status": "conflict",
+  "contentSource": "ours",
+  "minConflicts": 1,
+  "rationale": "Framework removed the file (theirs == ''); expert also edited it locally (ours != base). Silently honoring the framework delete would lose the expert's edits; surface as a conflict so the expert can see both intents. Per KZ-M6-R1 preserve-ours, content is the expert's local content."
+}

@@ -1,0 +1,7 @@
+{
+  "status": "conflict",
+  "contentSource": "ours",
+  "expectedContent": "",
+  "minConflicts": 1,
+  "rationale": "Expert deleted the file (ours == ''); framework also modified it (theirs != base). Silently honoring the delete would hide the framework update; surface as a conflict so the expert can see both intents. Per KZ-M6-R1 preserve-ours, content is the empty string (the deletion)."
+}
