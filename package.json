@@ -29,7 +29,10 @@
     ".kaizen-dvir/instructions/",
     ".kaizen-dvir/celulas/",
     ".kaizen-dvir/infra/",
-    ".kaizen-dvir/refs/"
+    ".kaizen-dvir/refs/",
+    ".claude/settings.json",
+    ".claude/README.md",
+    ".gitignore"
   ],
   "scripts": {
     "lint": "node -e \"process.exit(0)\"",

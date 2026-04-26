@@ -370,5 +370,7 @@ module.exports.compareSemver = compareSemver;
 module.exports.walkSourceTree = walkSourceTree;
 module.exports.YOTZER_SOURCE_REL = YOTZER_SOURCE_REL;
 module.exports.YOTZER_TARGET_REL = YOTZER_TARGET_REL;
-module.exports.ETLMAKER_KBS_SOURCE_REL = ETLMAKER_KBS_SOURCE_REL;
-module.exports.YOTZER_KBS_TARGET_REL = YOTZER_KBS_TARGET_REL;
+// NOTE: ETLMAKER_KBS_SOURCE_REL / YOTZER_KBS_TARGET_REL exports removed —
+// the symbols were never declared in this module and threw ReferenceError on
+// every load (blocked all `kaizen init` invocations regardless of channel).
+// Surfaced and resolved in scope by M6.6 channel smoke tests (FR-052).
