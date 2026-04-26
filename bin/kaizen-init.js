@@ -49,7 +49,10 @@ const COPY_MANIFEST = [
   ['package.json', 'package.json'],
   ['bin/kaizen.js', 'bin/kaizen.js'],
   ['bin/kaizen-init.js', 'bin/kaizen-init.js'],
-  ['.gitignore', '.gitignore'],
+  // .gitignore is NOT copied — npm excludes .gitignore from tarballs by
+  // default (regardless of `files` whitelist), so reading it from
+  // INSTALL_ROOT after `npm install` raises ENOENT. M6.1.1 fix: ship the
+  // template via INLINE_TEMPLATES instead. See GITIGNORE_SCAFFOLD below.
 ];
 
 const DIRS_TO_CREATE = [
@@ -123,12 +126,44 @@ const RULE_TEMPLATES = (function buildRuleTemplates() {
   return out;
 })();
 
+// .gitignore template (M6.1.1). Inlined here because npm hard-excludes
+// `.gitignore` from published tarballs (default behavior, not overridable
+// via package.json `files`). Source of truth lives here so `npm install`
+// receives the bytes inside `bin/kaizen-init.js`.
+const GITIGNORE_SCAFFOLD =
+  '# KaiZen runtime directory — ephemeral, never committed (CON-004)\n' +
+  '# Criado pelo `kaizen init` no workspace do usuário; logs/handoffs lá são\n' +
+  '# histórico LOCAL da instância de uso, não do framework. Não distribuir.\n' +
+  '.kaizen/\n' +
+  '\n' +
+  '# Node.js\n' +
+  'node_modules/\n' +
+  'npm-debug.log*\n' +
+  'yarn-debug.log*\n' +
+  'yarn-error.log*\n' +
+  'pnpm-debug.log*\n' +
+  '\n' +
+  '# Editor / OS artifacts\n' +
+  '.DS_Store\n' +
+  'Thumbs.db\n' +
+  '.vscode/\n' +
+  '.idea/\n' +
+  '*.swp\n' +
+  '*.swo\n' +
+  '*~\n' +
+  '\n' +
+  '# Build / distribution\n' +
+  '*.tarball\n' +
+  '*.log\n' +
+  'dist/\n';
+
 const INLINE_TEMPLATES = Object.assign(
   {},
   IKIGAI_SCAFFOLDS,
   RULE_TEMPLATES,
   {
     '.claude/CLAUDE.md': CLAUDE_MD_SCAFFOLD,
+    '.gitignore': GITIGNORE_SCAFFOLD,
   }
 );
 

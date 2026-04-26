@@ -1,6 +1,6 @@
 {
-  "version": "1.5.0",
-  "generatedAt": "2026-04-26T22:45:53.647Z",
+  "version": "1.5.1",
+  "generatedAt": "2026-04-26T23:15:16.015Z",
   "generator": "build-canonical-manifest@1",
   "files": {
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
@@ -934,9 +934,9 @@
       "size": 8369
     },
     "bin/kaizen-init.js": {
-      "hash": "sha256:7f7d9f3d547dc0ee85b7726fe42bacd03b67e0e76d89c1c319d7a213065b2938",
+      "hash": "sha256:a228d02f4a1b3ad6fa0c7d1d99dff49a36698dbea3ee3cfeac923d709f72bfd6",
       "layer": "L1",
-      "size": 22763
+      "size": 24034
     },
     "bin/kaizen-update.js": {
       "hash": "sha256:9b0a0e99012a01258f32e75e273d6bddb9acbd84214b4c736d4bad6c8b3c0c11",
