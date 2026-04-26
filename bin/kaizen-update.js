@@ -67,6 +67,19 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+// M8.4 — shared cell-skill registration helpers. Used to re-register the
+// `.claude/commands/Kaizen/*` slash skills after the layered policy applies
+// updated cell manifests, so a new specialist agent appearing in the new
+// version's `celula.yaml` lands without requiring a manual `kaizen init`.
+// The helper is stdlib-only and idempotent (no writes when nothing changed).
+const _registerCellsLib = require('./lib/register-cells.js');
+
+// Anchor for loading framework code (`.kaizen-dvir/dvir/cell-registry.js`).
+// Same convention as `bin/kaizen-init.js`: `INSTALL_ROOT` is the package root
+// where this file lives — either the dev checkout or
+// `node_modules/@DanYuzo/kaizen-dvir/`.
+const INSTALL_ROOT = path.resolve(__dirname, '..');
+
 // -- Module loaders --------------------------------------------------------
 //
 // The four libraries are loaded lazily so a syntax error in one does not
@@ -558,6 +571,122 @@ function emitUpdateSummary(summary) {
   process.stdout.write(lines.join('\n') + '\n');
 }
 
+// -- Skill resync (Story M8.4) ---------------------------------------------
+
+/**
+ * Re-runs registerCellSkills() for all bundled cells after the layered
+ * policy completes. Idempotent — unchanged cells produce zero writes.
+ * Orphan detection is delegated to the M8.2 helper, which scans
+ * `.claude/commands/Kaizen/<Cell>/` and emits a pt-BR WARN per file whose
+ * agent is no longer declared in the cell manifest. Orphans are NOT
+ * auto-deleted — the expert may have customized them.
+ *
+ * Skipped on --dry-run. Throws on malformed cell manifest; the caller
+ * surfaces a pt-BR error and halts the update.
+ *
+ * @param {object} ctx
+ * @param {string} ctx.root           project root being updated
+ * @param {boolean} ctx.dryRun        when true, this function is a no-op
+ * @param {object} ctx.logger         the update logger (append/flush)
+ * @returns {{
+ *   skipped: boolean,
+ *   perCell: Array<{ name, entryWritten, specialistsCount,
+ *                    atualizadas, preservadas, warnings }>,
+ *   warnings: string[],
+ * }}
+ *
+ * @throws {Error} pt-BR-prefixed error when any cell manifest is malformed.
+ */
+function resyncCellSkills(ctx) {
+  const { root, dryRun, logger } = ctx;
+  if (dryRun) {
+    if (logger) {
+      logger.append(
+        'skills_skipped_dry_run',
+        'resync de skills nao executado em --dry-run.'
+      );
+    }
+    return { skipped: true, perCell: [], warnings: [] };
+  }
+  let result;
+  try {
+    result = _registerCellsLib.registerSkillsForCells(root, {
+      frameworkRoot: INSTALL_ROOT,
+    });
+  } catch (err) {
+    // Re-throw with pt-BR preamble; caller halts the update.
+    const inner = (err && err.message) || String(err);
+    const wrapped = new Error(
+      'erro ao registrar skills das celulas: ' + inner
+    );
+    wrapped.cellName = err && err.cellName;
+    wrapped.cellRoot = err && err.cellRoot;
+    wrapped.cause = err;
+    throw wrapped;
+  }
+  if (logger) {
+    for (const entry of result.perCell) {
+      logger.append(
+        'skills_resynced',
+        entry.name +
+          ' — atualizadas=' +
+          entry.atualizadas +
+          ' preservadas=' +
+          entry.preservadas +
+          ' specialists=' +
+          entry.specialistsCount
+      );
+    }
+    for (const w of result.warnings) {
+      logger.append('skills_warn', w);
+    }
+  }
+  return { skipped: false, perCell: result.perCell, warnings: result.warnings };
+}
+
+/**
+ * Append the M8.4 "Skills sincronizadas" section to the update summary
+ * already emitted by emitUpdateSummary. Rendered as a top-level block (NOT
+ * nested) per story Dev Notes § "M6 NFR-104 summary template".
+ *
+ * @param {object} skillsResult
+ * @param {boolean} dryRun
+ */
+function emitSkillsSummary(skillsResult, dryRun) {
+  const lines = [];
+  lines.push('Skills sincronizadas:');
+  if (skillsResult.skipped) {
+    lines.push(
+      '  (modo --dry-run: registro de skills nao executado)'
+    );
+  } else if (skillsResult.perCell.length === 0) {
+    lines.push('  (nenhuma celula bundled detectada)');
+  } else {
+    for (const entry of skillsResult.perCell) {
+      lines.push(
+        '  - ' +
+          entry.name +
+          ' (' +
+          entry.atualizadas +
+          ' atualizadas, ' +
+          entry.preservadas +
+          ' preservadas)'
+      );
+    }
+  }
+  if (skillsResult.warnings && skillsResult.warnings.length > 0) {
+    lines.push('');
+    lines.push('Avisos durante registro de skills:');
+    for (const w of skillsResult.warnings) {
+      lines.push('  - ' + w);
+    }
+  }
+  lines.push('');
+  process.stdout.write(lines.join('\n') + '\n');
+  // dryRun parameter retained for future divergence; currently unused.
+  void dryRun;
+}
+
 // -- Orchestration ---------------------------------------------------------
 
 function runUpdate(args) {
@@ -875,6 +1004,39 @@ function runUpdate(args) {
     );
   }
 
+  // Step 6.5 — Skill resync (Story M8.4).
+  // Re-register Claude Code slash skills for every bundled cell so changes
+  // to `celula.yaml` between framework versions (new specialist added,
+  // specialist removed, slashPrefix changed) propagate to
+  // `.claude/commands/Kaizen/*` without requiring a manual `kaizen init`.
+  // Runs ONLY when:
+  //   - no L3 conflicts (otherwise the update will halt for --continue;
+  //     the resync runs in runContinue once conflicts resolve);
+  //   - not --dry-run (resyncCellSkills returns { skipped: true } early).
+  // Errors halt the update with a pt-BR stderr message.
+  let skillsResult = { skipped: opts.dryRun, perCell: [], warnings: [] };
+  if (summary.conflicts.length === 0) {
+    try {
+      skillsResult = resyncCellSkills({
+        root: root,
+        dryRun: opts.dryRun,
+        logger: logger,
+      });
+    } catch (err) {
+      process.stderr.write(
+        (err && err.message ? err.message : String(err)) +
+          '\nUpdate interrompido para preservar estado consistente. ' +
+          "Corrija o manifesto da celula e rode 'kaizen update' novamente.\n"
+      );
+      logger.append(
+        'skills_failed',
+        String(err && err.message ? err.message : err)
+      );
+      logger.flush();
+      return 1;
+    }
+  }
+
   // Step 7 — refresh local manifest (skipped on dry-run AND on conflict halt).
   if (!opts.dryRun && summary.conflicts.length === 0) {
     const refreshed = {
@@ -938,6 +1100,10 @@ function runUpdate(args) {
 
   // Step 8 — emit pt-BR three-block summary.
   emitUpdateSummary(summary);
+  // Story M8.4: emit "Skills sincronizadas" block after the three-block
+  // summary. Always rendered (even on conflict halt) so the expert sees
+  // what happened with skill registration when relevant.
+  emitSkillsSummary(skillsResult, opts.dryRun);
 
   const logPath = logger.flush();
   if (logPath) {
@@ -1112,6 +1278,31 @@ function runContinue(ctx) {
     manifestLib.writeManifest(root, refreshed);
     clearUpdateState(root);
   }
+
+  // Story M8.4: skill resync runs on the --continue success path too, so
+  // the expert never has to re-run `kaizen init` after resolving conflicts.
+  // Idempotent — unchanged cells produce zero writes.
+  let skillsResult = { skipped: opts.dryRun, perCell: [], warnings: [] };
+  try {
+    skillsResult = resyncCellSkills({
+      root: root,
+      dryRun: opts.dryRun,
+      logger: logger,
+    });
+  } catch (err) {
+    process.stderr.write(
+      (err && err.message ? err.message : String(err)) +
+        '\nResync de skills falhou apos --continue. Corrija o manifesto da' +
+        " celula e rode 'kaizen update --continue' novamente.\n"
+    );
+    logger.append(
+      'continue_skills_failed',
+      String(err && err.message ? err.message : err)
+    );
+    logger.flush();
+    return 1;
+  }
+
   process.stdout.write(
     '\nUpdate finalizado: ' +
       state.fromVersion +
@@ -1119,6 +1310,7 @@ function runContinue(ctx) {
       state.toVersion +
       '. Manifesto atualizado.\n'
   );
+  emitSkillsSummary(skillsResult, opts.dryRun);
   logger.append(
     'continue_complete',
     'todos os conflitos resolvidos; manifesto atualizado para ' +
@@ -1135,6 +1327,8 @@ module.exports = {
   runUpdate: runUpdate,
   parseArgs: parseArgs,
   emitUpdateSummary: emitUpdateSummary,
+  emitSkillsSummary: emitSkillsSummary,
+  resyncCellSkills: resyncCellSkills,
   isMemoryMdException: isMemoryMdException,
   HELP_TEXT_PT_BR: HELP_TEXT_PT_BR,
   UPDATE_STATE_REL: UPDATE_STATE_REL,
@@ -1146,6 +1340,24 @@ if (require.main === module) {
 }
 
 // --- Change Log -----------------------------------------------------------
+// 2026-04-25 — @dev (Dex) — M8.4: wired `kaizen update` to call
+//   registerSkillsForCells() (shared helper at bin/lib/register-cells.js)
+//   AFTER the layered policy step completes and BEFORE the manifest refresh,
+//   so changes to bundled `celula.yaml` files (new specialist added,
+//   specialist removed, slashPrefix changed) propagate to
+//   `.claude/commands/Kaizen/*` without requiring a manual `kaizen init`.
+//   Skipped on --dry-run; run on the --continue success path so the expert
+//   never has to re-run init after resolving conflicts. Skipped when the
+//   layered walk produced L3 conflicts (deferred to --continue). Helper
+//   throws on malformed cell manifest -> update halts with pt-BR stderr +
+//   "Update interrompido" guard. Helper warnings (orphan skill detection
+//   from M8.2) are aggregated and surfaced in pt-BR under the new "Skills
+//   sincronizadas" / "Avisos durante registro de skills" sections appended
+//   to the M6 three-block summary. Orphans are NEVER auto-deleted (preserves
+//   expert customization per story Dev Notes). New module exports:
+//   resyncCellSkills, emitSkillsSummary. No new external dependencies; init
+//   refactored in tandem to delegate to the same shared helper (single
+//   source of truth — Constitution Art. VII).
 // 2026-04-25 — @dev (Dex) — M6.2: initial implementation of `kaizen update`.
 //   Orchestrates manifest.js / migrations.js / snapshot.js / merge.js into
 //   the layered policy flow (L1 overwrite, L2 overwrite + MEMORY.md

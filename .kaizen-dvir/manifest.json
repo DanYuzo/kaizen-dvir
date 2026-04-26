@@ -1,6 +1,6 @@
 {
   "version": "1.5.0-rc.0",
-  "generatedAt": "2026-04-26T07:53:42.257Z",
+  "generatedAt": "2026-04-26T16:20:00.771Z",
   "generator": "build-canonical-manifest@1",
   "files": {
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
@@ -704,9 +704,9 @@
       "size": 13724
     },
     ".kaizen-dvir/dvir/doctor/cells-reporter.js": {
-      "hash": "sha256:ddf1e0c04c4870963ea267734c6f1b658971dfe29d8de6b80461b61fc72132a1",
+      "hash": "sha256:d3149149852a6be2857eab187f008ab513af3ad5a317516a119bd180a0720c8b",
       "layer": "L1",
-      "size": 5991
+      "size": 6200
     },
     ".kaizen-dvir/dvir/doctor/gates-reporter.js": {
       "hash": "sha256:929c265191d3bcf88842f26854df4c3a7f05e9b2b638c20e3fbacaf0482aefe2",
@@ -929,14 +929,14 @@
       "size": 8369
     },
     "bin/kaizen-init.js": {
-      "hash": "sha256:0b8c0f8915b4c88b0ed96ba400695801393c81dcd57b1e80794f82b82275c70d",
+      "hash": "sha256:7f7d9f3d547dc0ee85b7726fe42bacd03b67e0e76d89c1c319d7a213065b2938",
       "layer": "L1",
-      "size": 23013
+      "size": 22763
     },
     "bin/kaizen-update.js": {
-      "hash": "sha256:4b687030dd2454410214b8719bc914dddbd8bba7c1bdf6f13d2a13667daff1bf",
+      "hash": "sha256:60d31568f18ff7e109b6948d73f750bebfdfdebf3bac640b49b60d5fb263d007",
       "layer": "L1",
-      "size": 38812
+      "size": 47208
     },
     "bin/kaizen.js": {
       "hash": "sha256:4520197bf9cf2493993569e62020fbb5f3a1f897e2bb6add52f8451ef1e6688c",
@@ -947,6 +947,11 @@
       "hash": "sha256:2466a8b63e45735161de63cf26560d6e112a4288a19bc7adf3078f6c5bbe342d",
       "layer": "L1",
       "size": 14079
+    },
+    "bin/lib/register-cells.js": {
+      "hash": "sha256:e465063adf7091d9b619386c8b71ac0a49ccbcab09e55a5c37e35e86b8ad63de",
+      "layer": "L1",
+      "size": 11932
     }
   }
 }

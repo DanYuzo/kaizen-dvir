@@ -345,42 +345,35 @@ function installYotzer(targetRoot) {
 // message + non-zero exit. Soft warnings (`warnings[]` from the helper) are
 // printed to stdout in pt-BR as part of the post-init summary block.
 
-const CELL_REGISTRY_REL = path.join('.kaizen-dvir', 'dvir', 'cell-registry.js');
+// M8.4 — delegate to the shared helper at bin/lib/register-cells.js so init
+// and update share a single source of truth for cell enumeration + skill
+// registration. The shared module also classifies actions as `atualizadas` vs
+// `preservadas` (used by update; init only consumes the count + warnings).
+// REUSE > ADAPT > CREATE — Constitution Art. VII; D-v1.5-05 (generic per-cell
+// registration). Local re-exports below preserve the M8.3 public surface.
+const _registerCellsLib = require('./lib/register-cells.js');
+const CELL_REGISTRY_REL = _registerCellsLib.CELL_REGISTRY_REL;
 
 /**
  * Enumerate bundled cells under `<targetRoot>/.kaizen-dvir/celulas/`.
- *
- * Returns one entry per direct subdirectory of `celulas/` whose `celula.yaml`
- * file exists on disk. The iteration order is stable (sorted by directory
- * name) so the post-init summary is deterministic across runs.
+ * Thin re-export — implementation lives in `bin/lib/register-cells.js`.
  *
  * @param {string} targetRoot
  * @returns {Array<{ name: string, cellRoot: string }>}
  */
 function enumerateBundledCells(targetRoot) {
-  const celulasDir = path.join(targetRoot, '.kaizen-dvir', 'celulas');
-  if (!fs.existsSync(celulasDir)) return [];
-  let entries;
-  try {
-    entries = fs.readdirSync(celulasDir, { withFileTypes: true });
-  } catch (_) {
-    return [];
-  }
-  const out = [];
-  for (const ent of entries) {
-    if (!ent.isDirectory()) continue;
-    const cellRoot = path.join(celulasDir, ent.name);
-    const manifestAbs = path.join(cellRoot, 'celula.yaml');
-    if (!fs.existsSync(manifestAbs)) continue;
-    out.push({ name: ent.name, cellRoot });
-  }
-  out.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-  return out;
+  return _registerCellsLib.enumerateBundledCells(targetRoot);
 }
 
 /**
  * Register Claude Code slash skills for every bundled cell at
  * `.kaizen-dvir/celulas/{*}/`. Generic per D-v1.5-05.
+ *
+ * Delegates to the shared helper, then strips the action-classification
+ * fields (`atualizadas`/`preservadas`) the init summary does not surface.
+ * The shape kept here is the M8.3 contract:
+ *   { perCell: [{ name, entryWritten, specialistsCount, warnings }],
+ *     warnings: string[] }
  *
  * @param {string} targetRoot
  * @returns {{
@@ -394,48 +387,25 @@ function enumerateBundledCells(targetRoot) {
  *   exit 1 to avoid leaving a half-registered state.
  */
 function registerSkillsForCells(targetRoot) {
-  // Load the helper from INSTALL_ROOT (where the framework code actually
-  // lives — either the dev tree or `node_modules/@DanYuzo/kaizen-dvir/`).
-  // The helper is L1 framework code and is not copied into the target
-  // project by `kaizen init`; only the cells under `.kaizen-dvir/celulas/`
-  // are copied. The helper reads cell manifests from `targetRoot` (read-
-  // only) and writes skills under `targetRoot/.claude/commands/`.
-  const { registerCellSkills } = require(
-    path.join(INSTALL_ROOT, CELL_REGISTRY_REL)
-  );
-  const commandsDir = path.join(targetRoot, '.claude', 'commands');
-  const cells = enumerateBundledCells(targetRoot);
-  const perCell = [];
-  const aggregatedWarnings = [];
-  for (const cell of cells) {
-    let result;
-    try {
-      result = registerCellSkills(cell.cellRoot, commandsDir);
-    } catch (err) {
-      // Re-throw with the cell name prefixed so the caller can build a
-      // pt-BR stderr message that names the offending cell.
-      const inner = (err && err.message) || String(err);
-      const e = new Error(
-        "celula '" + cell.name + "': " + inner
-      );
-      e.cellName = cell.name;
-      e.cellRoot = cell.cellRoot;
-      e.cause = err;
-      throw e;
-    }
-    perCell.push({
-      name: cell.name,
-      entryWritten: !!result.entryWritten,
-      specialistsCount: Array.isArray(result.specialistsWritten)
-        ? result.specialistsWritten.length
-        : 0,
-      warnings: Array.isArray(result.warnings) ? result.warnings.slice() : [],
-    });
-    for (const w of (result.warnings || [])) {
-      aggregatedWarnings.push("[" + cell.name + "] " + w);
-    }
-  }
-  return { perCell, warnings: aggregatedWarnings };
+  // Anchor the helper-loading at INSTALL_ROOT (where the framework code
+  // actually lives — either the dev tree or
+  // `node_modules/@DanYuzo/kaizen-dvir/`). The shared helper reads cell
+  // manifests from `targetRoot` (read-only) and writes skills under
+  // `targetRoot/.claude/commands/`.
+  const result = _registerCellsLib.registerSkillsForCells(targetRoot, {
+    frameworkRoot: INSTALL_ROOT,
+  });
+  return {
+    perCell: result.perCell.map(function (entry) {
+      return {
+        name: entry.name,
+        entryWritten: entry.entryWritten,
+        specialistsCount: entry.specialistsCount,
+        warnings: entry.warnings,
+      };
+    }),
+    warnings: result.warnings,
+  };
 }
 
 function init(args) {
@@ -561,6 +531,15 @@ module.exports.registerSkillsForCells = registerSkillsForCells;
 // Surfaced and resolved in scope by M6.6 channel smoke tests (FR-052).
 
 // --- Change Log -----------------------------------------------------------
+// 2026-04-25 — @dev (Dex) — M8.4: refactored init to delegate cell-skill
+//   registration to the shared helper at bin/lib/register-cells.js so init
+//   and update share a single source of truth (Constitution Art. VII —
+//   REUSE > ADAPT > CREATE; D-v1.5-05 — generic per-cell registration).
+//   Inlined `enumerateBundledCells` + `registerSkillsForCells` reduced to
+//   thin re-export wrappers that preserve the M8.3 public surface. Behavior
+//   unchanged: same warnings/error semantics, same per-cell summary format.
+//   The shared helper additionally returns `atualizadas`/`preservadas`
+//   counts (consumed by update; init drops them in the wrapper).
 // 2026-04-25 — @dev (Dex) — M8.3: wired init to call registerCellSkills()
 //   from .kaizen-dvir/dvir/cell-registry.js (M8.2) for every bundled cell at
 //   .kaizen-dvir/celulas/{*}/ after installYotzer() returns. Added

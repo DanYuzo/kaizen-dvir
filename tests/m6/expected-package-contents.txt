@@ -196,4 +196,5 @@ bin/kaizen-init.js
 bin/kaizen-update.js
 bin/kaizen.js
 bin/lib/claude-md-scaffold.js
+bin/lib/register-cells.js
 package.json
