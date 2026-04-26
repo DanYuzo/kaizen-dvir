@@ -1,5 +1,0 @@
-{
-  "status": "merged",
-  "contentSource": "theirs",
-  "rationale": "ours == base; only the framework (theirs) changed; trivial case B adopts theirs."
-}

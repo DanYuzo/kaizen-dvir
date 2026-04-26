@@ -1,5 +1,0 @@
-{
-  "status": "merged",
-  "expectedContent": "line-1\nline-2-EXPERT\nline-3\nline-4\nline-5\nline-6-FRAMEWORK\nline-7\n",
-  "rationale": "Both sides edited disjoint regions (line-2 vs. line-6); LCS-based 3-way merge applies both edits."
-}
