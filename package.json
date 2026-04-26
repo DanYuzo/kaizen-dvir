@@ -1,9 +1,8 @@
 {
-  "name": "@DanYuzo/kaizen-dvir",
-  "version": "1.5.0-rc.0",
+  "name": "kaizen-dvir",
+  "version": "1.5.0",
   "description": "KaiZen — macro framework that orchestrates células (v1.5 / M6 Distribution & Update)",
   "license": "MIT",
-  "private": true,
   "type": "commonjs",
   "engines": {
     "node": ">=20"
@@ -12,12 +11,26 @@
     "type": "git",
     "url": "git+https://github.com/DanYuzo/kaizen-dvir.git"
   },
+  "homepage": "https://github.com/DanYuzo/kaizen-dvir#readme",
+  "bugs": {
+    "url": "https://github.com/DanYuzo/kaizen-dvir/issues"
+  },
+  "keywords": [
+    "kaizen",
+    "framework",
+    "marketing",
+    "sales",
+    "ai",
+    "agents",
+    "cli",
+    "method"
+  ],
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "access": "public"
   },
   "bin": {
     "kaizen": "bin/kaizen.js",
+    "kaizen-dvir": "bin/kaizen.js",
     "kaizen-init": "bin/kaizen-init.js"
   },
   "files": [
