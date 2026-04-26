@@ -12,6 +12,9 @@ const HELP_TEXT = [
   '  init                            Inicializa um projeto KaiZen no diretório atual',
   '  doctor                          Diagnostica o projeto KaiZen (5 seções: hooks, gates, memory, cells, promotion)',
   '  install                         Instala uma célula (disponível em M4)',
+  '  update                          Atualiza o framework no projeto aplicando a política em camadas (M6.2)',
+  '  update --dry-run                Simula update sem escrever em disco',
+  '  update --continue               Retoma update interrompido por conflito em L3',
   '  rollback                        Restaura o último snapshot do framework (M6.4)',
   '  rollback --list                 Lista snapshots disponíveis em .kaizen/snapshots/',
   '  Kaizen:Yotzer publish <id>      Publica a célula gerada pelo Yotzer (M4.5)',
@@ -1432,6 +1435,10 @@ function main(argv) {
     case 'install':
       printNotImplemented('install', 'M4');
       return 0;
+    case 'update': {
+      const updateCmd = require('./kaizen-update.js');
+      return updateCmd.runUpdate(args.slice(1));
+    }
     case 'rollback':
       return runRollback(args.slice(1));
     case 'Kaizen:Yotzer':
@@ -1479,3 +1486,8 @@ module.exports = {
 //   live state already matches the snapshot. No-snapshot case emits
 //   pt-BR warn + exit 0 (NFR-105 / AC-024). All console output is pt-BR
 //   per Commandment IV / D-v1.4-06.
+// 2026-04-25 — @dev (Dex) — M6.2: added `update` router case delegating
+//   to bin/kaizen-update.js. Updated pt-BR HELP_TEXT to advertise
+//   `update`, `update --dry-run`, `update --continue`. The orchestrator
+//   wires manifest.js (M6.2) + migrations.js (M6.5) + snapshot.js (M6.4)
+//   + merge.js (M6.3) into the layered policy flow per FR-043 / FR-044.

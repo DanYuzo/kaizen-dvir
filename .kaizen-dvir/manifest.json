@@ -1,6 +1,6 @@
 {
   "version": "1.5.0-rc.0",
-  "generatedAt": "2026-04-26T02:17:41.148Z",
+  "generatedAt": "2026-04-26T07:53:42.257Z",
   "generator": "build-canonical-manifest@1",
   "files": {
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
@@ -24,9 +24,9 @@
       "size": 15463
     },
     ".kaizen-dvir/celulas/yotzer/agents/_shared/publisher.js": {
-      "hash": "sha256:2470b2106e583f61c925723b5f94f3dcfc25857969e5dd704fb03592748186e3",
+      "hash": "sha256:2222541c86c896d1807f55badd3412520aa20916ddee0e14430266fe39f2fb4a",
       "layer": "L2",
-      "size": 29299
+      "size": 36451
     },
     ".kaizen-dvir/celulas/yotzer/agents/archaeologist.md": {
       "hash": "sha256:3c192fc683031078eccd588be9831cd9e5825e33e48d77035d0e6d12ca473995",
@@ -693,6 +693,11 @@
       "layer": "L1",
       "size": 5391
     },
+    ".kaizen-dvir/dvir/cell-registry.js": {
+      "hash": "sha256:2e3a9153f84e2a6aed71827d8f0d6bc657da316cadaa13d465491ec3a9683dbb",
+      "layer": "L1",
+      "size": 26009
+    },
     ".kaizen-dvir/dvir/config-loader.js": {
       "hash": "sha256:1c09a7a8dcc03152b8ed7830d33f665adce0b803990befe8c17fcf415033a078",
       "layer": "L1",
@@ -823,6 +828,16 @@
       "layer": "L1",
       "size": 3834
     },
+    ".kaizen-dvir/dvir/migrations/README-MACHINE.md": {
+      "hash": "sha256:ea98a6ece681f9b654e0406fcc44a2110b34f4593bee2cb349e883b3e2c4596c",
+      "layer": "L1",
+      "size": 6092
+    },
+    ".kaizen-dvir/dvir/migrations/v1.4-to-v1.5.js": {
+      "hash": "sha256:da7ca310512606f10c7f7300b44bda1396a4b9eaaaa769da60b08264984aa361",
+      "layer": "L1",
+      "size": 10878
+    },
     ".kaizen-dvir/dvir/schemas/celula-schema.json": {
       "hash": "sha256:794461282abebc33836d10a472cfeee8b757d14f19cf8a164703ccac087e4485",
       "layer": "L1",
@@ -843,6 +858,26 @@
       "layer": "L1",
       "size": 6667
     },
+    ".kaizen-dvir/dvir/update/manifest.js": {
+      "hash": "sha256:87967df84709edfa00474874b848580fb8eb30722ea30a18d1491e5115b0c4da",
+      "layer": "L1",
+      "size": 8844
+    },
+    ".kaizen-dvir/dvir/update/merge.js": {
+      "hash": "sha256:ddb27d020edf0be5be1a26f84c9e1d98bb43a1343e8fc5dd1408ed241b43e7e7",
+      "layer": "L1",
+      "size": 17768
+    },
+    ".kaizen-dvir/dvir/update/migrations.js": {
+      "hash": "sha256:57a702d756d1c913f97758d6bc120bb08021dd25cf20b02a7fde688d766ef34a",
+      "layer": "L1",
+      "size": 13565
+    },
+    ".kaizen-dvir/dvir/update/snapshot.js": {
+      "hash": "sha256:4118c5a916b99a094c76cc6c77f412c0d53d3cf73cbc47a09e69d0b3f2c9c053",
+      "layer": "L1",
+      "size": 16066
+    },
     ".kaizen-dvir/dvir/yotzer/time-budget.js": {
       "hash": "sha256:af19791bf5ef418ac3651330224d58bc46821342897de8db48f6bd2d7fc03b55",
       "layer": "L1",
@@ -858,20 +893,60 @@
       "layer": "L2",
       "size": 1217
     },
+    ".kaizen-dvir/instructions/templates/rules/boundary.md": {
+      "hash": "sha256:c2865706c1a390d5d7461f3d2b280d3236afe8754174b0d807fe24b7811eb4f1",
+      "layer": "L2",
+      "size": 3801
+    },
+    ".kaizen-dvir/instructions/templates/rules/cells.md": {
+      "hash": "sha256:e61d1502f92c5976e3f0a52461df9248a7674e72290a31fab1d46af88d1376de",
+      "layer": "L2",
+      "size": 5617
+    },
+    ".kaizen-dvir/instructions/templates/rules/commit-conventions.md": {
+      "hash": "sha256:7f5e41f127d6a3df4a002846f00f7425fec13e07694c0115b49db7fc9673f14e",
+      "layer": "L2",
+      "size": 4695
+    },
+    ".kaizen-dvir/instructions/templates/rules/doctor.md": {
+      "hash": "sha256:f66d8622c683e6f78cdd17fce65d6b8d9164a73187a971f61e71fe54778b064c",
+      "layer": "L2",
+      "size": 5105
+    },
+    ".kaizen-dvir/instructions/templates/rules/language-policy.md": {
+      "hash": "sha256:d8674ec42d1041eaf71529edc810e4dd7a508e87efb5a72474de606610f3aecc",
+      "layer": "L2",
+      "size": 4812
+    },
+    ".kaizen-dvir/instructions/templates/rules/yotzer.md": {
+      "hash": "sha256:2c88ebc7bd59ce485083bb5539da91fe7aa6fd4fe786bb1a5961ae9cbf7e6f29",
+      "layer": "L2",
+      "size": 4822
+    },
     "bin/build-canonical-manifest.js": {
       "hash": "sha256:9bad5cd082fa2fb96ce7a5b54cac1df4f20338d31e7c50410cb095e5c3bd9344",
       "layer": "L1",
       "size": 8369
     },
     "bin/kaizen-init.js": {
-      "hash": "sha256:039d930ef33e370f4e0df046ab649a9e0194f8882879455156d76afcb7277d04",
+      "hash": "sha256:0b8c0f8915b4c88b0ed96ba400695801393c81dcd57b1e80794f82b82275c70d",
       "layer": "L1",
-      "size": 12526
+      "size": 23013
+    },
+    "bin/kaizen-update.js": {
+      "hash": "sha256:4b687030dd2454410214b8719bc914dddbd8bba7c1bdf6f13d2a13667daff1bf",
+      "layer": "L1",
+      "size": 38812
     },
     "bin/kaizen.js": {
-      "hash": "sha256:26b6650a222b505e60baa9e64ad98f7299648e882f6e65fd7ceb997f93248ec6",
+      "hash": "sha256:4520197bf9cf2493993569e62020fbb5f3a1f897e2bb6add52f8451ef1e6688c",
       "layer": "L1",
-      "size": 38257
+      "size": 47595
+    },
+    "bin/lib/claude-md-scaffold.js": {
+      "hash": "sha256:2466a8b63e45735161de63cf26560d6e112a4288a19bc7adf3078f6c5bbe342d",
+      "layer": "L1",
+      "size": 14079
     }
   }
 }

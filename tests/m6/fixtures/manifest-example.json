@@ -1,0 +1,37 @@
+{
+  "version": "1.5.0",
+  "generatedAt": "2026-04-25T12:00:00.000Z",
+  "generator": "kaizen-update@1",
+  "files": {
+    ".claude/CLAUDE.md": {
+      "hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "layer": "L3",
+      "size": 256
+    },
+    ".kaizen-dvir/celulas/yotzer/MEMORY.md": {
+      "hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "layer": "L2",
+      "size": 1024
+    },
+    ".kaizen-dvir/commandments.md": {
+      "hash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "layer": "L1",
+      "size": 7700
+    },
+    ".kaizen-dvir/instructions/templates/rules/boundary.md": {
+      "hash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "layer": "L2",
+      "size": 5120
+    },
+    "bin/kaizen.js": {
+      "hash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "layer": "L1",
+      "size": 28000
+    },
+    "celulas/expert-cell/celula.yaml": {
+      "hash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "layer": "L4-readonly",
+      "size": 512
+    }
+  }
+}
