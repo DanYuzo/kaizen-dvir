@@ -416,6 +416,17 @@ function _celulasRoot() {
   return path.join(__dirname, '..', 'celulas');
 }
 
+// Story M8.5 — `.claude/commands/` directory consumed by the Yotzer
+// publisher when registering generated cells as slash skills. Tests
+// override via env var to avoid polluting the framework working tree;
+// production resolves to <project-root>/.claude/commands.
+function _claudeCommandsDir() {
+  if (process.env.KAIZEN_CLAUDE_COMMANDS_DIR) {
+    return process.env.KAIZEN_CLAUDE_COMMANDS_DIR;
+  }
+  return path.join(__dirname, '..', '.claude', 'commands');
+}
+
 function _yotzerWorkRoot() {
   if (process.env.KAIZEN_YOTZER_WORK_DIR) {
     return process.env.KAIZEN_YOTZER_WORK_DIR;
@@ -639,7 +650,26 @@ function _doPublish(publisher, spec, celulasRoot, cellName, isBranched) {
   targetSpec.manifest.name = cellName;
   if (!targetSpec.manifest.version) targetSpec.manifest.version = '1.0.0';
 
-  const result = publisher.materializeCell(targetSpec, celulasRoot);
+  // Story M8.5 — pass `.claude/commands` so materializeCell can delegate
+  // slash-skill registration to dvir/cell-registry.registerCellSkills().
+  // Helper handles the absent-personas case internally (no-op when the
+  // materialized cell has no persona files yet — incomplete fixtures).
+  let result;
+  try {
+    result = publisher.materializeCell(targetSpec, celulasRoot, {
+      claudeCommandsDir: _claudeCommandsDir(),
+    });
+  } catch (matErr) {
+    // Skill registration may have failed inside materializeCell. The
+    // publisher already appended a CHANGELOG failure entry; surface the
+    // pt-BR error and exit non-zero (NFR-101).
+    process.stderr.write(
+      'publisher bloqueou publicacao: ' +
+        ((matErr && matErr.message) || String(matErr)) +
+        '\n'
+    );
+    return 1;
+  }
 
   // Run the four pre-publish validators.
   const pre = publisher.prePublishCheck(result.celulaPath);
@@ -676,6 +706,33 @@ function _doPublish(publisher, spec, celulasRoot, cellName, isBranched) {
       _slashName(cellName) +
       '.\n'
   );
+
+  // Story M8.5 — surface skill-registration confirmation and any warnings
+  // the cell-registry helper collected (orphan files, missing non-chief
+  // personas). Block only renders when registration actually ran, i.e.
+  // the materialized cell had at least one persona file under agents/.
+  const reg = result.skillRegistration;
+  if (reg && reg.entryWritten) {
+    const slashPrefix =
+      (targetSpec.manifest && targetSpec.manifest.slashPrefix) ||
+      'Kaizen:' + _slashName(cellName);
+    const specialistsCount = Array.isArray(reg.specialistsWritten)
+      ? reg.specialistsWritten.length
+      : 0;
+    process.stdout.write(
+      'Skill registrada: /' +
+        slashPrefix +
+        ' (1 entry + ' +
+        specialistsCount +
+        ' specialists)\n'
+    );
+    if (Array.isArray(reg.warnings)) {
+      for (const w of reg.warnings) {
+        process.stdout.write('Aviso: ' + w + '\n');
+      }
+    }
+  }
+
   return 0;
 }
 

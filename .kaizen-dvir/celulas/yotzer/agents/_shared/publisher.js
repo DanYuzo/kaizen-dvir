@@ -61,17 +61,46 @@
  *       Appends a new version row (e.g. 1.0.1) to the CHANGELOG.md
  *       without overwriting prior rows (FR-023 append-only).
  *
- *   materializeCell(spec, targetCelulasRoot) -> { celulaPath, manifest }
+ *   materializeCell(spec, targetCelulasRoot, options?) ->
+ *       { celulaPath, manifest, manifestPath, skillRegistration }
  *       Materializes the AC-118 directory layout:
  *         celula.yaml, README.md, CHANGELOG.md, MEMORY.md, OST.md,
  *         agents/, tasks/, workflows/, templates/, checklists/, kbs/.
+ *       When `options.claudeCommandsDir` is provided AND the materialized
+ *       cell has at least one persona file under agents/, the publisher
+ *       delegates to `dvir/cell-registry.registerCellSkills()` to write
+ *       the slash skills (entry + specialists) under that directory.
+ *       The `skillRegistration` field is `null` when registration is
+ *       skipped (no claudeCommandsDir provided OR agents/ has zero
+ *       persona files).
+ *
+ *   Internal-only helper (not exported):
+ *     _registerSkillsForCell(cellPath, manifest, claudeCommandsDir)
+ *       Calls registerCellSkills() from cell-registry.js with the
+ *       generated cell's root and the project's .claude/commands/ dir.
+ *       Invoked automatically at the end of materializeCell() when
+ *       options.claudeCommandsDir is provided. Catches throws, appends a
+ *       failure line to the cell's CHANGELOG, then re-throws so the
+ *       caller (`runYotzerPublish` in `bin/kaizen.js`) can surface the
+ *       pt-BR error and exit non-zero.
  *
  * CON-002 CommonJS / ES2022. CON-003 Node stdlib only.
  * Language Policy D-v1.4-06: pt-BR for surfaced errors.
+ *
+ * Story M8.5 — Refactor publisher to consume registerCellSkills() so
+ * generated cells acquire slash skills via the same code path as init/
+ * update (D8.5, D-v1.5-05, D-v1.5-06).
  */
 
 const fs = require('node:fs');
 const path = require('node:path');
+
+// `cell-registry.js` lives at `.kaizen-dvir/dvir/cell-registry.js`. From
+// this file (`.kaizen-dvir/celulas/yotzer/agents/_shared/publisher.js`)
+// the relative path is four levels up: _shared/ -> agents/ -> yotzer/ ->
+// celulas/ -> .kaizen-dvir/, then `dvir/cell-registry`. CON-005 read-only
+// cross-L1-L2 access.
+const cellRegistry = require('../../../../dvir/cell-registry');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..', '..', '..');
 const SCHEMAS_DIR = path.join(PROJECT_ROOT, '.kaizen-dvir', 'dvir', 'schemas');
@@ -744,7 +773,7 @@ function emitYaml(manifest) {
   return lines.join('\n') + '\n';
 }
 
-function materializeCell(spec, targetCelulasRoot) {
+function materializeCell(spec, targetCelulasRoot, options) {
   if (!spec || typeof spec !== 'object') {
     const err = new Error('publisher: spec invalido para materializeCell.');
     err.code = 'MATERIALIZE_SPEC_INVALID';
@@ -761,6 +790,7 @@ function materializeCell(spec, targetCelulasRoot) {
     err.code = 'MATERIALIZE_ROOT_MISSING';
     throw err;
   }
+  const opts = options || {};
   const cellPath = path.join(targetCelulasRoot, cellName);
   fs.mkdirSync(cellPath, { recursive: true });
 
@@ -880,7 +910,120 @@ function materializeCell(spec, targetCelulasRoot) {
     }
   }
 
-  return { celulaPath: cellPath, manifest: manifest, manifestPath: manifestPath };
+  // -------------------------------------------------------------------------
+  //  Story M8.5 — slash-skill registration via cell-registry helper.
+  //  Skipped (skillRegistration === null) when the caller did not provide a
+  //  claudeCommandsDir (e.g., M4.5 unit tests that exercise materializeCell
+  //  in isolation) OR when the materialized cell has no persona files yet
+  //  under agents/ (incomplete fixture; nothing to register). Real publish
+  //  flow always passes claudeCommandsDir AND seeds agents/ via spec.seed
+  //  Files in F9 — see `_doPublish` in `bin/kaizen.js`.
+  // -------------------------------------------------------------------------
+  let skillRegistration = null;
+  if (
+    typeof opts.claudeCommandsDir === 'string' &&
+    opts.claudeCommandsDir.length > 0 &&
+    _hasAgentPersonas(cellPath)
+  ) {
+    skillRegistration = _registerSkillsForCell(
+      cellPath,
+      manifest,
+      opts.claudeCommandsDir
+    );
+  }
+
+  return {
+    celulaPath: cellPath,
+    manifest: manifest,
+    manifestPath: manifestPath,
+    skillRegistration: skillRegistration,
+  };
+}
+
+// -- 11. Skill registration delegation (M8.5) -------------------------------
+
+function _hasAgentPersonas(cellPath) {
+  const agentsDir = path.join(cellPath, 'agents');
+  let entries;
+  try {
+    entries = fs.readdirSync(agentsDir, { withFileTypes: true });
+  } catch (_) {
+    return false;
+  }
+  for (const ent of entries) {
+    if (ent.isFile() && ent.name.endsWith('.md')) return true;
+  }
+  return false;
+}
+
+/**
+ * Internal post-materialize hook (M8.5). Delegates skill emission to
+ * `dvir/cell-registry.registerCellSkills()` — the single source of truth
+ * shared with `kaizen init` (M8.3) and `kaizen update` (M8.4). The
+ * publisher itself never inlines skill-file templates: this guarantees
+ * that bundled cells and expert-generated cells acquire activatable
+ * slash skills through the same code path (D8.5, D-v1.5-05).
+ *
+ * On throw from registerCellSkills() (malformed manifest, missing chief
+ * persona, etc.) the helper appends a failure line to the cell's
+ * CHANGELOG.md and re-throws the original pt-BR error so the calling
+ * `runYotzerPublish` in `bin/kaizen.js` can surface it and exit
+ * non-zero. Failure path complies with NFR-101 and Commandment V.
+ *
+ * @param {string} cellPath          Absolute path to the materialized cell.
+ * @param {object} manifest          Parsed celula.yaml (used for slashPrefix
+ *                                   pre-flight via configureCli).
+ * @param {string} claudeCommandsDir Absolute path to <project>/.claude/commands.
+ * @returns {{ entryWritten: boolean,
+ *            specialistsWritten: string[],
+ *            warnings: string[] }}
+ * @throws {Error} pt-BR error message after appending CHANGELOG failure entry.
+ */
+function _registerSkillsForCell(cellPath, manifest, claudeCommandsDir) {
+  // Pre-flight: configureCli throws CLI_SLASH_PREFIX_MISSING when the
+  // manifest does not declare slashPrefix. Catching here lets us write a
+  // CHANGELOG failure entry before bubbling up — registerCellSkills would
+  // throw the same kind of error a moment later, but the configureCli
+  // contract is the historical pre-publish gate for slashPrefix and
+  // produces the exact pt-BR phrasing the expert already knows.
+  try {
+    configureCli(cellPath, manifest);
+  } catch (cfgErr) {
+    if (cfgErr && cfgErr.code === 'CLI_SLASH_PREFIX_MISSING') {
+      _safeAppendChangelogFailure(
+        cellPath,
+        'falha ao registrar skill: slashPrefix ausente no manifesto. ' +
+          'configure /Kaizen:{NomeDaCelula} antes de republicar.'
+      );
+    }
+    throw cfgErr;
+  }
+
+  let result;
+  try {
+    result = cellRegistry.registerCellSkills(cellPath, claudeCommandsDir);
+  } catch (regErr) {
+    const msg =
+      regErr && regErr.message ? regErr.message : String(regErr);
+    _safeAppendChangelogFailure(
+      cellPath,
+      'falha ao registrar skill via cell-registry: ' + msg
+    );
+    throw regErr;
+  }
+  return result;
+}
+
+function _safeAppendChangelogFailure(cellPath, summary) {
+  // Best-effort CHANGELOG annotation. The publish flow already
+  // initialized CHANGELOG.md at 1.0.0 earlier in materializeCell(), so
+  // appending should normally succeed. Swallow append errors here to
+  // avoid masking the original registration error the caller cares about.
+  try {
+    appendChangelogVersion(cellPath, '1.0.0+skill-fail', summary);
+  } catch (_) {
+    /* ignore — original error path takes precedence. */
+  }
 }
 
 module.exports = {
