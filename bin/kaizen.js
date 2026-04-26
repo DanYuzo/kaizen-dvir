@@ -12,6 +12,8 @@ const HELP_TEXT = [
   '  init                            Inicializa um projeto KaiZen no diretório atual',
   '  doctor                          Diagnostica o projeto KaiZen (5 seções: hooks, gates, memory, cells, promotion)',
   '  install                         Instala uma célula (disponível em M4)',
+  '  rollback                        Restaura o último snapshot do framework (M6.4)',
+  '  rollback --list                 Lista snapshots disponíveis em .kaizen/snapshots/',
   '  Kaizen:Yotzer publish <id>      Publica a célula gerada pelo Yotzer (M4.5)',
   '  Kaizen:Yotzer resume <id>       Retoma o trabalho a partir do ultimo handoff (M4.6)',
   '  Kaizen:Yotzer validate <id>     Valida o trabalho antes de publicar (M4.6)',
@@ -1196,6 +1198,159 @@ function runYotzerValidate(args) {
   return failures === 0 ? 0 : 1;
 }
 
+// --- rollback subcommand (M6.4) -------------------------------------------
+//
+// `kaizen rollback` restores the most recent snapshot from
+// `.kaizen/snapshots/`. Idempotent (NFR-105 / AC-024): re-running on a
+// state that already matches the snapshot content emits a pt-BR warn and
+// exits 0 without rewriting files. Running with no snapshots present
+// also emits a pt-BR warn and exits 0. All console output is pt-BR per
+// Commandment IV / D-v1.4-06.
+//
+// `kaizen rollback --list` prints available snapshots in pt-BR (newest
+// first) without restoring anything.
+//
+// The module under .kaizen-dvir/dvir/update/snapshot.js is a pure I/O
+// library — it never logs; this CLI layer owns all expert-facing
+// strings.
+
+function _snapshotModule() {
+  const p = path.join(
+    __dirname,
+    '..',
+    '.kaizen-dvir',
+    'dvir',
+    'update',
+    'snapshot.js'
+  );
+  delete require.cache[require.resolve(p)];
+  return require(p);
+}
+
+function _projectRoot() {
+  if (process.env.KAIZEN_PROJECT_ROOT) return process.env.KAIZEN_PROJECT_ROOT;
+  return path.join(__dirname, '..');
+}
+
+function _formatSizeBytes(bytes) {
+  if (typeof bytes !== 'number' || isNaN(bytes)) return '0 B';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+function _renderSnapshotList(entries) {
+  if (entries.length === 0) {
+    return 'Nenhum snapshot encontrado em .kaizen/snapshots/.\n';
+  }
+  const lines = [];
+  lines.push('Snapshots disponíveis (mais recente primeiro):');
+  for (const e of entries) {
+    lines.push(
+      '  ' +
+        (e.timestamp || '(sem timestamp)') +
+        '  versão=' +
+        e.version +
+        '  tamanho=' +
+        _formatSizeBytes(e.sizeBytes) +
+        '  caminho=' +
+        e.path
+    );
+  }
+  return lines.join('\n') + '\n';
+}
+
+function runRollback(args) {
+  const snapshot = _snapshotModule();
+  const projectRoot = _projectRoot();
+
+  if (args.includes('--list')) {
+    try {
+      const entries = snapshot.listSnapshots({ projectRoot: projectRoot });
+      process.stdout.write(_renderSnapshotList(entries));
+      return 0;
+    } catch (err) {
+      process.stderr.write(
+        'rollback --list: falha ao ler snapshots (' +
+          (err && err.message ? err.message : String(err)) +
+          ').\n'
+      );
+      return 1;
+    }
+  }
+
+  let entries;
+  try {
+    entries = snapshot.listSnapshots({ projectRoot: projectRoot });
+  } catch (err) {
+    process.stderr.write(
+      'rollback: falha ao ler snapshots (' +
+        (err && err.message ? err.message : String(err)) +
+        ').\n'
+    );
+    return 1;
+  }
+
+  if (entries.length === 0) {
+    // AC-024 — no snapshot present: pt-BR warn + exit 0.
+    process.stdout.write(
+      'Aviso: nenhum snapshot disponível em .kaizen/snapshots/. ' +
+        'Nada a restaurar. Execute `kaizen update` para gerar o primeiro snapshot.\n'
+    );
+    return 0;
+  }
+
+  const latest = entries[0];
+
+  // Idempotency check — if the live state already matches the snapshot
+  // content byte-for-byte, skip the restore.
+  let liveFp;
+  let snapFp;
+  try {
+    liveFp = snapshot.computeStateFingerprint({ projectRoot: projectRoot });
+    snapFp = snapshot.computeSnapshotFingerprint(latest.path);
+  } catch (_) {
+    liveFp = null;
+    snapFp = null;
+  }
+  if (liveFp && snapFp && liveFp === snapFp) {
+    process.stdout.write(
+      'Aviso: estado atual já corresponde ao snapshot ' +
+        latest.name +
+        '. Nada a restaurar (operação idempotente).\n'
+    );
+    return 0;
+  }
+
+  let result;
+  try {
+    result = snapshot.restoreSnapshot({
+      projectRoot: projectRoot,
+      snapshotPath: latest.path,
+    });
+  } catch (err) {
+    process.stderr.write(
+      'rollback: falha ao restaurar snapshot (' +
+        (err && err.message ? err.message : String(err)) +
+        '). Snapshot em ' +
+        latest.path +
+        ' continua intacto.\n'
+    );
+    return 1;
+  }
+
+  process.stdout.write(
+    'Rollback concluído: ' +
+      result.restoredCount +
+      ' arquivo(s) restaurado(s) a partir de ' +
+      latest.name +
+      ' em ' +
+      result.durationMs +
+      ' ms.\n'
+  );
+  return 0;
+}
+
 function main(argv) {
   const args = argv.slice(2);
   const cmd = args[0];
@@ -1220,6 +1375,8 @@ function main(argv) {
     case 'install':
       printNotImplemented('install', 'M4');
       return 0;
+    case 'rollback':
+      return runRollback(args.slice(1));
     case 'Kaizen:Yotzer':
     case 'kaizen:yotzer':
       return runYotzerCommand(args.slice(1));
@@ -1240,6 +1397,7 @@ module.exports = {
   runYotzerPublish: runYotzerPublish,
   runYotzerResume: runYotzerResume,
   runYotzerValidate: runYotzerValidate,
+  runRollback: runRollback,
 };
 
 // --- Change Log -----------------------------------------------------------
@@ -1257,3 +1415,10 @@ module.exports = {
 //   Gate, OST closure, Actions-inline, handoff size audit, critical
 //   invariants flag, Reuse Gate re-check; pt-BR per-check rendering;
 //   does NOT publish; only writes a single validate-event log entry.
+// 2026-04-25 — @dev (Dex) — M6.4: added `rollback` subcommand. Restores
+//   the most recent snapshot from .kaizen/snapshots/ via the snapshot
+//   module's restoreSnapshot API. Supports `--list` for inventory.
+//   Idempotent: pre-restore state-fingerprint check skips restore when
+//   live state already matches the snapshot. No-snapshot case emits
+//   pt-BR warn + exit 0 (NFR-105 / AC-024). All console output is pt-BR
+//   per Commandment IV / D-v1.4-06.

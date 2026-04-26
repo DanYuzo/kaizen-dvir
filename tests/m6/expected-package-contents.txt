@@ -1,3 +1,6 @@
+.claude/README.md
+.claude/settings.json
+.gitignore
 .kaizen-dvir/celulas/.gitkeep
 .kaizen-dvir/celulas/yotzer/CHANGELOG.md
 .kaizen-dvir/celulas/yotzer/MEMORY.md
@@ -168,6 +171,7 @@
 .kaizen-dvir/dvir/schemas/handoff-schema.json
 .kaizen-dvir/dvir/schemas/task-contract-schema.json
 .kaizen-dvir/dvir/schemas/validator.js
+.kaizen-dvir/dvir/update/merge.js
 .kaizen-dvir/dvir/yotzer/time-budget.js
 .kaizen-dvir/infra/.gitkeep
 .kaizen-dvir/instructions/.gitkeep
@@ -178,4 +182,5 @@
 bin/build-canonical-manifest.js
 bin/kaizen-init.js
 bin/kaizen.js
+bin/lib/claude-md-scaffold.js
 package.json
