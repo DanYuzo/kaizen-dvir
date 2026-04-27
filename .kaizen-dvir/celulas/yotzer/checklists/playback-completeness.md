@@ -43,10 +43,10 @@ adverbios. Chief consulta este arquivo antes de fechar a revisao.
 
 ## F6 — To-be
 
-- [ ] pre-condicao verificada via handoff: F4 e F5 ja estao fechadas.
+- [ ] pre-condicao verificada via handoff: F4 PASS e F5 PASS confirmados.
 - [ ] process-map-to-be.yaml presente.
 - [ ] mermaid com rotulos em pt-BR embutido no artefato.
-- [ ] PUs incorporam filtro de F4 e mitigacoes de F5.
+- [ ] PUs incorporam filtro de F4 PASS e mitigacoes de F5 PASS.
 - [ ] Solutions definitivas no OST ligadas a Opportunities.
 - [ ] toda Solution liga a pelo menos uma Opportunity.
 - [ ] nao-critica — a revisao fecha sozinha em modo automatico quando nao ha pendencia.

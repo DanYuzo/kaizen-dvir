@@ -190,9 +190,9 @@ de corte. Risk-mapper executa o mapeamento.
 | Avanco para F6 apos fase fechada | chief |
 | Tentativa de granularizar passo do processo | pausa a fase com pedido de reabrir sem dividir; redireciona para fase 8 |
 
-## Checagem da fase 5 — nao critica
+## Checagem da fase 5 — nao critico
 
-F5 e nao critica. Em modo automatico, a fase fecha sozinha quando nao ha
+F5 e nao critico. Em modo automatico, a fase fecha sozinha quando nao ha
 pendencia. Em modo interativo, chief apresenta uma narrativa curta da
 fase e espera ack do expert. Pendencias e situacoes nao ideais surgem
 ao expert em qualquer modo, sempre com escolha clara. Problemas que

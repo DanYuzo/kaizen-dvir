@@ -17,12 +17,12 @@ api:
   handoff_engine: [generate, persist]
   playback_gate: [present]
 outcome_types:
-  - sistematizacao
   - problema
   - desejo
+  - melhoria
   - mapeamento
   - automacao
-default_outcome_type: sistematizacao
+default_outcome_type: melhoria
 retro_compat:
   skip_if_outcome_exists: outcome-statement.yaml
 ---
@@ -85,13 +85,14 @@ re-executa — chief reconhece F1 como fechada e roteia para `*resume`.
    Se o expert quiser, archaeologist captura o norte no formato de
    `outcome-statement.yaml:31-37` com `natureza: norte`. Se o expert
    recusar ou pular, F1 segue. **Norte nao e gate — e contexto.**
-5. Archaeologist classifica o workflow em um dos cinco tipos:
-   `sistematizacao` (default), `problema`, `desejo`, `mapeamento`,
-   `automacao`. Se o workflow nao se encaixa em nenhum tipo,
-   archaeologist usa `sistematizacao` como fallback. Rejeita apenas
-   se a resposta do expert e vazia ou impossivel de classificar como
+5. Archaeologist classifica o workflow em um dos 5 tipos canonicos:
+   `problema`, `desejo`, `melhoria` (default), `mapeamento`,
+   `automacao`. Se o workflow nao se encaixa em nenhum dos 5 tipos,
+   archaeologist usa `melhoria` como fallback. Rejeita apenas se a
+   resposta do expert e vazia ou impossivel de classificar como
    workflow recorrente — em pt-BR:
-   `descreva o workflow que voce quer melhorar. uma frase basta.`
+   `descreva o workflow em um dos 5 tipos (problema, desejo, melhoria,
+   mapeamento, automacao). reformule em uma frase.`
 6. Archaeologist escreve `outcome-statement.yaml` na celula gerada
    com os campos `id`, `type` e `description`. A descricao carrega o
    workflow ancorado (exemplo: `sistematizo o ciclo semanal de

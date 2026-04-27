@@ -79,7 +79,8 @@ para dentro da Task? (AC-119, D-v1.3-04)`
 ## Comportamento observavel — fronteira de aceitacao (AC-108B)
 
 Cada Action descreve comportamento observavel. Adjetivo inferencial
-pausa a fase com pedido de reescrita. Exemplos:
+dispara Quality Gate FAIL e pausa a fase com pedido de reescrita.
+Exemplos:
 
 | Forma | Aceito? |
 |-------|---------|

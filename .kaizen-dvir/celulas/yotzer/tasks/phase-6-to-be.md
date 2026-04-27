@@ -41,12 +41,11 @@ definitivas no OST ligadas a Opportunities.
 
 ## Pre-condicao (bloqueante)
 
-F6 exige que F4 e F5 ja estejam fechadas. Archaeologist verifica via
+F6 exige F4 PASS e F5 PASS. Archaeologist verifica via
 `handoff-engine.readLatest()` os artefatos produzidos por F4 e F5 em
 M4.3. Se qualquer um falta, archaeologist pausa F6 e emite em pt-BR:
 
-`a fase 6 precisa que as fases 4 e 5 ja estejam fechadas. execute a
-M4.3 antes.`
+`F6 precisa de F4 PASS e F5 PASS. execute a M4.3 antes.`
 
 A pre-condicao nao aceita bypass. Chief nao pode forcar F6 sem os
 dois handoffs.
@@ -96,7 +95,7 @@ toda correcao entra como nova linha no Change Log.
 
 ## pt-BR — mensagens padrao
 
-- bloqueio de pre-condicao: `a fase 6 precisa que as fases 4 e 5 ja estejam fechadas. execute a M4.3 antes.`
+- bloqueio de pre-condicao: `F6 precisa de F4 PASS e F5 PASS. execute a M4.3 antes.`
 - bloqueio de Solution orfa: `a Solution esta sem Opportunity ligada. ligue antes da revisao de fechamento.`
 
 ## Referencia de escrita

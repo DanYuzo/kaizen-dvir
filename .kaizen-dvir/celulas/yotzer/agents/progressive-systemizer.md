@@ -175,7 +175,7 @@ publica celula.
 
 ## pt-BR — mensagens padrao
 
-- pulo de tier: `o plano pulou direto para o tier <N> sem justificar o aprendizado do tier <N-1>. a ordem e fixa: manual, simplificado, batch, automatizado. escreva o aprendizado esperado e o racional do tier anterior antes de seguir.`
+- pulo de tier: `o plano pulou direto para o tier <N> sem justificativa do tier <N-1>. a ordem fixa e: manual, simplificado, batch, automatizado. escreva o aprendizado esperado e o racional do tier anterior antes de seguir.`
 - aprendizado ausente: `o tier <N> da Task <id> esta sem expected_learning. cada tier precisa do campo preenchido para a progressao funcionar.`
 - racional ausente: `o tier <N> da Task <id> esta sem rationale. ligue ao aprendizado do tier <N-1>.`
 - waiver registrado: `decisao de pular tier registrada para Task <id>. voce assumiu o risco. publisher recebe o plano com a marca da decisao.`

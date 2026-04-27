@@ -204,16 +204,15 @@ function _padRight(s, w) {
 //                                  celula correspondente. Remova o arquivo
 //                                  ou registre a celula."
 //
-// Specialist sub-skill drift detection (per spawn-prompt directive that
-// supersedes story Scope OUT line 106 for this wave): for cells whose
-// entry is present, doctor lists declared agents from `celula.yaml`'s
-// `tiers.tierN.agents[]` arrays and checks each `<segments...>/{agent}.md`
-// file. Missing specialists emit:
-//   - AVISO  specialist missing  → "AVISO: especialista '{agentId}' da
-//                                  celula '{cellName}' sem skill
-//                                  registrada em {expectedSkillPath}.
-//                                  Rode 'kaizen update' ou 'kaizen init'
-//                                  para registrar."
+// Specialist sub-skill drift detection — REMOVED in v1.7.0 ("1 cell = 1
+// slash command" contract). Under the new rule, specialists are loaded
+// internally by the chief from `<cellRoot>/agents/<id>.md` (engine layer)
+// and never get their own `.md` files under `.claude/commands/`. The
+// previous per-specialist AVISO loop was producing false-positive warnings
+// for every declared specialist on every install, since those files are
+// no longer expected to exist. Doctor still validates declared agents at
+// the engine layer and still warns when the ENTRY skill is missing — the
+// only structural slash file under the new contract.
 //
 // Exit code is unchanged — WARN lines do not flip status (M2/M3 doctor
 // semantics preserved).
@@ -503,19 +502,14 @@ function _renderSkillCheckSection() {
     }
     lines.push('  OK: ' + row.name + ' -> /' + row.slashPrefix);
 
-    // Specialist sub-skill drift — per spawn-prompt requirement.
-    for (const sp of row.specialists) {
-      if (sp.present) continue;
-      lines.push(
-        "  AVISO: especialista '" +
-          sp.agentId +
-          "' da celula '" +
-          row.name +
-          "' sem skill registrada em " +
-          _relPath(sp.skillPath) +
-          ". Rode 'kaizen update' ou 'kaizen init' para registrar."
-      );
-    }
+    // Specialist sub-skill drift loop REMOVED in v1.7.0.
+    // Under the "1 cell = 1 slash command" contract, specialists do not
+    // have their own slash files — they are loaded internally by the chief
+    // from <cellRoot>/agents/<id>.md (engine layer). Iterating declared
+    // specialists here would emit false-positive AVISO lines for every
+    // install. The `row.specialists[]` array is still populated by
+    // `listCellSkillStatuses()` for backward-compat / structured callers,
+    // but no longer surfaces in the rendered report.
   }
 
   // Orphan scan — separate sub-section.

@@ -114,9 +114,10 @@ Exemplos:
    campo em pt-BR (AC-104). Contract-builder bloqueia avanco. Task
    volta para task-granulator para ajuste estrutural OU para
    archaeologist se o passo do processo de origem estiver incompleto.
-7. Task vazia ou incompleta dispara bloqueio com pt-BR:
-   `a Task <id> ainda nao tem contrato valido. a publicacao espera
-   contrato limpo antes de seguir. revise inputs, outputs e gates.`
+7. Task vazia ou incompleta dispara bloqueio em F10. F10 nao roda sem
+   Schema Gate PASS em todo contrato. Mensagem em pt-BR:
+   `a Task <id> ainda nao tem contrato valido. F10 espera Schema Gate
+   PASS em todo contrato. revise inputs, outputs e gates.`
 8. Contract-builder gera handoff F9→F10 via
    `handoff-engine.generate()` + `persist()`. O payload carrega
    ponteiros para `contracts/` da celula gerada. Fica abaixo de 500

@@ -81,11 +81,11 @@ A ordem nao varia. Stress-tester e expert seguem assim:
    nao cria gatilho, nao agenda execucao. Concretizacao real entra em
    F10.
 
-A reordenacao pausa a fase. A mensagem nomeia o passo esperado e o
-passo tentado em pt-BR:
+Quebra da ordem Musk emite Quality Gate FAIL e pausa a fase. A mensagem
+nomeia o passo esperado e o passo tentado em pt-BR:
 
-`a ordem dos passos foi trocada — o metodo exige sequencia fixa.
-esperado: <passo>. tentado: <passo>. quer voltar para o passo correto?`
+`ordem Musk quebrada. esperado: <passo>. tentado: <passo>. volte antes
+de seguir.`
 
 ## Passos da fase
 
@@ -160,10 +160,12 @@ esperado: <passo>. tentado: <passo>. quer voltar para o passo correto?`
 | F4-AUTOMATIZAR-CONCEPTUAL | medium | sem artefato concreto de automacao |
 | F4-CHECKLIST | high | `pu-reduction-justified.md` confere |
 
-`F4-CUT-TARGET` e medium por design — abaixo de meta surge ao expert
-com escolha (aprofundar ou seguir mesmo assim), nunca encerra a fase
-sozinho como problema bloqueante. Os demais criterios seguem a regra
-padrao do Quality Gate.
+`F4-CUT-TARGET` emite verdict CONCERNS (nunca FAIL) quando o corte fica
+abaixo de 10% sem waiver. CONCERNS surge ao expert com escolha
+(aprofundar a fase Deletar OU seguir com `approved_by` registrado).
+Verdict FAIL apenas por meta nao se aplica aqui — meta nao atingida
+nunca, sozinha, encerra a fase como problema bloqueante. Os demais
+criterios seguem a regra padrao do Quality Gate.
 
 ## Veto conditions
 

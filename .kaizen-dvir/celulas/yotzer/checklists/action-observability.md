@@ -32,8 +32,8 @@ D-v1.3-04, FR-108.
       de skill reusavel.
 - [ ] split registra duas Tasks ligadas a mesma Solution.
 - [ ] skill extraida tem forma registrada em pt-BR para reuso futuro.
-- [ ] Task com 8 ou mais Actions sem tratamento pausa a fase com pedido
-      de split ou skill extraida.
+- [ ] Task com 8 ou mais Actions sem tratamento dispara FAIL e pausa a
+      fase com pedido de split ou skill extraida.
 
 ## Actions inline (AC-119, D-v1.3-04)
 
@@ -47,8 +47,8 @@ D-v1.3-04, FR-108.
 ## OST — fechamento da cadeia (AC-117)
 
 - [ ] toda Task liga a exatamente uma Solution no `OST.md`.
-- [ ] Task sem Solution ligada pausa a fase com pedido de ligar antes
-      de fechar.
+- [ ] Task sem Solution ligada dispara FAIL e pausa a fase com pedido de
+      ligar antes de fechar.
 - [ ] mesma Solution pode ter mais de uma Task filha.
 - [ ] cadeia Outcome -> Opportunity -> Solution -> Task fica
       auditavel apos F8.

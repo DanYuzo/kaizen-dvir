@@ -145,9 +145,9 @@ remocao com referencia ao `cut-log.yaml`. A escrita passa por
 poda. A Opportunity nao e apagada do arquivo: ela ganha rastro de
 remocao para auditoria futura.
 
-## Checagem da fase 4 — nao critica
+## Checagem da fase 4 — nao critico
 
-F4 e nao critica. Em modo automatico, a fase fecha sozinha quando nao ha
+F4 e nao critico. Em modo automatico, a fase fecha sozinha quando nao ha
 pendencia. Em modo interativo, chief apresenta uma narrativa curta da
 fase e espera ack do expert. Pendencias e situacoes nao ideais surgem
 ao expert em qualquer modo, sempre com escolha clara. Problemas que

@@ -25,7 +25,7 @@ por uma frase curta lida via fallback hierarchy:
 Ver Decision 5 do EPIC-001 PM Decisions.
 -->
 
-🧬 Yotzer — Meta-celula do Kaizen
+🧬 Yotzer ativo — Meta-celula do Kaizen
 Construo o sistema operacional do seu workflow recorrente.
 
 📊 Status: {NARRATIVA-DE-STATUS}
@@ -63,7 +63,7 @@ segue diretrizes-escrita.md: frases curtas, presente, voz ativa, sem
 adverbios. Sem induzir criacao (CON-105, FR-118).
 
 Mesma estrutura de 5 elementos do greeting Yotzer acima. Publisher infere
-{ICONE}, {NOME-DA-CELULA}, {TAGLINE-DA-CELULA}, {LINHA-DE-PAPEL-DA-CELULA}
+{ICONE}, <NOME-DA-CELULA>, {TAGLINE-DA-CELULA}, {LINHA-DE-PAPEL-DA-CELULA}
 e {ASSINATURA-DA-CELULA} a partir do manifesto. {OPCAO-1} e {OPCAO-2} vem
 das capacidades especificas da celula declaradas no manifesto.
 -->
@@ -77,7 +77,7 @@ ou ser omitida se a celula nao oferece modo automatico (publisher detecta
 ausencia de invariante critico no manifesto e remove a linha).
 -->
 
-{ICONE} {NOME-DA-CELULA} — {TAGLINE-DA-CELULA}
+{ICONE} <NOME-DA-CELULA> — {TAGLINE-DA-CELULA}
 {LINHA-DE-PAPEL-DA-CELULA}
 
 📊 Status: {NARRATIVA-DE-STATUS}
@@ -99,7 +99,7 @@ Notas para o publisher:
   (CON-105). O caminho de criacao fica restrito ao Yotzer. As opcoes
   numeradas devem refletir somente capacidades da propria celula —
   nunca "gerar nova celula" ou variantes.
-- O greeting cita o nome da celula no banner ({NOME-DA-CELULA}) para o
+- O greeting cita o nome da celula no banner (<NOME-DA-CELULA>) para o
   expert reconhecer a entrada imediatamente.
 - {LINHA-DE-PAPEL-DA-CELULA} segue o padrao do Yotzer: uma frase curta,
   presente, voz ativa, descrevendo o papel da celula em ate 12 palavras.
@@ -113,8 +113,8 @@ Notas para o publisher:
   nunca expoe sintaxe `*comando`. Comandos ficam reservados para `*help`.
 - A celula gerada expoe **apenas 1 slash command** (o entry point
   `/Kaizen:{NomeDaCelula}` que carrega o chief). Specialists nao tem
-  slash proprio — sao carregados internamente pelo chief via engine
-  path (`@.kaizen-dvir/celulas/{nome}/agents/<id>.md`). Power-user que
+  slash proprio — chief os carrega internamente via engine path
+  (`@.kaizen-dvir/celulas/{nome}/agents/<id>.md`). Power-user que
   quiser pular para um specialist usa o `@path` direto, nunca um slash
   de superficie. Publisher aplica o mesmo padrao de comentario
   power-user que aparece no greeting do Yotzer (linhas 44-53 deste
