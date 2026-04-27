@@ -204,10 +204,48 @@ function ensureDirs(targetRoot) {
   }
 }
 
+// M6.1.3: paths whose published content is a *placeholder* or *user template*.
+// When the target already has different bytes here, that means the expert has
+// filled it in with their own content — preserve it instead of treating as a
+// conflict. Anything NOT listed here is framework-strict (commandments, dvir
+// code, hooks, etc.) — different bytes there means the framework is being
+// modified locally and we abort to avoid silent breakage.
+//
+// The matching is exact path or directory-prefix (trailing `/`). This stays
+// in sync with INLINE_TEMPLATES + the user-facing slots in COPY_MANIFEST.
+const USER_CUSTOMIZABLE_PATHS = new Set([
+  // Ikigai placeholders — the expert's identity content
+  'refs/ikigai/quem-sou.md',
+  'refs/ikigai/o-que-faco.md',
+  'refs/ikigai/para-quem.md',
+  'refs/ikigai/como-faco.md',
+  // Project-level files the expert owns
+  'package.json',
+  '.gitignore',
+  // Configurable surfaces
+  '.claude/CLAUDE.md',
+  '.claude/settings.json',
+  '.kaizen-dvir/dvir-config.yaml',
+]);
+
+const USER_CUSTOMIZABLE_PREFIXES = [
+  // Rule templates — seeded once, expert edits freely
+  '.claude/rules/',
+];
+
+function isUserCustomizable(targetRel) {
+  if (USER_CUSTOMIZABLE_PATHS.has(targetRel)) return true;
+  for (const prefix of USER_CUSTOMIZABLE_PREFIXES) {
+    if (targetRel.startsWith(prefix)) return true;
+  }
+  return false;
+}
+
 function diffScan(targetRoot, plan) {
   const conflicts = [];
   const identical = [];
   const missing = [];
+  const userPreserved = [];
   for (const item of plan) {
     const abs = path.join(targetRoot, item.targetRel);
     if (!fs.existsSync(abs)) {
@@ -217,11 +255,13 @@ function diffScan(targetRoot, plan) {
     const current = fs.readFileSync(abs);
     if (Buffer.compare(current, item.canonical) === 0) {
       identical.push(item);
+    } else if (isUserCustomizable(item.targetRel)) {
+      userPreserved.push(item);
     } else {
       conflicts.push(item);
     }
   }
-  return { conflicts, identical, missing };
+  return { conflicts, identical, missing, userPreserved };
 }
 
 function formatNotCleanError(conflicts) {
@@ -455,7 +495,7 @@ function init(args) {
   ensureDirs(targetRoot);
 
   const plan = plannedWrites();
-  const { conflicts, identical, missing } = diffScan(targetRoot, plan);
+  const { conflicts, identical, missing, userPreserved } = diffScan(targetRoot, plan);
 
   if (conflicts.length > 0) {
     process.stderr.write(formatNotCleanError(conflicts));
@@ -466,6 +506,7 @@ function init(args) {
     const abs = path.join(targetRoot, item.targetRel);
     writeFileAtomic(abs, item.canonical);
   }
+  // userPreserved: target has expert content — DO NOT touch.
 
   // Yotzer auto-install after the L1/L2 skeleton lands (FR-002, AC-100).
   let yotzerResult = { copied: 0, skipped: 0, warning: null };
@@ -498,6 +539,7 @@ function init(args) {
   const total = plan.length;
   const created = missing.length;
   const skipped = identical.length;
+  const preservedUser = userPreserved.length;
 
   const warningBlock = yotzerResult.warning
     ? '\n' + yotzerResult.warning + '\n'
@@ -522,10 +564,15 @@ function init(args) {
       skillsResult.warnings.map((w) => '  - ' + w).join('\n') + '\n'
     : '';
 
+  const userPreservedBlock = preservedUser > 0
+    ? '  Conteúdo do expert preservado: ' + preservedUser + ' arquivo(s)\n'
+    : '';
+
   const summary =
     '✔ kaizen init concluído.\n' +
     '  Criados: ' + created + ' arquivo(s)\n' +
     '  Já existentes (idênticos — preservados): ' + skipped + ' arquivo(s)\n' +
+    userPreservedBlock +
     '  Total no esqueleto: ' + total + ' arquivo(s)\n' +
     '  Yotzer: ' + yotzerResult.copied + ' arquivo(s) copiados; ' +
     yotzerResult.skipped + ' conjunto(s) preservados.\n' +
