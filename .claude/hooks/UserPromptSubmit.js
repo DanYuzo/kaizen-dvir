@@ -24,12 +24,34 @@
  * CON-004: Errors written to .kaizen/logs/hook-calls/ via log-writer.js.
  */
 
+const fs = require('node:fs');
 const path = require('node:path');
 
 // Resolve the real handler modules inside `.kaizen-dvir/dvir/hooks/`.
 // Up 2: .claude/hooks -> .claude -> <projectRoot>
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const HOOKS_DIR = path.join(PROJECT_ROOT, '.kaizen-dvir', 'dvir', 'hooks');
+
+// 2-step lookup so the shipped shim works in two install shapes:
+//   1. Monorepo / framework source — `.kaizen-dvir/dvir/hooks/` lives at
+//      <projectRoot>/.kaizen-dvir/dvir/hooks (current dev layout).
+//   2. Installed package — kaizen-init only copies a subset of dvir/ to the
+//      target project. The full `dvir/hooks/` ships inside the npm package
+//      at `node_modules/kaizen-dvir/.kaizen-dvir/dvir/hooks/`.
+function resolveHooksDir() {
+  const local = path.resolve(PROJECT_ROOT, '.kaizen-dvir', 'dvir', 'hooks');
+  if (fs.existsSync(path.join(local, 'hook-runner.js'))) return local;
+  try {
+    return path.dirname(
+      require.resolve('kaizen-dvir/.kaizen-dvir/dvir/hooks/hook-runner.js')
+    );
+  } catch (_) {
+    // Last resort: keep local path so the subsequent require throws a
+    // clearer "Cannot find module" pointing at the expected location.
+    return local;
+  }
+}
+
+const HOOKS_DIR = resolveHooksDir();
 
 const hookRunner = require(path.join(HOOKS_DIR, 'hook-runner.js'));
 const cie = require(path.join(HOOKS_DIR, 'cie.js'));
