@@ -24,34 +24,21 @@
  * CON-004: Errors written to .kaizen/logs/hook-calls/ via log-writer.js.
  */
 
-const fs = require('node:fs');
 const path = require('node:path');
 
 // Resolve the real handler modules inside `.kaizen-dvir/dvir/hooks/`.
 // Up 2: .claude/hooks -> .claude -> <projectRoot>
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
-// 2-step lookup so the shipped shim works in two install shapes:
-//   1. Monorepo / framework source — `.kaizen-dvir/dvir/hooks/` lives at
-//      <projectRoot>/.kaizen-dvir/dvir/hooks (current dev layout).
-//   2. Installed package — kaizen-init only copies a subset of dvir/ to the
-//      target project. The full `dvir/hooks/` ships inside the npm package
-//      at `node_modules/kaizen-dvir/.kaizen-dvir/dvir/hooks/`.
-function resolveHooksDir() {
-  const local = path.resolve(PROJECT_ROOT, '.kaizen-dvir', 'dvir', 'hooks');
-  if (fs.existsSync(path.join(local, 'hook-runner.js'))) return local;
-  try {
-    return path.dirname(
-      require.resolve('kaizen-dvir/.kaizen-dvir/dvir/hooks/hook-runner.js')
-    );
-  } catch (_) {
-    // Last resort: keep local path so the subsequent require throws a
-    // clearer "Cannot find module" pointing at the expected location.
-    return local;
-  }
-}
-
-const HOOKS_DIR = resolveHooksDir();
+// v1.7.3: simple local lookup. The full `dvir/` runtime tree is now copied
+// into every target project at init-time (RECURSIVE_COPY_DIRS in
+// bin/kaizen-init.js), so this path is always resolvable post-init. Works for
+// both monorepo / framework dev (the source IS the project) and end-user
+// projects (init copied the tree). The previous 2-step lookup with
+// `require.resolve('kaizen-dvir/...')` failed under `npx kaizen-dvir@latest
+// init` because npx never populates `node_modules/kaizen-dvir/` in the user's
+// project — see v1.7.3 release notes.
+const HOOKS_DIR = path.resolve(PROJECT_ROOT, '.kaizen-dvir', 'dvir', 'hooks');
 
 const hookRunner = require(path.join(HOOKS_DIR, 'hook-runner.js'));
 const cie = require(path.join(HOOKS_DIR, 'cie.js'));

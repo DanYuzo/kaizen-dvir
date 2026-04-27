@@ -41,27 +41,10 @@ const path = require('node:path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
-// 2-step lookup so the shipped shim works in two install shapes:
-//   1. Monorepo / framework source — `.kaizen-dvir/dvir/` lives at
-//      <projectRoot>/.kaizen-dvir/dvir (current dev layout).
-//   2. Installed package — kaizen-init only copies a subset of dvir/ to the
-//      target project. The full `dvir/` tree ships inside the npm package
-//      at `node_modules/kaizen-dvir/.kaizen-dvir/dvir/`.
-function resolveDvirDir() {
-  const local = path.resolve(PROJECT_ROOT, '.kaizen-dvir', 'dvir');
-  if (fs.existsSync(path.join(local, 'hooks', 'hook-runner.js'))) return local;
-  try {
-    return path.dirname(
-      path.dirname(
-        require.resolve('kaizen-dvir/.kaizen-dvir/dvir/hooks/hook-runner.js')
-      )
-    );
-  } catch (_) {
-    return local;
-  }
-}
-
-const DVIR_DIR = resolveDvirDir();
+// v1.7.3: simple local lookup. The full `dvir/` runtime tree is now copied
+// into every target project at init-time, so this path is always resolvable
+// post-init. See UserPromptSubmit.js for full rationale.
+const DVIR_DIR = path.resolve(PROJECT_ROOT, '.kaizen-dvir', 'dvir');
 const RUNNER_PATH = path.join(DVIR_DIR, 'hooks', 'hook-runner.js');
 const LOG_WRITER_PATH = path.join(DVIR_DIR, 'hooks', 'log-writer.js');
 const HANDOFF_ENGINE_PATH = path.join(DVIR_DIR, 'memory', 'handoff-engine.js');

@@ -39,11 +39,15 @@ function readRuleSeed(name) {
 
 // Files copied verbatim from the canonical installation into the target.
 // Tuple: [source-relative-to-INSTALL_ROOT, target-relative-to-process.cwd()]
+//
+// NOTE (v1.7.3): the entire `.kaizen-dvir/dvir/` tree is now copied recursively
+// via `RECURSIVE_COPY_DIRS` below — Option A (resolve from node_modules) failed
+// in fresh `npx kaizen-dvir@latest init` flows because npx does not populate
+// `node_modules/kaizen-dvir/` in the user's project. Option B (copy the tree
+// to the target) makes the hooks self-contained post-init.
 const COPY_MANIFEST = [
   ['.kaizen-dvir/commandments.md', '.kaizen-dvir/commandments.md'],
   ['.kaizen-dvir/dvir-config.yaml', '.kaizen-dvir/dvir-config.yaml'],
-  ['.kaizen-dvir/dvir/config-loader.js', '.kaizen-dvir/dvir/config-loader.js'],
-  ['.kaizen-dvir/dvir/boundary-toggle.js', '.kaizen-dvir/dvir/boundary-toggle.js'],
   ['.claude/settings.json', '.claude/settings.json'],
   ['.claude/README.md', '.claude/README.md'],
   // M6.1.2 fix: ship .claude/hooks/ shim scripts referenced by settings.json.
@@ -59,6 +63,23 @@ const COPY_MANIFEST = [
   // default (regardless of `files` whitelist), so reading it from
   // INSTALL_ROOT after `npm install` raises ENOENT. M6.1.1 fix: ship the
   // template via INLINE_TEMPLATES instead. See GITIGNORE_SCAFFOLD below.
+];
+
+// Recursive directory copies. Each entry is `[sourceRel, targetRel]` (relative
+// to INSTALL_ROOT and process.cwd() respectively). The whole subtree is mirrored
+// — every file under `sourceRel` is written under `targetRel` preserving
+// structure. Idempotent: existing files with identical bytes are left alone;
+// existing files with different bytes are PRESERVED (treated as expert forks)
+// so `kaizen update` (which knows merge semantics) owns subsequent updates.
+//
+// v1.7.3 fix: the dvir/ runtime (hooks, gates, doctor, memory, schemas, update,
+// migrations, yotzer, cell-registry) is shipped in the npm package via the
+// `files` whitelist and now lands inside the target project at init-time. The
+// hook shims in `.claude/hooks/*.js` resolve `dvir/hooks/` locally (no
+// `require.resolve('kaizen-dvir/...')` fallback needed) — the lookup is now
+// always satisfied because init copied the tree.
+const RECURSIVE_COPY_DIRS = [
+  ['.kaizen-dvir/dvir', '.kaizen-dvir/dvir'],
 ];
 
 const DIRS_TO_CREATE = [
@@ -278,6 +299,51 @@ function formatNotCleanError(conflicts) {
 function writeFileAtomic(absPath, canonical) {
   fs.mkdirSync(path.dirname(absPath), { recursive: true });
   fs.writeFileSync(absPath, canonical);
+}
+
+/**
+ * Recursively copy a directory tree from `<INSTALL_ROOT>/<srcRel>` into
+ * `<targetRoot>/<dstRel>`. Returns counts:
+ *   { copied: number, identical: number, preserved: number }
+ *
+ * Semantics (matches `installYotzer` for consistency):
+ *   - Missing target file → write canonical bytes (counts as `copied`).
+ *   - Existing target file with identical bytes → no-op (counts as `identical`).
+ *   - Existing target file with different bytes → PRESERVE target. Treated
+ *     as expert customization; v1.7.3 leaves any local edits alone so
+ *     `kaizen update` (M6.x) can resolve via merge semantics. Counts as
+ *     `preserved`.
+ *
+ * Stdlib only (CON-003). v1.7.3.
+ */
+function copyDirRecursive(srcRel, dstRel, targetRoot) {
+  const srcRoot = path.join(INSTALL_ROOT, srcRel);
+  const dstRoot = path.join(targetRoot, dstRel);
+  const counts = { copied: 0, identical: 0, preserved: 0 };
+
+  if (!fs.existsSync(srcRoot) || !fs.statSync(srcRoot).isDirectory()) {
+    return counts;
+  }
+
+  const files = walkSourceTree(srcRoot);
+  for (const rel of files) {
+    const absSrc = path.join(srcRoot, rel);
+    const absDst = path.join(dstRoot, rel);
+    const srcBuf = fs.readFileSync(absSrc);
+    if (fs.existsSync(absDst)) {
+      const dstBuf = fs.readFileSync(absDst);
+      if (Buffer.compare(srcBuf, dstBuf) === 0) {
+        counts.identical++;
+      } else {
+        counts.preserved++;
+      }
+      continue;
+    }
+    fs.mkdirSync(path.dirname(absDst), { recursive: true });
+    fs.writeFileSync(absDst, srcBuf);
+    counts.copied++;
+  }
+  return counts;
 }
 
 // -- Yotzer auto-install (Story M4.1, FR-002, AC-100) ---------------------
@@ -508,6 +574,19 @@ function init(args) {
   }
   // userPreserved: target has expert content — DO NOT touch.
 
+  // v1.7.3: copy the entire dvir/ runtime tree into the target project so the
+  // shipped `.claude/hooks/*.js` shims can resolve `dvir/hooks/hook-runner.js`,
+  // `cie.js`, `log-writer.js`, etc. locally. Without this, `npx kaizen-dvir
+  // init` left the target with broken hooks because the npx flow does not
+  // populate `node_modules/kaizen-dvir/` in the user's project.
+  let dvirCopyTotals = { copied: 0, identical: 0, preserved: 0 };
+  for (const [srcRel, dstRel] of RECURSIVE_COPY_DIRS) {
+    const c = copyDirRecursive(srcRel, dstRel, targetRoot);
+    dvirCopyTotals.copied += c.copied;
+    dvirCopyTotals.identical += c.identical;
+    dvirCopyTotals.preserved += c.preserved;
+  }
+
   // Yotzer auto-install after the L1/L2 skeleton lands (FR-002, AC-100).
   let yotzerResult = { copied: 0, skipped: 0, warning: null };
   try {
@@ -574,6 +653,9 @@ function init(args) {
     '  Já existentes (idênticos — preservados): ' + skipped + ' arquivo(s)\n' +
     userPreservedBlock +
     '  Total no esqueleto: ' + total + ' arquivo(s)\n' +
+    '  Runtime dvir/: ' + dvirCopyTotals.copied + ' arquivo(s) copiados; ' +
+    dvirCopyTotals.identical + ' idêntico(s); ' +
+    dvirCopyTotals.preserved + ' fork(s) do expert preservado(s).\n' +
     '  Yotzer: ' + yotzerResult.copied + ' arquivo(s) copiados; ' +
     yotzerResult.skipped + ' conjunto(s) preservados.\n' +
     skillsBlock +
@@ -601,6 +683,8 @@ if (require.main === module) {
 module.exports = init;
 module.exports.init = init;
 module.exports.COPY_MANIFEST = COPY_MANIFEST;
+module.exports.RECURSIVE_COPY_DIRS = RECURSIVE_COPY_DIRS;
+module.exports.copyDirRecursive = copyDirRecursive;
 module.exports.DIRS_TO_CREATE = DIRS_TO_CREATE;
 module.exports.GITKEEP_TARGETS = GITKEEP_TARGETS;
 module.exports.INLINE_TEMPLATES = INLINE_TEMPLATES;
