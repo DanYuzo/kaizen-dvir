@@ -41,12 +41,12 @@ definitivas no OST ligadas a Opportunities.
 
 ## Pre-condicao (bloqueante)
 
-F6 exige F4 PASS e F5 PASS. Archaeologist verifica via
+F6 exige que F4 e F5 ja estejam fechadas. Archaeologist verifica via
 `handoff-engine.readLatest()` os artefatos produzidos por F4 e F5 em
-M4.3. Se qualquer um falta, archaeologist bloqueia F6 e emite em
-pt-BR:
+M4.3. Se qualquer um falta, archaeologist pausa F6 e emite em pt-BR:
 
-`F6 precisa de F4 PASS e F5 PASS. execute a M4.3 antes.`
+`a fase 6 precisa que as fases 4 e 5 ja estejam fechadas. execute a
+M4.3 antes.`
 
 A pre-condicao nao aceita bypass. Chief nao pode forcar F6 sem os
 dois handoffs.
@@ -76,9 +76,9 @@ dois handoffs.
 9. Archaeologist gera handoff F6 para F7 via `handoff-engine.generate()`
    + `persist()`. O handoff lista Solutions por id, Links, caminho do
    process map To-be. Fica abaixo de 500 tokens.
-10. Chief apresenta Playback Gate F6 em pt-BR. F6 nao e critico:
-    auto-aprova em modo automatico quando o gate retorna PASS e o
-    checklist `playback-completeness.md` confere.
+10. Chief apresenta a revisao de fechamento da fase 6 em pt-BR. F6 nao
+    e critica: fecha sozinha em modo automatico quando o checklist
+    `playback-completeness.md` confere e nao ha pendencia.
 
 ## Post-condicao
 
@@ -86,18 +86,18 @@ dois handoffs.
 - Diagrama mermaid To-be com rotulos em pt-BR.
 - OST.md com Solutions definitivas populadas.
 - OST.md com Links Solution-Opportunity escritos.
-- Playback Gate F6 em PASS.
+- Revisao de fechamento da fase 6 fechada sem pendencia.
 
 ## Veto conditions
 
-F6 nao roda sem F4 PASS e F5 PASS. Archaeologist nao cria Solution
-sem Opportunity ligada. Archaeologist nao reescreve Solution: toda
-correcao entra como nova linha no Change Log.
+F6 nao roda sem as fases 4 e 5 fechadas. Archaeologist nao cria
+Solution sem Opportunity ligada. Archaeologist nao reescreve Solution:
+toda correcao entra como nova linha no Change Log.
 
 ## pt-BR — mensagens padrao
 
-- bloqueio de pre-condicao: `F6 precisa de F4 PASS e F5 PASS. execute a M4.3 antes.`
-- bloqueio de Solution orfa: `solution sem opportunity ligada. ligue antes do Playback.`
+- bloqueio de pre-condicao: `a fase 6 precisa que as fases 4 e 5 ja estejam fechadas. execute a M4.3 antes.`
+- bloqueio de Solution orfa: `a Solution esta sem Opportunity ligada. ligue antes da revisao de fechamento.`
 
 ## Referencia de escrita
 

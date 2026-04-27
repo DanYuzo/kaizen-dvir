@@ -1,6 +1,8 @@
-# Yotzer — Célula Meta de Criação de Células
+# Yotzer — Célula Meta para construção de SOs de workflow recorrente
 
-> Yotzer é a célula bundled do KaiZen que cria novas células. Ela tem duas superfícies de ativação: slash command interativo (sessão Claude Code) e shell subcommand (terminal programático). Esta regra explica quando usar cada uma.
+> Yotzer é a célula bundled do KaiZen que constrói o sistema operacional vivo de um workflow recorrente do expert. Cada célula gerada acompanha esse workflow, registra o que funciona, corta o que não funciona, e melhora iteração a iteração — kaizen aplicado ao próprio fazer do expert.
+>
+> Yotzer cria novas células como manifestação concreta desse princípio. Ela tem duas superfícies de ativação: slash command interativo (sessão Claude Code) e shell subcommand (terminal programático). Esta regra explica quando usar cada uma.
 
 ## Duas Superfícies de Ativação
 
@@ -16,7 +18,6 @@ As duas superfícies são produtos diferentes. O slash command é onde o expert 
 - Você ainda não sabe exatamente o que precisa criar.
 - Você quer dialogar com o `chief` para descobrir o caminho.
 - Você quer começar uma nova spec de célula do zero.
-- Você quer acessar um specialist direto: `/Kaizen:Yotzer:archaeologist`, `/Kaizen:Yotzer:publisher`, etc.
 
 ## Quando Usar o Shell Subcommand
 
@@ -44,20 +45,26 @@ O workflow do Yotzer é dividido em dez fases. O `chief` conduz a sequência; ca
 
 Detalhes operacionais e contratos de cada fase vivem em `.kaizen-dvir/celulas/yotzer/workflows/`.
 
-## Specialists Acessíveis Direto
+## Reativação Direta de Specialist (power-user)
 
-Sempre que você quer pular a entrada padrão e falar direto com um specialist, use a sub-skill:
+Os specialists não aparecem como slash commands na superfície default — o `chief` os carrega internamente via path de persona. Para um power-user que sabe exatamente qual specialist quer falar e prefere pular a entrada padrão, há um mecanismo de reativação direta: referenciar o arquivo de persona pelo `@path` (engine path, fonte real das personas).
 
 ```
-/Kaizen:Yotzer:archaeologist     → análise de fonte e exemplos
-/Kaizen:Yotzer:analyst           → stress-test e análise
-/Kaizen:Yotzer:architect         → desenho da célula
-/Kaizen:Yotzer:task-granulator   → granulação de tasks
-/Kaizen:Yotzer:validator         → Playback Gate
-/Kaizen:Yotzer:publisher         → publicação final
+@.kaizen-dvir/celulas/yotzer/agents/archaeologist.md          → análise de fonte e exemplos
+@.kaizen-dvir/celulas/yotzer/agents/contract-builder.md       → contratos de tasks/specialists
+@.kaizen-dvir/celulas/yotzer/agents/prioritizer.md            → priorização de escopo MVP
+@.kaizen-dvir/celulas/yotzer/agents/progressive-systemizer.md → sistematização incremental
+@.kaizen-dvir/celulas/yotzer/agents/publisher.md              → publicação final da célula
+@.kaizen-dvir/celulas/yotzer/agents/risk-mapper.md            → mapa de riscos do processo
+@.kaizen-dvir/celulas/yotzer/agents/stress-tester.md          → stress-test do processo
+@.kaizen-dvir/celulas/yotzer/agents/task-granulator.md        → granulação de tasks
 ```
 
-Quando em dúvida, ative o `chief` e deixe ele rotear.
+Esse caminho é opcional e voltado a quem já conhece o fluxo. Quando em dúvida, ative o `chief` (`/Kaizen:Yotzer`) e deixe ele rotear.
+
+## Regra invariante: 1 célula = 1 slash command
+
+Cada célula publicada (Yotzer e qualquer célula gerada por ela) expõe **apenas 1 slash command** — o entry point que carrega o `chief`. Specialists (tier 2, tier 3, sub-agentes) **não** recebem slash command próprio. Eles vivem no engine path (`@.kaizen-dvir/celulas/{nome}/agents/<id>.md`) e são carregados internamente pelo chief via roteamento de fase ou delegação. Power-user que quiser pular direto para um specialist usa o `@path` (mecanismo descrito acima), nunca um slash de superfície. Esta regra é validada pelo gate `F10b-CLI-MAPPED` do publisher e está documentada em `.kaizen-dvir/celulas/yotzer/templates/celula-blueprint-tmpl.yaml` (campo `slashPrefix`). O propósito é manter a superfície de ativação limpa, evitar duplicação de entry points, e centralizar a orquestração no chief.
 
 ## Quality Gates do Yotzer
 
@@ -67,7 +74,7 @@ Antes da publicação (F10), Yotzer aplica três gates:
 2. **Authority Gate** — autoridades declaradas não conflitam com Commandment II (cada um faz o seu).
 3. **Playback Gate** — expert recebe o resumo do que será gerado e confirma antes do build (Commandment VI).
 
-`FAIL` em qualquer gate retorna o trabalho à fase anterior com feedback específico. `WAIVED` exige `approved_by` do expert registrado no work artifact.
+Quando um gate identifica problema, o trabalho volta à fase anterior com feedback específico que descreve em pt-BR o que precisa ajustar. Quando o expert decide seguir mesmo com uma situação não ideal, a decisão fica registrada no work artifact com `approved_by`. Os termos `PASS`, `FAIL`, `CONCERNS` e `WAIVED` são identificadores internos de gate (telemetria, schemas, logs) — nunca aparecem como texto direto ao expert na conversa.
 
 ## Onde Saber Mais
 

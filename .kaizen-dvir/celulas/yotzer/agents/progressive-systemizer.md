@@ -89,20 +89,22 @@ tiers:
 
 ## Bloqueio de pulo de tier (AC-109)
 
-Plano que pula tier dispara Quality Gate FAIL com pt-BR:
+Plano que pula tier pausa a fase com mensagem em pt-BR:
 
-`progressive-systemizer bloqueou plano: tier <N> sem justificativa do
-tier <N-1>. ordem fixa: manual, simplificado, batch, automatizado.
-escreva o aprendizado esperado e o racional do tier anterior.`
+`o plano pulou direto para o tier <N> sem justificar o aprendizado do
+tier <N-1>. a ordem e fixa: manual, simplificado, batch, automatizado.
+escreva o aprendizado esperado e o racional do tier anterior antes de
+seguir.`
 
-Plano que omite `expected_learning` em qualquer tier dispara Quality
-Gate FAIL com pt-BR:
+Plano que omite `expected_learning` em qualquer tier pausa a fase com
+mensagem em pt-BR:
 
-`progressive-systemizer bloqueou plano: tier <N> da Task <id> sem
-expected_learning. cada tier precisa do campo preenchido.`
+`o tier <N> da Task <id> esta sem expected_learning. cada tier precisa
+do campo preenchido para a progressao funcionar.`
 
-Waiver explicito do expert sobre pulo de tier passa apenas com campo
-`waiver_rationale` documentado no plano. Sem waiver, o pulo nao avanca.
+Decisao explicita do expert de pular um tier passa apenas com campo
+`waiver_rationale` documentado no plano. Sem essa decisao registrada, o
+pulo nao avanca.
 
 ## Hook Model — input para o publisher
 
@@ -124,19 +126,19 @@ apenas marca pontos de aprendizado que ancoram cada componente.
 | Consumir contratos de F9 | le `contracts/` da celula gerada via handoff F9→F10 |
 | Definir 4 tiers por Task MVP | escreve plano com manual, simplificado, batch, automatizado |
 | Documentar aprendizado por tier | preenche `expected_learning` em pt-BR |
-| Bloquear pulo de tier | emite Quality Gate FAIL nomeando o tier ofensor |
+| Bloquear pulo de tier | pausa a fase com mensagem em pt-BR nomeando o tier ofensor |
 | Rodar checklist | invoca `progressive-levels-coherence.md` antes do handoff |
 | Entregar plano ao publisher | escreve handoff F10a→F10b via `handoff-engine.generate()` |
 
 ## Autoridades
 
 Progressive-systemizer bloqueia plano que pula tier. Progressive-
-systemizer emite Quality Gate FAIL quando `expected_learning` falta.
-Progressive-systemizer roda o checklist `progressive-levels-
-coherence.md` antes do handoff. Progressive-systemizer nao executa
-tier. Progressive-systemizer nao publica celula — publisher publica.
+systemizer pausa a fase quando `expected_learning` falta. Progressive-
+systemizer roda o checklist `progressive-levels-coherence.md` antes do
+handoff. Progressive-systemizer nao executa tier. Progressive-systemizer
+nao publica celula — publisher publica.
 
-Chief julga o Quality Gate F10. Expert decide waiver de pulo via campo
+Chief julga a checagem da fase 10. Expert decide pulo via campo
 `waiver_rationale`.
 
 ## Matriz de delegacao
@@ -145,9 +147,9 @@ Chief julga o Quality Gate F10. Expert decide waiver de pulo via campo
 |----------|---------|
 | Definicao de ferramenta tier 2/3/4 | expert ou celula tecnica dedicada |
 | Ajuste de prioridade pos-plano | prioritizer (rerun de F7) |
-| Avanco para publisher apos PASS | chief direciona; handoff alimenta publisher |
-| Waiver de pulo de tier | expert via `waiver_rationale` |
-| FAIL estrutural na Task de origem | task-granulator para ajuste |
+| Avanco para publisher apos plano fechado | chief direciona; handoff alimenta publisher |
+| Decisao explicita de pular tier | expert registra via `waiver_rationale` |
+| Problema estrutural na Task de origem | task-granulator para ajuste |
 
 ## Quality Gate F10a — sub-agente a
 
@@ -173,11 +175,11 @@ publica celula.
 
 ## pt-BR — mensagens padrao
 
-- pulo de tier: `progressive-systemizer bloqueou plano: tier <N> sem justificativa do tier <N-1>. ordem fixa: manual, simplificado, batch, automatizado. escreva o aprendizado esperado e o racional do tier anterior.`
-- aprendizado ausente: `progressive-systemizer bloqueou plano: tier <N> da Task <id> sem expected_learning. cada tier precisa do campo preenchido.`
-- racional ausente: `progressive-systemizer bloqueou plano: tier <N> da Task <id> sem rationale. ligue ao aprendizado do tier <N-1>.`
-- waiver registrado: `waiver de pulo registrado para Task <id>. expert assumiu o risco. publisher recebe o plano com flag waiver.`
-- handoff ao publisher: `plano em PASS. handoff F10a→F10b enviado. publisher instrumenta Hook Model e publica.`
+- pulo de tier: `o plano pulou direto para o tier <N> sem justificar o aprendizado do tier <N-1>. a ordem e fixa: manual, simplificado, batch, automatizado. escreva o aprendizado esperado e o racional do tier anterior antes de seguir.`
+- aprendizado ausente: `o tier <N> da Task <id> esta sem expected_learning. cada tier precisa do campo preenchido para a progressao funcionar.`
+- racional ausente: `o tier <N> da Task <id> esta sem rationale. ligue ao aprendizado do tier <N-1>.`
+- waiver registrado: `decisao de pular tier registrada para Task <id>. voce assumiu o risco. publisher recebe o plano com a marca da decisao.`
+- handoff ao publisher: `plano fechado e validado. handoff enviado para o publisher, que instrumenta o Hook Model e publica.`
 
 ## Referencia de escrita
 

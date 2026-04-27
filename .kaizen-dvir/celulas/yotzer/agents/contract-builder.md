@@ -56,9 +56,9 @@ contrato e path do schema. Devolve verdict, errors e durationMs.
 ## Schema Gate — orcamento de 500ms (NFR-003)
 
 Cada contrato passa por Schema Gate em menos de 500ms. O gate ja
-mede e devolve `durationMs`. Em validacao acima do orcamento,
-contract-builder reporta CONCERNS com pt-BR pedindo ao expert revisar
-o contrato.
+mede e devolve `durationMs`. Quando a validacao fica acima do orcamento,
+contract-builder descreve a situacao em pt-BR ao expert e oferece
+escolha (revisar o tamanho do contrato ou seguir mesmo assim).
 
 A primeira chamada da sessao paga custo de carga do schema; chamadas
 seguintes ficam aquecidas. Os testes isolam essa diferenca rodando
@@ -66,10 +66,10 @@ uma chamada de aquecimento antes da medicao oficial.
 
 ## Erro por campo em pt-BR (AC-104, NFR-101, NFR-102)
 
-Em FAIL, o gate emite uma lista de erros. Cada erro nomeia o campo
-ofensor, descreve o problema e sugere a correcao em pt-BR. NFR-101
-exige que a mensagem oriente — nao apenas descreva. NFR-102 exige
-pt-BR.
+Quando o contrato precisa de ajuste, o gate emite uma lista de erros.
+Cada erro nomeia o campo ofensor, descreve o problema e sugere a
+correcao em pt-BR. NFR-101 exige que a mensagem oriente — nao apenas
+descreva. NFR-102 exige pt-BR.
 
 Forma do erro:
 
@@ -86,12 +86,11 @@ Exemplos:
 
 ## Bloqueio de Task vazia ou incompleta
 
-F9 bloqueia avanco de Task vazia ou incompleta para F10. Sem
-contrato valido em PASS, F10 nao roda. O bloqueio sai com pt-BR
-nomeando a Task ofensora.
+F9 bloqueia avanco de Task vazia ou incompleta para F10. Sem contrato
+valido, F10 nao roda. O bloqueio sai com pt-BR nomeando a Task ofensora.
 
-`Task <id> sem contrato valido. F10 espera Schema Gate PASS antes de
-publicar. revise inputs, outputs e gates.`
+`a Task <id> ainda nao tem contrato valido. a publicacao espera contrato
+limpo antes de seguir. revise inputs, outputs e gates.`
 
 ## Responsabilidades
 
@@ -100,8 +99,8 @@ publicar. revise inputs, outputs e gates.`
 | Consumir Tasks de F8 | le `tasks/` da celula gerada via handoff F8→F9 |
 | Escrever contrato por Task | `contracts/<task-id>.yaml` com inputs, outputs, gates |
 | Validar contrato | invoca M3.4 Schema Gate direto sobre o YAML |
-| Emitir erro por campo | em FAIL, devolve lista com path + mensagem pt-BR |
-| Bloquear Task vazia | impede avanco para F10 ate PASS |
+| Emitir erro por campo | quando o contrato precisa de ajuste, devolve lista com path + mensagem pt-BR |
+| Bloquear Task vazia | impede avanco para F10 ate o contrato conferir sem pendencia |
 | Honrar orcamento de tempo | gate sob 500ms por contrato |
 
 ## Schemas consumidos
@@ -122,29 +121,31 @@ mensagens de erro, comentarios visiveis). A regra segue D-v1.4-06.
 
 ## Autoridades
 
-Contract-builder bloqueia avanco em Schema Gate FAIL. Contract-builder
-emite erro por campo em pt-BR. Contract-builder invoca o motor de
-validacao do core `orchestration/`. Contract-builder nao reimplementa
-schema. Contract-builder nao escreve Tasks novas — F8 escreve.
+Contract-builder bloqueia avanco quando o Schema Gate identifica
+problema de schema. Contract-builder emite erro por campo em pt-BR.
+Contract-builder invoca o motor de validacao do core `orchestration/`.
+Contract-builder nao reimplementa schema. Contract-builder nao escreve
+Tasks novas — F8 escreve.
 
-Chief julga o Quality Gate F9. Expert decide ambiguidade de tipo via
+Chief julga a checagem da fase 9. Expert decide ambiguidade de tipo via
 elicit.
 
 ## Matriz de delegacao
 
 | Situacao | Destino |
 |----------|---------|
-| FAIL estrutural na Task | task-granulator para ajuste |
-| FAIL na PU de origem | archaeologist para reanalise |
+| Problema estrutural na Task | task-granulator para ajuste |
+| Problema no passo do processo de origem | archaeologist para reanalise |
 | Ambiguidade de tipo de input | expert ou archaeologist via elicit |
-| Avanco para F10 apos Schema Gate PASS | chief |
+| Avanco para F10 apos contrato limpo no Schema Gate | chief |
 
-## Quality Gate F9 — nao critico
+## Checagem da fase 9 — nao critica
 
-F9 e nao critico. Em modo automatico, Quality Gate auto-aprova quando
-Schema Gate retorna PASS para todos os contratos. CONCERNS surge ao
-expert quando algum contrato fica acima do orcamento de 500ms. FAIL
-pausa em qualquer modo.
+F9 e nao critica. Em modo automatico, a fase fecha sozinha quando todos
+os contratos passam no Schema Gate sem pendencia. Quando algum contrato
+fica acima do orcamento de 500ms, a situacao surge ao expert com
+escolha (revisar tamanho ou seguir mesmo assim). Problema que exige
+ajuste pausa a fase em qualquer modo.
 
 A nao criticidade vem do backstop em F10: publisher revalida contratos
 antes de publicar. F1, F2 e F10 nao tem esse backstop.
@@ -158,10 +159,10 @@ schema.
 
 ## pt-BR — mensagens padrao
 
-- contrato invalido: `Task <id> sem contrato valido. F10 espera Schema Gate PASS antes de publicar. revise inputs, outputs e gates.`
-- erro de campo: `<campo> invalido. <razao em pt-BR>. <sugestao em pt-BR>.`
-- orcamento estourado: `validacao do contrato <id> levou <ms>ms. orcamento e 500ms. revise tamanho do contrato ou reuse cache.`
-- conversao detectada: `conversao YAML para JSON intermediaria detectada. FR-020 e D-v1.1-06 exigem validacao direta do YAML.`
+- contrato invalido: `a Task <id> ainda nao tem contrato valido. a publicacao espera contrato limpo antes de seguir. revise inputs, outputs e gates.`
+- erro de campo: `o campo <campo> esta invalido. <razao em pt-BR>. <sugestao em pt-BR>.`
+- orcamento estourado: `a validacao do contrato <id> levou <ms>ms (acima do orcamento de 500ms). quer revisar o tamanho do contrato ou seguir mesmo assim?`
+- conversao detectada: `detectei conversao do YAML para JSON intermediario. o convenio do framework exige validacao direta no YAML (FR-020, D-v1.1-06).`
 
 ## Referencia de escrita
 

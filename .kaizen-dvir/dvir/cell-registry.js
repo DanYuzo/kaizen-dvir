@@ -219,54 +219,22 @@ function registerCellSkills(cellRoot, claudeCommandsDir) {
   _writeIfChanged(entryPath, entryContent);
 
   // --------------------------------------------------------------------------
-  //  Specialist skills (chief included so /<prefix>:<chief-id> works)
+  //  Specialists: NO slash commands generated (Constitution: 1 cell = 1 slash).
+  //  Specialists live at <cellRoot>/agents/<id>.md and are loaded internally
+  //  by the chief. Power-users reactivate via @path; never via slash. The
+  //  rule is documented in `.kaizen-dvir/instructions/templates/rules/yotzer.md`
+  //  and enforced by the F10b-CLI-MAPPED gate in publisher.md.
   // --------------------------------------------------------------------------
-  fs.mkdirSync(specialistsDir, { recursive: true });
-
-  // Build the ordered list: chief first (so it lands at the top of the
-  // specialists folder), then the remaining tier_1 agents (none expected in
-  // the Yotzer fixture, but the contract supports multi-tier_1 cells), then
-  // tier_2, tier_3, ... in declared order. Each id appears at most once.
   const orderedAgentIds = _orderedAgentIds(tierAgents, chiefId);
-
   const specialistsWritten = [];
-  for (const agentId of orderedAgentIds) {
-    if (!RE_SAFE_AGENT_ID.test(agentId)) {
-      throw new Error(
-        "cell-registry: id de agente invalido '" +
-          agentId +
-          "' em celula '" +
-          cellName +
-          "'. Permitido apenas [a-z0-9-] iniciando com letra ou digito."
-      );
-    }
-    const personaAbs = path.join(cellRoot, 'agents', agentId + '.md');
-    if (!fs.existsSync(personaAbs)) {
-      // Soft failure for non-chief specialists.
-      warnings.push(
-        'Persona do especialista ausente em ' +
-          _relativizeForMsg(personaAbs) +
-          " para a celula '" +
-          cellName +
-          "'. Skill gerada referencia o arquivo mesmo assim; crie ou remova o agente do manifesto."
-      );
-    }
-    const specialistPath = path.join(specialistsDir, agentId + '.md');
-    const specialistContent = _renderSpecialistSkill({
-      slashPrefix,
-      cellName,
-      cellRoot,
-      agentId,
-      isChief: agentId === chiefId,
-    });
-    _writeIfChanged(specialistPath, specialistContent);
-    specialistsWritten.push(agentId);
-  }
 
   // --------------------------------------------------------------------------
-  //  Orphan detection (WARN-only — never delete; D.5)
+  //  Orphan detection (WARN-only — never delete; D.5).
+  //  Any .md file under specialistsDir is now an orphan — the new contract
+  //  generates ZERO specialist skills. Pre-existing files (from older versions
+  //  before the 1-cell-1-slash rule landed) are flagged so the expert can
+  //  remove them manually.
   // --------------------------------------------------------------------------
-  const expectedFiles = new Set(orderedAgentIds.map((id) => id + '.md'));
   let dirEntries = [];
   try {
     dirEntries = fs.readdirSync(specialistsDir, { withFileTypes: true });
@@ -276,11 +244,10 @@ function registerCellSkills(cellRoot, claudeCommandsDir) {
   for (const ent of dirEntries) {
     if (!ent.isFile()) continue;
     if (!ent.name.endsWith('.md')) continue;
-    if (expectedFiles.has(ent.name)) continue;
     warnings.push(
       "Skill orfa detectada em " +
         _relativizeForMsg(path.join(specialistsDir, ent.name)) +
-        ". Nao foi gerada por esta execucao. Arquivo preservado (politica WARN-only); remova manualmente se nao for mais usado."
+        ". A regra atual e 1 celula = 1 slash command (entry point); specialists nao recebem slash. Arquivo preservado (politica WARN-only); remova manualmente."
     );
   }
 
@@ -588,9 +555,9 @@ function _renderEntrySkill({
   lines.push('## Especialistas');
   lines.push('');
   lines.push(
-    'Os demais agentes da celula estao disponiveis como sub-skills em `/' +
-      slashPrefix +
-      ':<agent-id>` para reativacao direta.'
+    'Os specialists da celula nao aparecem como slash commands na superficie default — o `chief` os carrega internamente. Para power-users que querem reativar um specialist diretamente, leia o arquivo de persona em `@.kaizen-dvir/celulas/' +
+      cellName +
+      '/agents/<id>.md`.'
   );
   lines.push('');
   return lines.join('\n');

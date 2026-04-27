@@ -43,7 +43,7 @@ de sucesso que o proprio expert traz.
 
 ## Pre-condicao
 
-- F1 em PASS.
+- F1 fechada sem pendencia.
 - `outcome-statement.yaml` presente na celula gerada.
 
 ## As quatro modalidades de contexto — multi-select
@@ -85,8 +85,8 @@ armadilhas a evitar. Archaeologist persiste os exemplos em
 `diretrizes-escrita.md`, usando o template
 `templates/success-examples-tmpl.md`.
 
-Se o expert traz menos de 3 exemplos, archaeologist bloqueia o
-Playback Gate F2 e reporta em pt-BR:
+Se o expert traz menos de 3 exemplos, archaeologist pausa a revisao de
+fechamento da fase 2 e reporta em pt-BR:
 `preciso de 3 exemplos de sucesso. traga mais 2.`
 
 ## Criterios derivados
@@ -121,8 +121,9 @@ Archaeologist extrai criterios comuns entre os exemplos e escreve
 - `kbs/` populado com fontes ou referencias.
 - `kbs/success-examples.md` com 3 ou mais entradas em pt-BR.
 - `derived-criteria.yaml` presente na celula gerada.
-- Playback Gate F2 em PASS via `playback-gate.present()`.
-- Checklist `playback-completeness.md` em PASS.
+- Revisao de fechamento da fase 2 fechada via `playback-gate.present()`
+  sem pendencia.
+- Checklist `playback-completeness.md` confere sem pendencia.
 
 ## Veto conditions
 

@@ -51,7 +51,7 @@ Identifica o desbloqueio de maior alavancagem do MVP.
 
 ## Pre-condicao
 
-- F6 em PASS.
+- F6 fechada sem pendencia.
 - `to-be.yaml` presente na celula gerada.
 - `OST.md` com Solutions consolidadas em F6.
 
@@ -62,10 +62,11 @@ regra entra aqui de proposito repetido. Em disputa entre PUs proximas,
 a tentacao e quebrar uma das duas em sub-Tasks. Prioritizer resiste.
 PU continua inteira em F7.
 
-A violacao dispara FAIL com pt-BR citando `D-v1.2-03`:
+A violacao pausa a fase com mensagem em pt-BR citando `D-v1.2-03`:
 
-`granularizacao em F7 nao roda. D-v1.2-03 manda Tasks para F8
-(task-granulator). reabra esta priorizacao sem dividir a PU.`
+`quebrar passo do processo em sub-tarefas nao acontece nesta fase — isso
+e o trabalho da fase 8 (task-granulator). reabra a priorizacao sem
+dividir o passo. (D-v1.2-03)`
 
 ## Passos da fase
 
@@ -121,9 +122,10 @@ A violacao dispara FAIL com pt-BR citando `D-v1.2-03`:
    `persist()`. O payload carrega ponteiros para `mvp-backlog.yaml`,
    `roadmap.yaml` e a revisao corrente do `OST.md` com marcacoes. Fica
    abaixo de 500 tokens.
-10. Chief apresenta Quality Gate F7. F7 nao e critico: auto-aprova em
-    modo automatico quando o gate retorna PASS. CONCERNS surge ao
-    expert em qualquer modo. FAIL pausa em qualquer modo.
+10. Chief apresenta a checagem da fase 7. F7 nao e critica: fecha
+    sozinha em modo automatico quando nao ha pendencia. Situacoes nao
+    ideais surgem ao expert em qualquer modo, sempre com escolha
+    clara. Problema que exige ajuste pausa em qualquer modo.
 
 ## Post-condicao
 
@@ -134,7 +136,7 @@ A violacao dispara FAIL com pt-BR citando `D-v1.2-03`:
   Log.
 - desbloqueio de maior alavancagem identificado em
   `mvp-backlog.yaml`.
-- Quality Gate F7 em PASS.
+- Checagem da fase 7 fechada sem pendencia.
 
 ## Quality Gate F7 — criterios
 
@@ -147,7 +149,8 @@ A violacao dispara FAIL com pt-BR citando `D-v1.2-03`:
 | F7-UNBLOCKER | high | sequence_starts_with apontando para PU concreta |
 | F7-NO-GRANULARIZATION | critical | nenhuma tentativa de quebrar PU em Tasks |
 
-`F7-NO-GRANULARIZATION` dispara FAIL com mensagem citando `D-v1.2-03`.
+`F7-NO-GRANULARIZATION` pausa a fase com mensagem em pt-BR citando
+`D-v1.2-03`.
 
 Quality Gate F7 invoca o checklist `mvp-vs-roadmap-separation.md`
 antes de fechar o veredito.
@@ -160,11 +163,11 @@ Solution sem marca.
 
 ## pt-BR — mensagens padrao
 
-- bloqueio de pre-condicao: `F7 precisa de F6 PASS. execute F6 antes.`
-- granularizacao em F7: `granularizacao em F7 nao roda. D-v1.2-03 manda Tasks para F8 (task-granulator). reabra esta priorizacao sem dividir a PU.`
-- item sem rationale: `item <id> sem rationale ICE. registre Impact, Confidence e Ease em pt-BR.`
-- bloco misturado: `item <id> aparece em mvp e em roadmap. escolha um bloco so.`
-- Solution sem marca: `Solution <id> sem marca. escolha mvp ou roadmap antes de fechar F7.`
+- bloqueio de pre-condicao: `a fase 7 precisa que a fase 6 esteja fechada antes. execute a fase 6 primeiro.`
+- granularizacao nesta fase: `quebrar passo do processo em sub-tarefas nao acontece nesta fase — isso e o trabalho da fase 8 (task-granulator). reabra a priorizacao sem dividir o passo. (D-v1.2-03)`
+- item sem rationale: `o item <id> ainda nao tem rationale ICE. registre Impact, Confidence e Ease em pt-BR.`
+- bloco misturado: `o item <id> aparece em mvp e em roadmap. escolha um bloco so.`
+- Solution sem marca: `a Solution <id> ainda nao foi marcada. escolha mvp (entra agora) ou roadmap (entra depois) antes de fechar a fase 7.`
 
 ## Referencia de escrita
 

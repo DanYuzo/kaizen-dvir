@@ -9,8 +9,8 @@ o veredito da fase F4.
 
 ## Invocacao
 
-- [ ] disparado pelo Quality Gate F4 antes de emitir PASS.
-- [ ] chief consulta este checklist como ultimo passo do gate F4.
+- [ ] disparado pela checagem da fase 4 antes de fechar.
+- [ ] chief consulta este checklist como ultimo passo da fase 4.
 - [ ] expert ve o resultado item por item em pt-BR.
 
 ## Rastreabilidade do corte
@@ -25,16 +25,19 @@ o veredito da fase F4.
 ## Meta de corte
 
 - [ ] meta de ≥10% de corte sobre as PUs do As-is atingida, OU
-- [ ] waiver do expert registrado com `approved_by: expert` e razao.
-- [ ] gate nao falha apenas por meta nao atingida — emite CONCERNS com
-      caminho de waiver.
+- [ ] decisao do expert de seguir mesmo assim registrada com
+      `approved_by: expert` e razao.
+- [ ] a fase nao para apenas por meta nao atingida — descreve a
+      situacao ao expert e oferece escolha (aprofundar Deletar ou
+      seguir mesmo assim).
 
 ## Ordem Musk
 
 - [ ] ordem Musk respeitada em todas as iteracoes.
 - [ ] passos seguidos: Questionar → Deletar → Simplificar → Acelerar →
       Automatizar.
-- [ ] reordenacao detectada dispara FAIL antes do gate chegar aqui.
+- [ ] reordenacao detectada pausa a fase com pedido de voltar ao passo
+      correto antes da checagem chegar aqui.
 
 ## OST poda
 
@@ -47,5 +50,6 @@ o veredito da fase F4.
 
 - [ ] o passo Automatizar produz prosa conceitual.
 - [ ] nenhum artefato concreto de automacao sai de F4.
-- [ ] artefato concreto detectado dispara CONCERNS com redirecao para
-      F10 (publisher).
+- [ ] artefato concreto detectado surge ao expert com pergunta:
+      descrever a oportunidade em prosa por enquanto e mover a
+      automacao real para a fase 10 (publisher)?

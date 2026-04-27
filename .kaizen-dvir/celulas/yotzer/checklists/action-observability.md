@@ -10,8 +10,8 @@ D-v1.3-04, FR-108.
 
 ## Invocacao
 
-- [ ] disparado pelo Quality Gate F8 antes de emitir PASS.
-- [ ] chief consulta este checklist como ultimo passo do gate F8.
+- [ ] disparado pela checagem da fase 8 antes de fechar.
+- [ ] chief consulta este checklist como ultimo passo da fase 8.
 - [ ] expert ve o resultado item por item em pt-BR.
 
 ## Comportamento observavel
@@ -19,11 +19,11 @@ D-v1.3-04, FR-108.
 - [ ] toda Action descreve comportamento observavel por terceiro.
 - [ ] nenhum adjetivo inferencial ("seja carismatico", "mostre
       confianca").
-- [ ] cada Action passa o teste do observador externo: PASS ou FAIL
-      por inspecao direta.
-- [ ] forma PASS: "levante o tom de voz", "aumente 20% a velocidade",
+- [ ] cada Action passa o teste do observador externo: aceita ou
+      pendente por inspecao direta.
+- [ ] forma aceita: "levante o tom de voz", "aumente 20% a velocidade",
       "pause 2 segundos antes de revelar o preco".
-- [ ] forma FAIL: adjetivos sem verbo concreto.
+- [ ] forma pendente: adjetivos sem verbo concreto.
 
 ## Granularidade
 
@@ -32,21 +32,23 @@ D-v1.3-04, FR-108.
       de skill reusavel.
 - [ ] split registra duas Tasks ligadas a mesma Solution.
 - [ ] skill extraida tem forma registrada em pt-BR para reuso futuro.
-- [ ] Task com 8 ou mais Actions sem tratamento dispara FAIL.
+- [ ] Task com 8 ou mais Actions sem tratamento pausa a fase com pedido
+      de split ou skill extraida.
 
 ## Actions inline (AC-119, D-v1.3-04)
 
 - [ ] cada Task carrega Actions na secao `## Actions` do markdown.
 - [ ] nenhum arquivo `action-*.md` foi emitido em runtime.
-- [ ] tentativa de emitir `action-*.md` dispara FAIL citando AC-119
-      e D-v1.3-04.
+- [ ] tentativa de emitir `action-*.md` pausa a fase com pedido de
+      mover as Actions inline (citando AC-119 e D-v1.3-04).
 - [ ] publisher (M4.5) revalida ausencia de `action-*.md` na
       publicacao.
 
 ## OST — fechamento da cadeia (AC-117)
 
 - [ ] toda Task liga a exatamente uma Solution no `OST.md`.
-- [ ] Task sem Solution ligada dispara FAIL.
+- [ ] Task sem Solution ligada pausa a fase com pedido de ligar antes
+      de fechar.
 - [ ] mesma Solution pode ter mais de uma Task filha.
 - [ ] cadeia Outcome -> Opportunity -> Solution -> Task fica
       auditavel apos F8.
@@ -63,7 +65,7 @@ D-v1.3-04, FR-108.
 
 ## Granularizacao concentrada em F8
 
-- [ ] F3, F5 e F7 nao granularizam.
-- [ ] F8 e a unica fase de granularizacao (consolidacao v1.2).
-- [ ] tentativa de granularizar fora de F8 dispara FAIL citando
-      `D-v1.2-03`.
+- [ ] F3, F5 e F7 nao quebram passo do processo em sub-tarefas.
+- [ ] F8 e a unica fase onde a quebra acontece (consolidacao v1.2).
+- [ ] tentativa de quebrar fora de F8 pausa a fase com pedido de
+      reabrir sem dividir (citando `D-v1.2-03`).

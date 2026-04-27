@@ -57,7 +57,7 @@ Outcome (AC-117). NUNCA emite arquivo `action-*.md` em runtime
 
 ## Pre-condicao
 
-- F7 em PASS.
+- F7 fechada sem pendencia.
 - `mvp-backlog.yaml` presente na celula gerada.
 - `OST.md` com Solutions marcadas mvp.
 
@@ -70,32 +70,33 @@ NENHUM arquivo `action-*.md` pode ser emitido em runtime (AC-119,
 D-v1.3-04). Esta regra e load-bearing. F8 nao escreve arquivo separado
 de Action. F10 publisher revalida na publicacao.
 
-A violacao dispara FAIL com pt-BR:
+A violacao pausa a fase com mensagem em pt-BR:
 
-`Actions inline na Task. nenhum arquivo action-*.md sai. AC-119,
-D-v1.3-04. remova o arquivo e mova as Actions para o corpo da Task.`
+`as Actions devem ficar inline no corpo da Task — nenhum arquivo
+action-*.md sai daqui. quer que eu remova o arquivo e mova as Actions
+para dentro da Task? (AC-119, D-v1.3-04)`
 
-## Comportamento observavel — fronteira de PASS/FAIL (AC-108B)
+## Comportamento observavel — fronteira de aceitacao (AC-108B)
 
 Cada Action descreve comportamento observavel. Adjetivo inferencial
-dispara FAIL. Exemplos:
+pausa a fase com pedido de reescrita. Exemplos:
 
-| Forma | Verdict |
+| Forma | Aceito? |
 |-------|---------|
-| `levante o tom de voz` | PASS |
-| `aumente 20% a velocidade ao descrever o beneficio chave` | PASS |
-| `seja carismatico` | FAIL — adjetivo inferencial |
-| `mostre confianca` | FAIL — adjetivo inferencial |
-| `pause 2 segundos antes de revelar o preco` | PASS |
+| `levante o tom de voz` | sim |
+| `aumente 20% a velocidade ao descrever o beneficio chave` | sim |
+| `seja carismatico` | nao — adjetivo inferencial |
+| `mostre confianca` | nao — adjetivo inferencial |
+| `pause 2 segundos antes de revelar o preco` | sim |
 
-Quality Gate F8 invoca o checklist `action-observability.md` antes
-de fechar o veredito.
+A checagem da fase 8 invoca o checklist `action-observability.md`
+antes de fechar a fase.
 
 ## Regra de granularidade
 
 Task com mais de 5 a 7 Actions dispara split em duas Tasks OU
 extracao de skill reusavel. Task com 8 ou mais Actions sem split nem
-extracao dispara FAIL.
+extracao pausa a fase com pedido das duas escolhas.
 
 A skill extraida fica registrada como prosa em pt-BR. Skill fica fora
 do escopo de Yotzer; a forma fica registrada para reuso futuro.
@@ -113,10 +114,10 @@ do escopo de Yotzer; a forma fica registrada para reuso futuro.
 3. Task-granulator garante: nenhum arquivo `action-*.md` e criado.
    Actions ficam exclusivamente como markdown na Task.
 4. Task-granulator valida cada Action por comportamento observavel.
-   Adjetivo inferencial dispara FAIL com mensagem em pt-BR.
+   Adjetivo inferencial pausa a fase com pedido de reescrita em pt-BR.
 5. Task-granulator aplica regra de granularidade. Task com mais de 5
    a 7 Actions vira split ou skill. Task com 8 ou mais sem
-   tratamento dispara FAIL.
+   tratamento pausa a fase com pedido das duas escolhas.
 6. Task-granulator liga cada Task a uma Solution no `OST.md` via
    `ost-writer.appendChangeLog()`. A linha registra:
    ```
@@ -126,10 +127,11 @@ do escopo de Yotzer; a forma fica registrada para reuso futuro.
    `handoff-engine.generate()` + `persist()`. O payload carrega
    ponteiros para `tasks/` da celula gerada e a revisao corrente do
    `OST.md` com Tasks ligadas. Fica abaixo de 500 tokens.
-8. Chief apresenta Quality Gate F8. F8 nao e critico: auto-aprova em
-   modo automatico quando o gate retorna PASS. Quality Gate F8 invoca
-   o checklist `action-observability.md`. CONCERNS surge ao expert em
-   qualquer modo. FAIL pausa em qualquer modo.
+8. Chief apresenta a checagem da fase 8. F8 nao e critica: fecha
+   sozinha em modo automatico quando nao ha pendencia. A checagem
+   invoca o checklist `action-observability.md`. Situacoes nao ideais
+   surgem ao expert em qualquer modo, sempre com escolha clara.
+   Problema que exige ajuste pausa em qualquer modo.
 
 ## Post-condicao
 
@@ -141,7 +143,7 @@ do escopo de Yotzer; a forma fica registrada para reuso futuro.
 - toda Action descreve comportamento observavel (AC-108B).
 - toda Task respeita regra de granularidade (5 a 7 Actions OU split
   OU skill extraida).
-- Quality Gate F8 em PASS.
+- Checagem da fase 8 fechada sem pendencia.
 
 ## Test hook explicito
 
@@ -161,8 +163,8 @@ diretorio `tasks/` da celula gerada apos rodada de F8.
 | F8-PU-PAI | critical | toda Task carrega `pu_pai` |
 | F8-RC21 | high | hierarquia respeitada — Role > Workflow > Task > Action |
 
-Quality Gate F8 invoca o checklist `action-observability.md` antes
-de fechar o veredito.
+A checagem da fase 8 invoca o checklist `action-observability.md` antes
+de fechar a fase.
 
 ## Veto conditions
 
@@ -174,12 +176,12 @@ nem skill extraida.
 
 ## pt-BR — mensagens padrao
 
-- bloqueio de pre-condicao: `F8 precisa de F7 PASS. execute F7 antes.`
-- arquivo action-*.md detectado: `Actions inline na Task. nenhum arquivo action-*.md sai. AC-119, D-v1.3-04. remova o arquivo e mova as Actions para o corpo da Task.`
-- Action inferencial: `Action <id> usa adjetivo inferencial. descreva comportamento observavel (exemplo: levante o tom de voz).`
-- Task sem Solution ligada: `Task <id> sem Solution ligada no OST. ligue antes de fechar F8.`
-- Task com mais de 7 Actions: `Task <id> com <n> Actions. quebre em duas Tasks ou extraia skill reusavel.`
-- Task sem pu_pai: `Task <id> sem pu_pai. registre a PU de origem do MVP backlog.`
+- bloqueio de pre-condicao: `a fase 8 precisa que a fase 7 esteja fechada antes. execute a fase 7 primeiro.`
+- arquivo action-*.md detectado: `as Actions devem ficar inline no corpo da Task — nenhum arquivo action-*.md sai daqui. quer que eu remova o arquivo e mova as Actions para dentro da Task? (AC-119, D-v1.3-04)`
+- Action inferencial: `a Action <id> usa adjetivo inferencial — um observador externo nao consegue julgar pela forma escrita. reescreva descrevendo o comportamento concreto (exemplo: "levante o tom de voz" no lugar de "seja carismatico").`
+- Task sem Solution ligada: `a Task <id> ainda nao foi ligada a uma Solution no OST. ligue antes de fechar a fase para a cadeia ficar auditavel.`
+- Task com mais de 7 Actions: `a Task <id> tem <n> Actions — esta acima do limite saudavel de 5 a 7. quer quebrar em duas Tasks ou extrair uma skill reusavel?`
+- Task sem pu_pai: `a Task <id> esta sem pu_pai. registre o passo do processo de origem (vem do MVP backlog).`
 
 ## Referencia de escrita
 

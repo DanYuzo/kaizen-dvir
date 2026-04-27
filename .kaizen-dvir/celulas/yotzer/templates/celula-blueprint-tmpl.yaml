@@ -29,7 +29,14 @@ name: "<NOME-DA-CELULA>"
 # version — semver da celula. Publisher inicia em 1.0.0 (FR-115).
 version: "1.0.0"
 
-# slashPrefix — prefixo do comando slash da celula no Claude Code.
+# slashPrefix — prefixo do UNICO comando slash de superficie da celula
+# no Claude Code. Regra invariante: 1 celula publicada = 1 slash command
+# = 1 entry point que carrega o chief. Specialists (tier 2, tier 3,
+# sub-agentes) NAO recebem slash proprio. Eles ficam no engine path
+# (`.kaizen-dvir/celulas/{nome}/agents/<id>.md`) e sao carregados
+# internamente pelo chief via roteamento de fase ou delegacao.
+# Power-user reativa specialist via `@path` direto, nunca via slash de
+# superficie. Padrao espelha `kaizen/.claude/rules/yotzer.md`.
 slashPrefix: "Kaizen:<NomeDaCelula>"
 
 # description — descricao curta em pt-BR (1-2 frases).
@@ -63,7 +70,11 @@ tiers:
     agents:
       - "<specialist-agent-id>"
 
-# commands — comandos slash da celula.
+# commands — `*comandos` internos da celula, todos roteados pelo chief
+# sob o unico slash de superficie definido em `slashPrefix`. Cada entrada
+# aqui descreve um `*comando` (com prefixo `*`), nunca um novo slash
+# command separado. O campo `agent` aponta para o chief-agent-id em
+# todos os casos — specialists nao recebem slash proprio.
 commands:
   - name: "*novo"
     description: "<DESCRICAO-DO-COMANDO-EM-PT-BR>"

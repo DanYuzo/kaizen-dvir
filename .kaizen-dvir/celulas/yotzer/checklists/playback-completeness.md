@@ -1,10 +1,10 @@
-# Checklist — Playback Completeness
+# Checklist — Revisao de fechamento de fase
 
 <!--
-Checklist disparado em cada Playback Gate de Yotzer nas fases F1, F2,
-F3 e F6. Toda entrada em pt-BR segue `diretrizes-escrita.md`: frases
-curtas, presente, voz ativa, sem adverbios. Chief consulta este
-arquivo antes de emitir PASS no Playback.
+Checklist disparado em cada revisao de fechamento de fase do Yotzer
+nas fases F1, F2, F3 e F6. Toda entrada em pt-BR segue
+`diretrizes-escrita.md`: frases curtas, presente, voz ativa, sem
+adverbios. Chief consulta este arquivo antes de fechar a revisao.
 -->
 
 ## Itens comuns (F1, F2, F3, F6)
@@ -39,14 +39,14 @@ arquivo antes de emitir PASS no Playback.
 - [ ] mermaid com rotulos em pt-BR embutido no artefato.
 - [ ] PUs extraidos de relato do expert, nao inventados.
 - [ ] primeiras Opportunities no OST ligadas a pelo menos uma PU.
-- [ ] nao-critico — Playback auto-aprova em modo automatico quando PASS.
+- [ ] nao-critica — a revisao fecha sozinha em modo automatico quando nao ha pendencia.
 
 ## F6 — To-be
 
-- [ ] pre-condicao F4 PASS e F5 PASS verificada via handoff.
+- [ ] pre-condicao verificada via handoff: F4 e F5 ja estao fechadas.
 - [ ] process-map-to-be.yaml presente.
 - [ ] mermaid com rotulos em pt-BR embutido no artefato.
 - [ ] PUs incorporam filtro de F4 e mitigacoes de F5.
 - [ ] Solutions definitivas no OST ligadas a Opportunities.
 - [ ] toda Solution liga a pelo menos uma Opportunity.
-- [ ] nao-critico — Playback auto-aprova em modo automatico quando PASS.
+- [ ] nao-critica — a revisao fecha sozinha em modo automatico quando nao ha pendencia.

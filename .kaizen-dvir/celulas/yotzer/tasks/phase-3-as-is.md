@@ -39,7 +39,7 @@ Opportunities no OST.
 
 ## Pre-condicao
 
-- F2 em PASS.
+- F2 fechada sem pendencia.
 - `derived-criteria.yaml` presente.
 
 ## Passos
@@ -75,16 +75,16 @@ Opportunities no OST.
 9. Archaeologist gera handoff F3 para F4 via `handoff-engine.generate()`
    + `persist()`. O handoff lista PUs por id, pontos de dor, caminho
    do process map. Fica abaixo de 500 tokens.
-10. Chief apresenta Playback Gate F3 em pt-BR. F3 nao e critico:
-    auto-aprova em modo automatico quando o gate retorna PASS e o
-    checklist `playback-completeness.md` confere.
+10. Chief apresenta a revisao de fechamento da fase 3 em pt-BR. F3 nao
+    e critica: fecha sozinha em modo automatico quando o checklist
+    `playback-completeness.md` confere e nao ha pendencia.
 
 ## Post-condicao
 
 - `process-map-as-is.yaml` presente na celula gerada.
 - Diagrama mermaid com rotulos em pt-BR embutido no artefato.
 - OST.md com primeiras Opportunities populadas.
-- Playback Gate F3 em PASS.
+- Revisao de fechamento da fase 3 fechada sem pendencia.
 
 ## Veto conditions
 

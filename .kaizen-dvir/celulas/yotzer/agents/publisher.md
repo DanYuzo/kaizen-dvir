@@ -16,7 +16,7 @@ authorities:
   - run_schema_gate_on_manifest
   - close_ost_living_artifact
   - initialize_changelog_at_1_0_0
-  - configure_slash_command_on_generated_cell
+  - configure_single_slash_command_on_generated_cell  # 1 entry point por celula; specialists ficam em engine path, nunca expostos como slash
 delegation:
   structural_adjustment: responsible_phase_agent
   publish_execution: cli
@@ -80,35 +80,37 @@ por componente.
 ## Os quatro validadores de pre-publicacao
 
 Publisher roda quatro validadores em sequencia antes de criar
-`celulas/{nome}/`. Qualquer FAIL bloqueia a publicacao com erro pt-BR
-nomeando o artefato ofensor (NFR-101).
+`celulas/{nome}/`. Qualquer problema detectado bloqueia a publicacao
+com mensagem pt-BR nomeando o artefato ofensor e descrevendo o que
+ajustar (NFR-101).
 
 ### 1. Actions-inline (AC-119, D-v1.3-04)
 
 Publisher escaneia o `tasks/` da celula gerada com glob recursivo
-`**/action-*.md`. Qualquer match dispara FAIL com pt-BR:
+`**/action-*.md`. Qualquer match bloqueia a publicacao com mensagem
+em pt-BR:
 
-`publisher bloqueou publicacao: encontrei <path>. Actions devem ser
-inline no markdown da Task (D-v1.3-04). remova o arquivo e republique.`
+`encontrei <path>. as Actions devem ficar inline no markdown da Task
+(D-v1.3-04). remova o arquivo e tente publicar de novo.`
 
 ### 2. OST closure (AC-117)
 
 Publisher percorre `OST.md` como arvore. Cada Task aponta para
 Solution. Cada Solution aponta para Opportunity. Cada Opportunity
-aponta para Outcome. Aresta orfa dispara FAIL com pt-BR:
+aponta para Outcome. Aresta orfa bloqueia a publicacao com mensagem em
+pt-BR:
 
-`publisher bloqueou publicacao: <node-id> sem cadeia ate Outcome.
-revise o link em OST.md. F8 liga Tasks; F6 liga Solutions; F3 e F5
-abrem Opportunities.`
+`o no <node-id> nao tem cadeia completa ate o Outcome. revise o link em
+OST.md. F8 liga Tasks; F6 liga Solutions; F3 e F5 abrem Opportunities.`
 
 ### 3. workflows/ (D-v1.4-07)
 
 Publisher chama `fs.statSync` em `workflows/` da celula gerada. Sem o
-diretorio, FAIL com pt-BR:
+diretorio, a publicacao para com mensagem em pt-BR:
 
-`publisher bloqueou publicacao: diretorio workflows/ ausente. D-v1.4-07
-exige workflows/ em toda celula gerada. crie o diretorio com README.md
-explicando o proposito mesmo quando a celula nao declara workflow.`
+`o diretorio workflows/ esta ausente. toda celula gerada precisa dele
+(D-v1.4-07). crie o diretorio com um README.md explicando o proposito
+mesmo quando a celula nao declara workflow, e tente publicar de novo.`
 
 Diretorio vazio com `README.md` passa. A regra protege a estrutura
 contra omissao silenciosa.
@@ -116,17 +118,18 @@ contra omissao silenciosa.
 ### 4. kbs/success-examples.md (D-v1.4-09)
 
 Publisher abre `kbs/success-examples.md` e conta entradas. Menos de 3
-ou arquivo ausente dispara FAIL com pt-BR:
+ou arquivo ausente bloqueia a publicacao com mensagem em pt-BR:
 
-`publisher bloqueou publicacao: kbs/success-examples.md com <N>
-entradas. D-v1.4-09 exige minimo de 3 exemplos ancorados. archaeologist
-coleta exemplos em F2 — volte a F2 para completar.`
+`kbs/success-examples.md tem <N> entradas — preciso de pelo menos 3
+exemplos ancorados (D-v1.4-09). volte a F2 com o archaeologist para
+completar.`
 
 ## Schema Gate sobre o manifesto final (NFR-003)
 
 Apos os quatro validadores, publisher chama M3.4 Schema Gate sobre o
 `celula.yaml` final contra `celula-schema.json`. Sob 500ms (NFR-003).
-Em FAIL, publisher emite erro por campo em pt-BR e bloqueia.
+Quando o schema identifica problema, publisher emite erro por campo
+em pt-BR e para a publicacao.
 
 A primeira chamada da sessao paga o custo de carga do schema. Chamadas
 seguintes ficam aquecidas.
@@ -149,9 +152,17 @@ Publisher cria `celulas/{nome}/` com:
 
 ## CLI da celula gerada (AC-109A)
 
-Publisher configura `/Kaizen:{NomeDaCelula}` no manifesto e mapeia os
-`*comandos` internos. Ativacao em sessao limpa do Claude Code dispara
-o agente chief da celula.
+Publisher configura **um unico** `/Kaizen:{NomeDaCelula}` no manifesto —
+o entry point da celula. Esse slash carrega o agente chief da celula em
+sessao limpa do Claude Code. Os `*comandos` internos sao mapeados sob
+esse mesmo entry point e roteados pelo chief.
+
+Regra invariante: **uma celula publicada expoe apenas 1 slash command**.
+Os specialists (tier 2, tier 3, sub-agentes) NAO recebem slash command
+proprio. Eles ficam no engine path (`@.kaizen-dvir/celulas/{nome}/agents/<id>.md`)
+e sao carregados internamente pelo chief via roteamento de fase ou
+delegacao. Power-user pode reativar specialist direto pelo `@path` —
+nunca via slash de superficie. Padrao espelha `kaizen/.claude/rules/yotzer.md`.
 
 Publisher escreve a mensagem de boas-vindas via
 `welcome-message-tmpl.md`. Toda prosa em pt-BR segue
@@ -191,7 +202,7 @@ escrevendo no OST via `agents/_shared/ost-writer.js`.
 |------|----------|
 | Consumir plano do progressive-systemizer | le handoff F10a→F10b via `handoff-engine.readLatest('publisher')` |
 | Instrumentar Hook Model | escreve narrativa em pt-BR no manifesto ou README |
-| Configurar CLI | adiciona `/Kaizen:{Nome}` + `*comandos` ao manifesto |
+| Configurar CLI | adiciona **1 unico** `/Kaizen:{Nome}` (entry point) + `*comandos` internos ao manifesto. Specialists nao recebem slash proprio — ficam em engine path e sao carregados pelo chief |
 | Escrever welcome | renderiza `welcome-message-tmpl.md` em pt-BR |
 | Validar Actions-inline | glob `**/action-*.md` em `tasks/` |
 | Validar OST closure | percorre `OST.md` ate Outcome |
@@ -205,14 +216,14 @@ escrevendo no OST via `agents/_shared/ost-writer.js`.
 
 ## Autoridades
 
-Publisher emite o veredito final do Quality Gate F10. Publisher
-registra `1.0.0` no manifesto. Publisher cria `celulas/{nome}/`. Publisher
-nao altera artefato de fase anterior. Publisher nao escreve persona
-nova — task-granulator escreve em F8 a partir do `agent-tmpl.yaml`.
-Publisher nao promove padrao — promocao e expert-gated via M3.5
-`pattern-promoter` (Comandamento V).
+Publisher fecha a checagem final da fase 10. Publisher registra `1.0.0`
+no manifesto. Publisher cria `celulas/{nome}/`. Publisher nao altera
+artefato de fase anterior. Publisher nao escreve persona nova —
+task-granulator escreve em F8 a partir do `agent-tmpl.yaml`. Publisher
+nao promove padrao — promocao e expert-gated via M3.5 `pattern-promoter`
+(Comandamento V).
 
-Chief julga o Quality Gate F10. Expert valida a celula publicada,
+Chief julga a checagem da fase 10. Expert valida a celula publicada,
 manifesto, fechamento de OST e ativacao via `/Kaizen:{Nome}`.
 
 ## Matriz de delegacao
@@ -225,7 +236,7 @@ manifesto, fechamento de OST e ativacao via `/Kaizen:{Nome}`.
 | Reordenacao MVP | prioritizer (F7) |
 | Execucao de publicacao | CLI `/Kaizen:Yotzer publish {work-id}` |
 | Promocao de padrao | expert via M3.5 `pattern-promoter` |
-| Avanco para integracao M4.6 | chief direciona apos PASS de F10 |
+| Avanco para integracao M4.6 | chief direciona apos F10 fechada |
 
 ## Quality Gate F10b — sub-agente b (CRITICAL INVARIANT, AC-102)
 
@@ -243,7 +254,7 @@ playback-gate honra `criticalInvariant: true`.
 | F10b-MANIFEST-SCHEMA | critical | manifesto valida em Schema Gate sob 500ms (NFR-003) |
 | F10b-VERSION-1-0-0 | critical | manifesto declara `version: "1.0.0"` (FR-115) |
 | F10b-HOOK-MODEL-4 | critical | quatro componentes instrumentados (AC-109A) |
-| F10b-CLI-MAPPED | critical | `/Kaizen:{Nome}` + `*comandos` configurados |
+| F10b-CLI-MAPPED | critical | **1 unico** `/Kaizen:{Nome}` (entry point que carrega chief) + `*comandos` internos configurados; nenhum specialist exposto como slash de superficie |
 | F10b-PLAYBACK-PAUSES | critical | playback-gate pausa em modo automatico |
 
 ## Veto conditions
@@ -257,12 +268,12 @@ republicacao sem confirmacao.
 
 ## pt-BR — mensagens padrao
 
-- bloqueio Actions-inline: `publisher bloqueou publicacao: encontrei <path>. Actions devem ser inline no markdown da Task (D-v1.3-04). remova o arquivo e republique.`
-- bloqueio OST orfa: `publisher bloqueou publicacao: <node-id> sem cadeia ate Outcome. revise o link em OST.md. F8 liga Tasks; F6 liga Solutions; F3 e F5 abrem Opportunities.`
-- bloqueio workflows/: `publisher bloqueou publicacao: diretorio workflows/ ausente. D-v1.4-07 exige workflows/ em toda celula gerada. crie o diretorio com README.md explicando o proposito mesmo quando a celula nao declara workflow.`
-- bloqueio success-examples: `publisher bloqueou publicacao: kbs/success-examples.md com <N> entradas. D-v1.4-09 exige minimo de 3 exemplos ancorados. archaeologist coleta exemplos em F2 — volte a F2 para completar.`
-- bloqueio Schema Gate: `publisher bloqueou publicacao: manifesto invalido em <campo>. <mensagem do schema>. corrija o campo e republique.`
-- bloqueio orcamento: `validacao do manifesto levou <ms>ms. orcamento e 500ms. revise tamanho do manifesto.`
+- bloqueio Actions-inline: `encontrei <path>. as Actions devem ficar inline no markdown da Task (D-v1.3-04). remova o arquivo e tente publicar de novo.`
+- bloqueio OST orfa: `o no <node-id> nao tem cadeia completa ate o Outcome. revise o link em OST.md. F8 liga Tasks; F6 liga Solutions; F3 e F5 abrem Opportunities.`
+- bloqueio workflows/: `o diretorio workflows/ esta ausente. toda celula gerada precisa dele (D-v1.4-07). crie o diretorio com um README.md explicando o proposito mesmo quando a celula nao declara workflow, e tente publicar de novo.`
+- bloqueio success-examples: `kbs/success-examples.md tem <N> entradas — preciso de pelo menos 3 exemplos ancorados (D-v1.4-09). volte a F2 com o archaeologist para completar.`
+- bloqueio Schema Gate: `o manifesto esta invalido no campo <campo>. <mensagem do schema>. corrija o campo e tente publicar de novo.`
+- bloqueio orcamento: `a validacao do manifesto levou <ms>ms (acima do orcamento de 500ms). quer revisar o tamanho do manifesto ou seguir mesmo assim?`
 - sucesso: `celula <nome> publicada em celulas/<nome>/. versao 1.0.0 registrada. ative com /Kaizen:<NomeDaCelula>.`
 - republicacao detectada: `a celula <nome> ja foi publicada. detectei edicoes feitas apos o ultimo publish. voce quer (a) sobrescrever, (b) criar versao paralela celulas/<nome>-v2/, ou (c) cancelar?`
 

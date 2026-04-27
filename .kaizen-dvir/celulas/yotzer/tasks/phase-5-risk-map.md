@@ -55,9 +55,16 @@ recomendacao de corte que volta para F4. Risk-mapper redige garantias
 de risk-reversal para a celula gerada. F5 cresce o OST com
 Opportunities residuais e primeiras Solutions.
 
+**Referencia de avaliacao:** o risco mapeado por PU avalia o impacto
+sobre o output do processo (a entrega concreta do workflow recorrente,
+implicita no `process-map-as-is.yaml`), nao sobre a metrica de negocio
+(gravada em `outcome-statement.yaml`). Risco que nao toca o output do
+processo fica fora de F5 — entra em conversa estrategica fora desta
+fase.
+
 ## Pre-condicao
 
-- F4 em PASS.
+- F4 fechada sem pendencia.
 - `as-is-filtered.yaml` presente na celula gerada.
 
 ## Fronteira critica — F5 NAO granulariza
@@ -67,11 +74,11 @@ regra entra aqui de proposito repetido. Quando a analise revela
 sub-fluxo dentro de uma PU, a tentacao e abrir em sub-Tasks.
 Risk-mapper resiste. PU continua inteira em F5.
 
-A violacao dispara Quality Gate FAIL com mensagem em pt-BR citando
-`D-v1.2-03`:
+A violacao pausa a fase com mensagem em pt-BR citando `D-v1.2-03`:
 
-`granularizacao em F5 nao roda. D-v1.2-03 manda Tasks para F8
-(task-granulator). reabra esta analise sem dividir a PU.`
+`quebrar passo do processo em sub-tarefas nao acontece nesta fase — isso
+e o trabalho da fase 8 (task-granulator). reabra a analise de risco sem
+dividir o passo. (D-v1.2-03)`
 
 ## Passos da fase
 
@@ -80,10 +87,16 @@ A violacao dispara Quality Gate FAIL com mensagem em pt-BR citando
    ponteiros para `as-is-filtered.yaml`, `cut-log.yaml` e a revisao
    corrente do `OST.md`.
 2. Para cada PU sobrevivente, risk-mapper enumera riscos em tres
-   categorias:
+   categorias. Cada categoria carrega a mesma pergunta-guia: **este
+   risco quebra o output do processo?**
    - **operacional** — risco no fluxo, na execucao, no humano.
+     Pergunta-guia: este risco no fluxo quebra o output do processo?
    - **tecnico** — risco em ferramenta, integracao, dado.
+     Pergunta-guia: este risco tecnico impede o processo de entregar
+     seu output?
    - **dependencia** — risco em terceiro, prazo, recurso externo.
+     Pergunta-guia: esta dependencia bloqueia a entrega do output do
+     processo?
 3. Para cada risco enumerado, risk-mapper associa destino:
    - **mitigacao concreta** — descreve a acao em prosa pt-BR.
    - **aceite explicito** — grava `approved_by: expert` + razao.
@@ -133,9 +146,10 @@ A violacao dispara Quality Gate FAIL com mensagem em pt-BR citando
    `risk-reversal-guarantees.yaml` e a revisao corrente do `OST.md`
    com Opportunities residuais e primeiras Solutions. Fica abaixo de
    500 tokens.
-9. Chief apresenta Quality Gate F5. F5 nao e critico: auto-aprova em
-   modo automatico quando o gate retorna PASS. CONCERNS surge ao
-   expert em qualquer modo. FAIL pausa em qualquer modo.
+9. Chief apresenta a checagem da fase 5. F5 nao e critica: fecha
+   sozinha em modo automatico quando nao ha pendencia. Situacoes nao
+   ideais surgem ao expert em qualquer modo, sempre com escolha clara.
+   Problema que exige ajuste pausa em qualquer modo.
 
 ## Post-condicao
 
@@ -144,7 +158,7 @@ A violacao dispara Quality Gate FAIL com mensagem em pt-BR citando
 - `OST.md` com Opportunities residuais adicionadas.
 - `OST.md` com primeiras Solutions adicionadas e ligadas a
   Opportunities.
-- Quality Gate F5 em PASS.
+- Checagem da fase 5 fechada sem pendencia.
 
 ## Quality Gate F5 — criterios
 
@@ -156,7 +170,8 @@ A violacao dispara Quality Gate FAIL com mensagem em pt-BR citando
 | F5-OST-SOLUTIONS-LINKED | high | toda Solution liga a uma Opportunity de origem |
 | F5-RISK-REVERSAL-PATTERNS | medium | quatro padroes presentes em `risk-reversal-guarantees.yaml` |
 
-`F5-NO-GRANULARIZATION` dispara FAIL com mensagem citando `D-v1.2-03`.
+`F5-NO-GRANULARIZATION` pausa a fase com mensagem em pt-BR citando
+`D-v1.2-03`.
 
 ## Veto conditions
 
@@ -167,11 +182,11 @@ sem Opportunity de origem.
 
 ## pt-BR — mensagens padrao
 
-- bloqueio de pre-condicao: `F5 precisa de F4 PASS. execute F4 antes.`
-- granularizacao em F5: `granularizacao em F5 nao roda. D-v1.2-03 manda Tasks para F8 (task-granulator). reabra esta analise sem dividir a PU.`
-- risco sem destino: `risco <id> na PU <id> sem destino. escolha mitigacao, aceite ou corte.`
-- aceite sem approved_by: `aceite sem approved_by. expert precisa aprovar antes de seguir.`
-- Solution sem Opportunity: `Solution <id> sem Opportunity de origem. ligue antes de salvar.`
+- bloqueio de pre-condicao: `a fase 5 precisa que a fase 4 esteja fechada antes. execute a fase 4 primeiro.`
+- granularizacao nesta fase: `quebrar passo do processo em sub-tarefas nao acontece nesta fase — isso e o trabalho da fase 8 (task-granulator). reabra a analise de risco sem dividir o passo. (D-v1.2-03)`
+- risco sem destino: `o risco <id> no passo <id> esta sem destino. quer mitigar com uma acao concreta, aceitar conviver com ele, ou recomendar corte do passo?`
+- aceite sem approved_by: `o aceite deste risco precisa do seu nome registrado para seguir. ok aprovar?`
+- Solution sem Opportunity: `a Solution <id> ainda nao foi ligada a uma Opportunity de origem. ligue antes de salvar para a cadeia ficar auditavel.`
 
 ## Referencia de escrita
 

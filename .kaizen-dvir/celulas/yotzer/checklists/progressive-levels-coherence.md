@@ -13,17 +13,17 @@ falha em qualquer item dispara FAIL.
 ## Como usar este checklist
 
 Progressive-systemizer roda este checklist apos escrever o plano de
-quatro tiers por Task MVP. Cada item devolve PASS ou FAIL. Qualquer
-FAIL bloqueia o handoff ao publisher e devolve o plano ao expert para
-ajuste.
+quatro tiers por Task MVP. Cada item devolve aceito ou pendente.
+Qualquer pendencia bloqueia o handoff ao publisher e devolve o plano
+ao expert para ajuste.
 
 ## 1. Quatro niveis declarados por Task MVP
 
 - [ ] Toda Task MVP carrega quatro tiers no plano.
 - [ ] Nenhum tier omitido. Sem placeholder vazio.
 
-**Falha pt-BR:** `Task <id> tem <N> tiers. cada Task MVP precisa de
-manual, simplificado, batch e automatizado.`
+**Pendencia pt-BR ao expert:** `a Task <id> tem <N> tiers. cada Task
+MVP precisa dos quatro: manual, simplificado, batch e automatizado.`
 
 ## 2. Ordem manual → simplificado → batch → automatizado
 
@@ -31,8 +31,8 @@ manual, simplificado, batch e automatizado.`
 - [ ] Nenhum tier acima sem o anterior validado.
 - [ ] Sem inversao de ordem. Sem mistura de degraus.
 
-**Falha pt-BR:** `Task <id> com tiers fora de ordem. ordem fixa: manual,
-simplificado, batch, automatizado.`
+**Pendencia pt-BR ao expert:** `a Task <id> tem tiers fora de ordem.
+a ordem e fixa: manual, simplificado, batch, automatizado.`
 
 ## 3. Aprendizado esperado documentado por nivel
 
@@ -40,8 +40,8 @@ simplificado, batch, automatizado.`
 - [ ] Cada `expected_learning` descreve o que o expert valida.
 - [ ] Nenhum campo vazio ou generico.
 
-**Falha pt-BR:** `Task <id> tier <N> sem expected_learning. cada tier
-precisa do campo preenchido.`
+**Pendencia pt-BR ao expert:** `o tier <N> da Task <id> esta sem
+expected_learning. cada tier precisa do campo preenchido.`
 
 ## 4. Racional ligando tier <N> ao tier <N-1>
 
@@ -49,8 +49,8 @@ precisa do campo preenchido.`
 - [ ] Cada `rationale` cita o aprendizado do tier anterior.
 - [ ] Nenhum tier superior justificado por especulacao.
 
-**Falha pt-BR:** `Task <id> tier <N> sem rationale ligando ao tier
-<N-1>. ligue ao aprendizado do tier anterior.`
+**Pendencia pt-BR ao expert:** `o tier <N> da Task <id> esta sem
+rationale ligando ao tier <N-1>. ligue ao aprendizado do tier anterior.`
 
 ## 5. Hook Model com quatro componentes instrumentados
 
@@ -59,33 +59,36 @@ precisa do campo preenchido.`
 - [ ] Plano marca o ponto que ancora Variable Reward.
 - [ ] Plano marca o ponto que ancora Investment.
 
-**Falha pt-BR:** `Hook Model incompleto: <componente> sem ponto de
-aprendizado ancorado. publisher exige os quatro componentes.`
+**Pendencia pt-BR ao expert:** `Hook Model incompleto — o componente
+<componente> esta sem ponto de aprendizado ancorado. publisher precisa
+dos quatro componentes.`
 
 ## 6. CLI com `/Kaizen:{Nome}` + `*comandos` mapeados
 
-- [ ] Plano declara o slash command da celula gerada.
-- [ ] Plano lista os `*comandos` internos (start, status, modo, etc.).
+- [ ] Plano declara **1 unico** slash command da celula gerada (entry point que carrega chief).
+- [ ] Plano lista os `*comandos` internos (start, status, modo, etc.) sob esse mesmo entry point.
 - [ ] Cada comando aponta para uma task valida.
+- [ ] Plano confirma que specialists (tier 2/3, sub-agentes) NAO recebem slash proprio — ficam em engine path.
 
-**Falha pt-BR:** `CLI da celula incompleto: <campo> ausente. publisher
-configura /Kaizen:<Nome> + *comandos antes de publicar.`
+**Pendencia pt-BR ao expert:** `CLI da celula incompleto — o campo
+<campo> esta ausente. publisher configura /Kaizen:<Nome> + *comandos
+antes de publicar.`
 
 ## 7. Waiver explicito quando aplicavel
 
 - [ ] Pulo de tier registrado com `waiver_rationale` em pt-BR.
 - [ ] Waiver assinado pelo expert com data ISO.
 
-**Falha pt-BR:** `pulo de tier sem waiver. registre waiver_rationale
-em pt-BR para o expert assumir o risco.`
+**Pendencia pt-BR ao expert:** `pulo de tier sem decisao registrada.
+registre waiver_rationale em pt-BR para o expert assumir o risco.`
 
-## Quality Gate F10a — integracao
+## Checagem da fase 10a — integracao
 
-Falha em qualquer item dispara Quality Gate F10a FAIL.
-Progressive-systemizer bloqueia o handoff ao publisher. Chief
-apresenta a falha ao expert em pt-BR. Plano volta para ajuste.
+Pendencia em qualquer item bloqueia a fase. Progressive-systemizer
+bloqueia o handoff ao publisher. Chief apresenta a pendencia ao expert
+em pt-BR. Plano volta para ajuste.
 
-PASS em todos os itens libera o handoff F10a→F10b. Publisher
+Quando todos os itens conferem, o handoff F10a→F10b sai. Publisher
 instrumenta o Hook Model, configura o CLI e segue para os quatro
 validadores de pre-publicacao.
 

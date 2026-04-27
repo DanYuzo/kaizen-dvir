@@ -9,8 +9,8 @@ de fechar o veredito da fase F7. Origem: AC-108A, FR-105.
 
 ## Invocacao
 
-- [ ] disparado pelo Quality Gate F7 antes de emitir PASS.
-- [ ] chief consulta este checklist como ultimo passo do gate F7.
+- [ ] disparado pela checagem da fase 7 antes de fechar.
+- [ ] chief consulta este checklist como ultimo passo da fase 7.
 - [ ] expert ve o resultado item por item em pt-BR.
 
 ## ICE por PU
@@ -51,11 +51,13 @@ de fechar o veredito da fase F7. Origem: AC-108A, FR-105.
 ## Fronteira de blocos
 
 - [ ] nenhum item aparece nos dois blocos ao mesmo tempo.
-- [ ] item duplicado entre blocos dispara FAIL.
+- [ ] item duplicado entre blocos pausa a fase com pedido de escolher
+      um bloco so.
 - [ ] cada PU sobrevivente fica em um bloco so.
 
-## Granularizacao bloqueada
+## Quebra de passo do processo bloqueada
 
-- [ ] F7 nao quebra PU em sub-Tasks.
-- [ ] tentativa de granularizar dispara FAIL citando `D-v1.2-03`.
-- [ ] granularizacao acontece em F8 (task-granulator).
+- [ ] F7 nao quebra passo do processo em sub-Tasks.
+- [ ] tentativa de quebrar pausa a fase com pedido de reabrir sem
+      dividir (citando `D-v1.2-03`).
+- [ ] a quebra acontece na fase 8 (task-granulator).

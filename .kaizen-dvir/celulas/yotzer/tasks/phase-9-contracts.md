@@ -45,11 +45,12 @@ aplicaveis. M3.4 Schema Gate valida o YAML diretamente contra
 `celula-schema.json` e `task-contract-schema.json` em
 `.kaizen-dvir/dvir/schemas/`. Sem conversao YAML para JSON
 intermediaria (FR-020, D-v1.1-06). Sob 500ms por contrato (NFR-003).
-Em FAIL, Schema Gate emite erro por campo em pt-BR (AC-104).
+Quando o schema identifica problema, Schema Gate emite erro por campo
+em pt-BR (AC-104).
 
 ## Pre-condicao
 
-- F8 em PASS.
+- F8 fechada sem pendencia.
 - `tasks/` da celula gerada populado com Tasks atomicas e Actions
   inline.
 
@@ -59,16 +60,17 @@ Schema Gate consome YAML direto. Recebe path do contrato e path do
 schema. Devolve verdict, errors, durationMs. Nao existe arquivo JSON
 intermediario gerado em runtime. Esta regra e load-bearing.
 
-A violacao dispara CONCERNS com pt-BR:
+A violacao surge ao expert em pt-BR:
 
-`conversao YAML para JSON intermediaria detectada. FR-020 e D-v1.1-06
-exigem validacao direta do YAML.`
+`detectei conversao do YAML para JSON intermediario. o convenio do
+framework exige validacao direta no YAML (FR-020, D-v1.1-06).`
 
 ## Erro por campo em pt-BR (AC-104, NFR-101, NFR-102)
 
-Schema Gate em FAIL devolve lista de erros. Cada erro nomeia o campo
-ofensor, descreve o problema e sugere a correcao em pt-BR. NFR-101
-exige que a mensagem oriente. NFR-102 exige pt-BR.
+Quando o Schema Gate identifica problema, ele devolve lista de erros.
+Cada erro nomeia o campo ofensor, descreve o problema e sugere a
+correcao em pt-BR. NFR-101 exige que a mensagem oriente. NFR-102 exige
+pt-BR.
 
 Exemplos:
 
@@ -104,33 +106,34 @@ Exemplos:
    diretamente. Sem conversao YAML para JSON intermediaria
    (FR-020, D-v1.1-06). Schema Gate retorna `verdict`, `errors`,
    `durationMs`.
-4. Em PASS com `durationMs < 500`, contract-builder fecha o contrato.
-5. Em PASS com `durationMs >= 500`, contract-builder reporta CONCERNS
-   pedindo revisao do tamanho do contrato (NFR-003).
-6. Em FAIL, Schema Gate emite erro por campo em pt-BR (AC-104).
-   Contract-builder bloqueia avanco. Task volta para task-granulator
-   para ajuste estrutural OU para archaeologist se a PU de origem
-   estiver incompleta.
+4. Quando o schema confere e `durationMs < 500`, contract-builder
+   fecha o contrato.
+5. Quando o schema confere mas `durationMs >= 500`, contract-builder
+   surge ao expert pedindo revisao do tamanho do contrato (NFR-003).
+6. Quando o schema identifica problema, Schema Gate emite erro por
+   campo em pt-BR (AC-104). Contract-builder bloqueia avanco. Task
+   volta para task-granulator para ajuste estrutural OU para
+   archaeologist se o passo do processo de origem estiver incompleto.
 7. Task vazia ou incompleta dispara bloqueio com pt-BR:
-   `Task <id> sem contrato valido. F10 espera Schema Gate PASS antes
-   de publicar. revise inputs, outputs e gates.`
+   `a Task <id> ainda nao tem contrato valido. a publicacao espera
+   contrato limpo antes de seguir. revise inputs, outputs e gates.`
 8. Contract-builder gera handoff F9→F10 via
    `handoff-engine.generate()` + `persist()`. O payload carrega
    ponteiros para `contracts/` da celula gerada. Fica abaixo de 500
    tokens.
-9. Chief apresenta Quality Gate F9. F9 nao e critico: auto-aprova em
-   modo automatico quando Schema Gate retorna PASS para todos os
-   contratos. CONCERNS surge ao expert para orcamento estourado. FAIL
-   pausa em qualquer modo.
+9. Chief apresenta a checagem da fase 9. F9 nao e critica: fecha
+   sozinha em modo automatico quando todos os contratos passam no
+   Schema Gate sem pendencia. Orcamento estourado surge ao expert com
+   escolha. Problema que exige ajuste pausa em qualquer modo.
 
 ## Post-condicao
 
 - `contracts/` da celula gerada populado com `<task-id>.yaml` por
   Task.
-- todo contrato passa Schema Gate em PASS.
-- toda validacao em FAIL emite erro por campo em pt-BR (AC-104).
+- todo contrato confere no Schema Gate sem pendencia.
+- toda validacao com problema emite erro por campo em pt-BR (AC-104).
 - nenhuma Task vazia ou incompleta avanca para F10.
-- Quality Gate F9 em PASS.
+- Checagem da fase 9 fechada sem pendencia.
 
 ## Schemas consumidos
 
@@ -157,11 +160,11 @@ intermediario. Contract-builder nao reimplementa schema.
 
 ## pt-BR — mensagens padrao
 
-- bloqueio de pre-condicao: `F9 precisa de F8 PASS. execute F8 antes.`
-- contrato invalido: `Task <id> sem contrato valido. F10 espera Schema Gate PASS antes de publicar. revise inputs, outputs e gates.`
-- erro de campo: `<campo> invalido. <razao em pt-BR>. <sugestao em pt-BR>.`
-- orcamento estourado: `validacao do contrato <id> levou <ms>ms. orcamento e 500ms. revise tamanho do contrato.`
-- conversao detectada: `conversao YAML para JSON intermediaria detectada. FR-020 e D-v1.1-06 exigem validacao direta do YAML.`
+- bloqueio de pre-condicao: `a fase 9 precisa que a fase 8 esteja fechada antes. execute a fase 8 primeiro.`
+- contrato invalido: `a Task <id> ainda nao tem contrato valido. a publicacao espera contrato limpo antes de seguir. revise inputs, outputs e gates.`
+- erro de campo: `o campo <campo> esta invalido. <razao em pt-BR>. <sugestao em pt-BR>.`
+- orcamento estourado: `a validacao do contrato <id> levou <ms>ms (acima do orcamento de 500ms). quer revisar o tamanho do contrato ou seguir mesmo assim?`
+- conversao detectada: `detectei conversao do YAML para JSON intermediario. o convenio do framework exige validacao direta no YAML (FR-020, D-v1.1-06).`
 
 ## Referencia de escrita
 

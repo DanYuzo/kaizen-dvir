@@ -51,9 +51,10 @@ explicitos: MVP essencial e roadmap de enriquecimento. Marca cada
 Solution no `OST.md` como `mvp` ou `roadmap` com rationale ICE em
 pt-BR. Sequencia o MVP a partir do desbloqueio de maior alavancagem.
 
-Prioritizer nao executa. Prioritizer nao granulariza PU em Tasks.
-Granularizacao e F8 (task-granulator). Esta fronteira e dura: tentar
-granularizar dispara FAIL com mensagem em pt-BR citando `D-v1.2-03`.
+Prioritizer nao executa. Prioritizer nao quebra passo do processo em
+Tasks. A quebra acontece na fase 8 (task-granulator). Esta fronteira e
+dura: tentar quebrar pausa a fase com mensagem em pt-BR citando
+`D-v1.2-03`.
 
 ## ICE simplificado — heuristica, nao planilha
 
@@ -123,10 +124,11 @@ Prioritizer ordena e separa. Prioritizer nao quebra PU em Tasks.
 Granularizacao acontece em F8 com task-granulator. A regra fica em
 prosa, em frontmatter e em teste.
 
-A violacao dispara FAIL com pt-BR. Exemplo:
+A violacao pausa a fase com mensagem em pt-BR. Exemplo:
 
-`granularizacao em F7 nao roda. D-v1.2-03 manda Tasks para F8
-(task-granulator). reabra esta priorizacao sem dividir a PU.`
+`quebrar passo do processo em sub-tarefas nao acontece nesta fase — isso
+e o trabalho da fase 8 (task-granulator). reabra a priorizacao sem
+dividir o passo. (D-v1.2-03)`
 
 ## Autoridades
 
@@ -135,7 +137,7 @@ define o roadmap que F10 publisher instrumenta. Prioritizer registra
 rationale ICE por item em pt-BR. Prioritizer nao executa PU.
 Prioritizer nao granulariza.
 
-Chief julga o Quality Gate F7. Expert decide disputas via elicit.
+Chief julga a checagem da fase 7. Expert decide disputas via elicit.
 Prioritizer ordena e separa.
 
 ## Matriz de delegacao
@@ -145,15 +147,16 @@ Prioritizer ordena e separa.
 | Disputa de prioridade entre PUs proximas | expert via elicit com contexto |
 | Reavaliacao apos aprendizado de F10 | re-execucao do agente |
 | Coerencia de metodo | chief |
-| Avanco para F8 apos PASS | chief |
-| Tentativa de granularizar PU | bloqueio FAIL e redirecionamento para F8 |
+| Avanco para F8 apos fase fechada | chief |
+| Tentativa de granularizar passo do processo | pausa a fase com pedido de reabrir sem dividir; redireciona para fase 8 |
 
-## Quality Gate F7 — nao critico
+## Checagem da fase 7 — nao critica
 
-F7 e nao critico. Em modo automatico, Quality Gate auto-aprova quando
-retorna PASS. Em modo interativo, chief apresenta playback curto e
-espera ack do expert. CONCERNS surgem ao expert em qualquer modo. FAIL
-pausa em qualquer modo.
+F7 e nao critica. Em modo automatico, a fase fecha sozinha quando nao ha
+pendencia. Em modo interativo, chief apresenta uma narrativa curta da
+fase e espera ack do expert. Pendencias e situacoes nao ideais surgem
+ao expert em qualquer modo, sempre com escolha clara. Problemas que
+exigem ajuste pausam a fase em qualquer modo.
 
 A nao criticidade vem do backstop em F8: task-granulator re-le
 `mvp-backlog.yaml` e detecta inconsistencia. Nao existe esse backstop
@@ -161,17 +164,17 @@ para F1, F2 ou F10.
 
 ## Veto conditions
 
-Prioritizer nao granulariza PU. Prioritizer nao registra item sem
-rationale ICE. Prioritizer nao deixa Solution sem marca mvp ou
-roadmap. Prioritizer nao mistura blocos — cada PU vai para um bloco
-so.
+Prioritizer nao quebra passo do processo em Tasks. Prioritizer nao
+registra item sem rationale ICE. Prioritizer nao deixa Solution sem
+marca mvp ou roadmap. Prioritizer nao mistura blocos — cada passo do
+processo vai para um bloco so.
 
 ## pt-BR — mensagens padrao
 
-- granularizacao em F7: `granularizacao em F7 nao roda. D-v1.2-03 manda Tasks para F8 (task-granulator). reabra esta priorizacao sem dividir a PU.`
-- item sem rationale ICE: `item <id> sem rationale ICE. registre Impact, Confidence e Ease em pt-BR antes de seguir.`
-- Solution sem marca: `Solution <id> sem marca. escolha mvp ou roadmap antes de fechar F7.`
-- bloco misturado: `item <id> aparece em mvp e em roadmap. escolha um bloco so.`
+- granularizacao nesta fase: `quebrar passo do processo em sub-tarefas nao acontece nesta fase — isso e o trabalho da fase 8 (task-granulator). reabra a priorizacao sem dividir o passo. (D-v1.2-03)`
+- item sem rationale ICE: `o item <id> ainda nao tem rationale ICE. registre Impact, Confidence e Ease em pt-BR antes de seguir.`
+- Solution sem marca: `a Solution <id> ainda nao foi marcada. escolha mvp (entra agora) ou roadmap (entra depois) antes de fechar a fase.`
+- bloco misturado: `o item <id> aparece em mvp e em roadmap. escolha um bloco so.`
 
 ## Referencia de escrita
 

@@ -10,8 +10,9 @@ const HELP_TEXT = [
   '',
   'Comandos:',
   '  init                            Inicializa um projeto KaiZen no diretório atual',
+  '  install                         Alias de `init` — inicializa o projeto KaiZen no diretório atual',
+  '  install <celula>                Instala uma célula específica (disponível em M4)',
   '  doctor                          Diagnostica o projeto KaiZen (5 seções: hooks, gates, memory, cells, promotion)',
-  '  install                         Instala uma célula (disponível em M4)',
   '  update                          Atualiza o framework no projeto aplicando a política em camadas (M6.2)',
   '  update --dry-run                Simula update sem escrever em disco',
   '  update --continue               Retoma update interrompido por conflito em L3',
@@ -1432,9 +1433,17 @@ function main(argv) {
     }
     case 'doctor':
       return runDoctor(args.slice(1));
-    case 'install':
-      printNotImplemented('install', 'M4');
+    case 'install': {
+      // `kaizen install` (sem arg) = alias de `init` — inicializa o projeto.
+      // `kaizen install <celula>` = instalação de célula específica (M4 — não implementado).
+      const subArgs = args.slice(1);
+      if (subArgs.length === 0) {
+        const initCmd = require('./kaizen-init.js');
+        return initCmd([]);
+      }
+      printNotImplemented('install ' + subArgs[0], 'M4');
       return 0;
+    }
     case 'update': {
       const updateCmd = require('./kaizen-update.js');
       return updateCmd.runUpdate(args.slice(1));
