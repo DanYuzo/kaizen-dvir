@@ -48,6 +48,15 @@ function readRuleSeed(name) {
 const COPY_MANIFEST = [
   ['.kaizen-dvir/commandments.md', '.kaizen-dvir/commandments.md'],
   ['.kaizen-dvir/dvir-config.yaml', '.kaizen-dvir/dvir-config.yaml'],
+  // v1.8.0 fix: copy the canonical manifest into the target so that
+  // `kaizen update` (M6.2) can read `<projectRoot>/.kaizen-dvir/manifest.json`
+  // and apply the layered L1/L2/L3/L4 policy. Before this entry, every
+  // `kaizen update` invocation failed with "manifesto local nao encontrado"
+  // because init never landed the file — leaving users stuck on `init`
+  // (which blocks on framework-strict drift). The bytes are produced by
+  // `npm run build:manifest` and shipped via the package `files` whitelist
+  // (see package.json — `.kaizen-dvir/manifest.json`).
+  ['.kaizen-dvir/manifest.json', '.kaizen-dvir/manifest.json'],
   ['.claude/settings.json', '.claude/settings.json'],
   ['.claude/README.md', '.claude/README.md'],
   // M6.1.2 fix: ship .claude/hooks/ shim scripts referenced by settings.json.
@@ -292,7 +301,10 @@ function formatNotCleanError(conflicts) {
     'Os seguintes arquivos já existem com conteúdo customizado e seriam sobrescritos:\n' +
     lines.join('\n') +
     '\n' +
-    'Remova ou renomeie esses arquivos e rode \'kaizen init\' novamente.\n'
+    'Remova ou renomeie esses arquivos e rode \'kaizen init\' novamente.\n' +
+    '\n' +
+    'Dica: para atualizar um projeto KaiZen ja inicializado, use \'kaizen update\' ' +
+    '(preserva seu trabalho via politica em camadas L1/L2/L3/L4).\n'
   );
 }
 
@@ -670,7 +682,8 @@ function init(args) {
     '  - Customize a área expert do .claude/CLAUDE.md (bloco KAIZEN:EXPERT, L3)\n' +
     '  - Preencha refs/ikigai/ com sua identidade e entrega\n' +
     '  - Ative o Yotzer com /Kaizen:Yotzer\n' +
-    '  - Rode \'kaizen doctor\' para diagnosticar o projeto\n';
+    '  - Rode \'kaizen doctor\' para diagnosticar o projeto\n' +
+    '  - Para futuras atualizacoes: npx kaizen-dvir@latest update\n';
   process.stdout.write(summary);
   return 0;
 }

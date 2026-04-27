@@ -1412,6 +1412,68 @@ function runRollback(args) {
   return 0;
 }
 
+// --- Init auto-route (v1.8.0) --------------------------------------------
+//
+// When `kaizen init` (or `kaizen install` with no args — alias of init) runs
+// in a directory that already has `.kaizen-dvir/manifest.json`, the project
+// is already KaiZen-initialized. Re-running init in that state would either
+// no-op (if everything matches canonical) or abort with "diretório não está
+// limpo" (when framework files have legitimately diverged after a previous
+// `kaizen update`). The right command is `kaizen update`, which applies the
+// layered L1/L2/L3/L4 policy and preserves expert work.
+//
+// Guard against dev-mode: the framework SOURCE REPO has a manifest at
+// `<INSTALL_ROOT>/.kaizen-dvir/manifest.json` by definition. If we auto-route
+// when `process.cwd() === INSTALL_ROOT`, every dev-test invocation
+// (`node bin/kaizen.js init`) would loop into update against the framework's
+// own root — a self-update against itself. We CANNOT use `package.json` name
+// as a dev-mode signal because `kaizen init` copies the framework's
+// package.json into the target project (so a freshly-init'ed expert project
+// also has `name: kaizen-dvir`). The reliable signal is whether the running
+// `bin/` directory is INSIDE the cwd — true only in the dev source tree.
+//
+// Returns:
+//   number — exit code from auto-routed `kaizen update`
+//   null   — no auto-route happened; caller proceeds with normal init flow
+function _isInsideFrameworkSourceRepo(cwd) {
+  // Signal 1: cwd resolves to the same directory as the framework install
+  // root (this very `bin/` lives at <INSTALL_ROOT>/bin/).
+  const installRoot = path.resolve(__dirname, '..');
+  const cwdResolved = path.resolve(cwd);
+  if (cwdResolved === installRoot) return true;
+  // Signal 2: the running CLI binary lives inside cwd. In an expert project,
+  // bin/ resolves to `<npx-cache>/kaizen-dvir/bin/` or
+  // `node_modules/kaizen-dvir/bin/` — outside the project root. Only the
+  // dev source repo has its bin/ AS A SUBDIRECTORY of cwd.
+  const relFromCwd = path.relative(cwdResolved, installRoot);
+  // path.relative === '' when paths are equal (covered by Signal 1); when
+  // installRoot is INSIDE cwd, relFromCwd does not start with '..' or with
+  // an absolute drive letter (Windows). We only treat as dev mode when
+  // the framework root is genuinely under cwd.
+  if (
+    relFromCwd !== '' &&
+    !relFromCwd.startsWith('..') &&
+    !path.isAbsolute(relFromCwd)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function _maybeAutoRouteInitToUpdate() {
+  const cwd = process.cwd();
+  const manifestPath = path.join(cwd, '.kaizen-dvir', 'manifest.json');
+  if (!fs.existsSync(manifestPath)) return null;
+  if (_isInsideFrameworkSourceRepo(cwd)) return null;
+  process.stdout.write(
+    'Projeto KaiZen ja inicializado. ' +
+    'Delegando para \'kaizen update\' ' +
+    '(politica em camadas L1/L2/L3/L4 preserva 100% do seu trabalho).\n'
+  );
+  const updateCmd = require('./kaizen-update.js');
+  return updateCmd.runUpdate([]);
+}
+
 function main(argv) {
   const args = argv.slice(2);
   const cmd = args[0];
@@ -1428,6 +1490,8 @@ function main(argv) {
 
   switch (cmd) {
     case 'init': {
+      const routed = _maybeAutoRouteInitToUpdate();
+      if (routed !== null) return routed;
       const initCmd = require('./kaizen-init.js');
       return initCmd(args.slice(1));
     }
@@ -1438,6 +1502,8 @@ function main(argv) {
       // `kaizen install <celula>` = instalação de célula específica (M4 — não implementado).
       const subArgs = args.slice(1);
       if (subArgs.length === 0) {
+        const routed = _maybeAutoRouteInitToUpdate();
+        if (routed !== null) return routed;
         const initCmd = require('./kaizen-init.js');
         return initCmd([]);
       }

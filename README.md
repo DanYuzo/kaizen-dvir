@@ -21,6 +21,16 @@ Roda dentro de uma pasta vazia (ou na raiz de um projeto novo). O comando cria t
 
 Requisitos: **Node.js 20+**.
 
+## Atualizando
+
+`init` é a primeira instalação. Para subir uma versão nova do framework no projeto que já está rodando, use `update`:
+
+```bash
+npx kaizen-dvir@latest update
+```
+
+O `update` aplica a política em camadas (L1/L2 atualizam, L3 faz merge inteligente, L4 é seu — fica intocado) e preserva o seu trabalho. Antes de qualquer mutação, ele cria um snapshot que dá pra reverter via `kaizen rollback`. Se o projeto ainda nem foi inicializado, rode `init` primeiro.
+
 ## Comandos
 
 ```bash

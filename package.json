@@ -1,6 +1,6 @@
 {
   "name": "kaizen-dvir",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "description": "KaiZen — macro framework that orchestrates células (v1.5 / M6 Distribution & Update)",
   "license": "MIT",
   "type": "commonjs",

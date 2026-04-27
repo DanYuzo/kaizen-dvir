@@ -1,6 +1,6 @@
 {
-  "version": "1.7.3",
-  "generatedAt": "2026-04-27T15:42:23.740Z",
+  "version": "1.8.0",
+  "generatedAt": "2026-04-27T16:24:31.392Z",
   "generator": "build-canonical-manifest@1",
   "files": {
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
@@ -934,9 +934,9 @@
       "size": 8369
     },
     "bin/kaizen-init.js": {
-      "hash": "sha256:861d762bc4f6644a29f5b593bf88a97c44534d64bda7679714483a473357b1f9",
+      "hash": "sha256:c4955bc2645400cb93beda65b16aceab20c454ffd20b93556a6f75b53f8e1273",
       "layer": "L1",
-      "size": 30199
+      "size": 31095
     },
     "bin/kaizen-update.js": {
       "hash": "sha256:9b0a0e99012a01258f32e75e273d6bddb9acbd84214b4c736d4bad6c8b3c0c11",
@@ -944,9 +944,9 @@
       "size": 53550
     },
     "bin/kaizen.js": {
-      "hash": "sha256:444122d9d907f3e9687ecfddec948b75094c12b65269041a92874e1c5a9d3c55",
+      "hash": "sha256:073b8b933f64dfc1f114aa6678c6edc68f3c34080c1e10f93ee296d9b87c2b03",
       "layer": "L1",
-      "size": 48118
+      "size": 51399
     },
     "bin/lib/claude-md-scaffold.js": {
       "hash": "sha256:2466a8b63e45735161de63cf26560d6e112a4288a19bc7adf3078f6c5bbe342d",
