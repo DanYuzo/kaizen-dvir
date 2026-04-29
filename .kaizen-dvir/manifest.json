@@ -1,43 +1,8 @@
 {
-  "version": "1.8.0",
-  "generatedAt": "2026-04-29T12:18:08.873Z",
+  "version": "2.0.1",
+  "generatedAt": "2026-04-29T13:30:11.627Z",
   "generator": "build-canonical-manifest@1",
   "files": {
-    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/CHANGELOG.md": {
-      "hash": "sha256:fba6249843d2d73c9a0a3a5280d0237bf7b26452eadc5de7e90d689620092052",
-      "layer": "L2",
-      "size": 301
-    },
-    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/MEMORY.md": {
-      "hash": "sha256:2800970bf895ffbed1977038db77164468e9d78d652ed5ad481b6384e384a9e3",
-      "layer": "L2",
-      "size": 104
-    },
-    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/OST.md": {
-      "hash": "sha256:17d218f6d686f18763c8bb4e8cbbce85c91adc59fa35d92c53697f0f6e806c4a",
-      "layer": "L2",
-      "size": 465
-    },
-    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/README.md": {
-      "hash": "sha256:c7262538ce66705b07f199f58ca065e38d8b745d267d3e2c7f276ebff04b09b6",
-      "layer": "L2",
-      "size": 752
-    },
-    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/celula.yaml": {
-      "hash": "sha256:c4fd9af21e35a1ffa614f32ebc6ae0761b9c50d2ed235a697a681ff4c01726e4",
-      "layer": "L2",
-      "size": 525
-    },
-    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/kbs/success-examples.md": {
-      "hash": "sha256:051e30df6255ba241e9e669a37c3d61e2c33f9094b8b4392ba7f46c01bdb50db",
-      "layer": "L2",
-      "size": 1610
-    },
-    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/workflows/README.md": {
-      "hash": "sha256:7e76cc1e6b9abaf8c82a0a2c957b790879cde43fcb4bd6702ca393ccd465a2bd",
-      "layer": "L2",
-      "size": 270
-    },
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
       "hash": "sha256:4f9b27743994aa42f6ae6dc10ed78add7e8f784214ef9d3e9cb3ab701544657b",
       "layer": "L2",
