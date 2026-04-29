@@ -425,7 +425,7 @@ Moreh é um **Squad-Forge especializado no método Danilo**. Diferença do Squad
 - stress-tester (fase 3)
 - risk-mapper (fase 4)
 - prioritizer (fase 5)
-- progressive-systemizer (fase 7)
+- flow-architect (fase 7)
 - loop-instrumenter (fase 8)
 
 ### 10.5 Regra meta
@@ -726,7 +726,7 @@ Moreh absorve isso como **lente transversal**. Todo output de squad gerado, toda
 
 ### 15.4 Decisão #4: Lente dos 5 agentes novos
 
-**Pendente:** stress-tester, risk-mapper, prioritizer, progressive-systemizer, loop-instrumenter são **ferramentas internas** do Danilo ou **entregáveis pro cliente**?
+**Pendente:** stress-tester, risk-mapper, prioritizer, flow-architect, loop-instrumenter são **ferramentas internas** do Danilo ou **entregáveis pro cliente**?
 
 **Afeta TUDO:**
 - Entregável: nível de polimento alto, docs extensas, UX cuidadosa

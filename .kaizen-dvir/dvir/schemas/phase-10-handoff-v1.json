@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kaizen.synkra/phase-10-handoff-v1.json",
+  "title": "KaiZen Phase-10 Handoff Artifact (F10a -> F10b)",
+  "description": "Strict schema for the F10a (flow-architect) -> F10b (publisher) Handoff Artifact. Extends the generic Handoff envelope (handoff-schema.json) with the required field `automation_classifications` carrying the per-Task reflection produced by flow-architect (M9.6, D-v2.0-03). Each item: { task, mode, evolution_plan, expert_confirmed }. The `mode` value MUST be one of `manual | tech | ai` (validated by the flow-architect checklist `automation-reflection-completeness.md` since the M2.5 stdlib validator subset does not include `enum`). Caps from generic schema apply: decisions <= 5, files_modified <= 10, blockers <= 3, total payload <= 500 tokens (FR-008). Authored 2026-04-28 for story M9.6 AC-12. Validator-compat: only uses keys supported by `.kaizen-dvir/dvir/schemas/validator.js` (type, required, additionalProperties, properties, items, minLength, maxItems).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["handoff"],
+  "properties": {
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "work_context",
+        "decisions",
+        "files_modified",
+        "blockers",
+        "next_action",
+        "automation_classifications"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "work_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "artifact_id",
+            "artifact_path",
+            "current_phase",
+            "branch"
+          ],
+          "properties": {
+            "artifact_id": { "type": "string", "minLength": 1 },
+            "artifact_path": { "type": "string", "minLength": 1 },
+            "current_phase": { "type": "string", "minLength": 1 },
+            "branch": { "type": "string", "minLength": 1 }
+          }
+        },
+        "decisions": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "files_modified": {
+          "type": "array",
+          "maxItems": 10,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "blockers": {
+          "type": "array",
+          "maxItems": 3,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "automation_classifications": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "task",
+              "mode",
+              "evolution_plan",
+              "expert_confirmed"
+            ],
+            "properties": {
+              "task": {
+                "type": "string",
+                "minLength": 1
+              },
+              "mode": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evolution_plan": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expert_confirmed": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

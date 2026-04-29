@@ -469,6 +469,111 @@ function listOrphanEntrySkills(statuses) {
   return orphans;
 }
 
+// --- M9.6 — stale agent reference scan ------------------------------------
+//
+// Scans generated cells under `<project_root>/celulas/{*}/` for stale
+// references to the `progressive-systemizer` agent (removed in M9.6 per
+// D-v2.0-03 — replaced by `flow-architect`). The check is advisory only:
+// emits AVISO (WARN) lines, never flips doctor exit code or status.
+//
+// Scope:
+//   - `celulas/{*}/celula.yaml` — manifest agent lists, components.agents
+//   - `celulas/{*}/workflows/*.yaml` — workflow step agents
+//
+// Rationale: a v1.x cell generated before M9.6 may carry the old agent
+// name in its manifest. Doctor surfaces the drift so the expert can
+// re-publish or hand-edit. Generated cells live at the project root
+// per D-v2.0-02 — never under `.kaizen-dvir/celulas/`.
+
+function _generatedCelulasRoot() {
+  if (process.env.KAIZEN_GENERATED_CELULAS_DIR) {
+    return process.env.KAIZEN_GENERATED_CELULAS_DIR;
+  }
+  return path.join(PROJECT_ROOT, 'celulas');
+}
+
+/**
+ * Scan a single text file for the literal string `progressive-systemizer`.
+ * Returns true on match, false on absence or read failure.
+ *
+ * @param {string} filePath
+ * @returns {boolean}
+ */
+function _fileMentionsStaleAgent(filePath) {
+  try {
+    const text = fs.readFileSync(filePath, 'utf8');
+    return text.indexOf('progressive-systemizer') !== -1;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Walk `celulas/{*}/` looking for stale agent references.
+ *
+ * Returns an array of `{ cellName, filePath }` rows — one per file that
+ * mentions the removed agent. Empty array when no generated cells exist
+ * or no stale references are found.
+ *
+ * @returns {Array<{cellName: string, filePath: string}>}
+ */
+function listStaleAgentReferences() {
+  const root = _generatedCelulasRoot();
+  const out = [];
+  if (!fs.existsSync(root)) return out;
+  let entries;
+  try {
+    entries = fs.readdirSync(root, { withFileTypes: true });
+  } catch (_) {
+    return out;
+  }
+  entries.sort((a, b) => a.name.localeCompare(b.name));
+  for (const ent of entries) {
+    if (!ent.isDirectory()) continue;
+    const cellDir = path.join(root, ent.name);
+    // 1) Manifest scan.
+    const manifestPath = path.join(cellDir, 'celula.yaml');
+    if (fs.existsSync(manifestPath) && _fileMentionsStaleAgent(manifestPath)) {
+      out.push({ cellName: ent.name, filePath: manifestPath });
+    }
+    // 2) Workflows directory scan (every .yaml under workflows/).
+    const wfDir = path.join(cellDir, 'workflows');
+    if (fs.existsSync(wfDir)) {
+      let wfEntries;
+      try {
+        wfEntries = fs.readdirSync(wfDir, { withFileTypes: true });
+      } catch (_) {
+        wfEntries = [];
+      }
+      wfEntries.sort((a, b) => a.name.localeCompare(b.name));
+      for (const wf of wfEntries) {
+        if (!wf.isFile()) continue;
+        if (!wf.name.endsWith('.yaml') && !wf.name.endsWith('.yml')) continue;
+        const wfPath = path.join(wfDir, wf.name);
+        if (_fileMentionsStaleAgent(wfPath)) {
+          out.push({ cellName: ent.name, filePath: wfPath });
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function _renderStaleAgentRefSection() {
+  const lines = [];
+  const stale = listStaleAgentReferences();
+  if (stale.length === 0) return lines;
+  for (const row of stale) {
+    lines.push(
+      '  AVISO: referencia desatualizada em ' +
+        _relPath(row.filePath) +
+        " — 'progressive-systemizer' foi removido em M9.6; atualize para 'flow-architect'."
+    );
+  }
+  lines.push('');
+  return lines;
+}
+
 function _renderSkillCheckSection() {
   const lines = [];
   lines.push('Skills Claude Code:');
@@ -555,6 +660,13 @@ function render() {
     lines.push(l);
   }
 
+  // M9.6 — stale agent reference scan appended after skill-check section.
+  // Advisory only — never flips doctor status.
+  const staleLines = _renderStaleAgentRefSection();
+  for (const l of staleLines) {
+    lines.push(l);
+  }
+
   return lines.join('\n') + '\n';
 }
 
@@ -563,4 +675,5 @@ module.exports = {
   listCells: listCells,
   listCellSkillStatuses: listCellSkillStatuses,
   listOrphanEntrySkills: listOrphanEntrySkills,
+  listStaleAgentReferences: listStaleAgentReferences,
 };

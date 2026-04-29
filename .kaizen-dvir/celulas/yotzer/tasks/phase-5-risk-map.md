@@ -146,6 +146,12 @@ dividir o passo. (D-v1.2-03)`
    `risk-reversal-guarantees.yaml` e a revisao corrente do `OST.md`
    com Opportunities residuais e primeiras Solutions. Fica abaixo de
    500 tokens.
+8a. Risk-mapper roda
+   `post-condition-checker.checkArtefacts(celulaPath,
+   ['risk-map.yaml', 'risk-reversal-guarantees.yaml', 'OST.md'],
+   { phase: 5 })` antes da apresentacao do gate. Falta de qualquer
+   arquivo pausa a etapa com mensagem em pt-BR. Mesma checagem roda em
+   modo interativo e em modo automatico.
 9. Chief apresenta a checagem da fase 5. F5 nao e critica: fecha
    sozinha em modo automatico quando nao ha pendencia. Situacoes nao
    ideais surgem ao expert em qualquer modo, sempre com escolha clara.

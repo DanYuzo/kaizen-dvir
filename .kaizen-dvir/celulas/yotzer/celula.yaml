@@ -31,7 +31,7 @@ tiers:
       - "prioritizer"
       - "task-granulator"
       - "contract-builder"
-      - "progressive-systemizer"
+      - "flow-architect"
       - "publisher"
 commands:
   - name: "*novo"
@@ -67,7 +67,7 @@ components:
     - "prioritizer"
     - "task-granulator"
     - "contract-builder"
-    - "progressive-systemizer"
+    - "flow-architect"
     - "publisher"
   tasks:
     - "start"
@@ -101,11 +101,12 @@ components:
     - "ost-tmpl"
     - "agent-tmpl"
     - "workflow-tmpl"
+    - "automation-reflection-tmpl"
   checklists:
     - "playback-completeness"
     - "pu-reduction-justified"
     - "action-observability"
-    - "progressive-levels-coherence"
+    - "automation-reflection-completeness"
     - "mvp-vs-roadmap-separation"
   kbs:
     - "kbs/yotzer"

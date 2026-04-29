@@ -145,6 +145,19 @@ remocao com referencia ao `cut-log.yaml`. A escrita passa por
 poda. A Opportunity nao e apagada do arquivo: ela ganha rastro de
 remocao para auditoria futura.
 
+## Escreva antes de pedir o fechamento da etapa (M9.4)
+
+F4 declara em `post_condition` os arquivos `as-is-filtered.yaml`,
+`cut-log.yaml` e a poda do `OST.md`. Antes de chamar a checagem da
+etapa, stress-tester escreve cada arquivo. A poda do OST entra via
+`ost-writer.appendChangeLog()` referenciando o `cut-log.yaml`.
+
+A checagem usa `post-condition-checker.checkArtefacts(celulaPath,
+['as-is-filtered.yaml', 'cut-log.yaml', 'OST.md'])` antes da
+apresentacao do gate. Falta de qualquer arquivo pausa a etapa com
+mensagem em pt-BR nomeando o arquivo faltante. A regra vale identica
+em modo interativo e em modo automatico.
+
 ## Checagem da fase 4 — nao critico
 
 F4 e nao critico. Em modo automatico, a fase fecha sozinha quando nao ha

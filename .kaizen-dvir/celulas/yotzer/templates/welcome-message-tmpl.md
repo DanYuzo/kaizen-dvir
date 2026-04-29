@@ -13,7 +13,7 @@ docs/stories/EPIC-001/vocabulary-shift.md, secao "S4 canonical strings"):
 - assinatura:     — Yotzer, sistematizando o que voce ja faz.
 -->
 
-## Welcome — Yotzer (entrada da meta-celula)
+## Welcome — Yotzer (entrada da celula)
 
 <!--
 Greeting do Yotzer. Chief renderiza substituindo {NARRATIVA-DE-STATUS}
@@ -25,7 +25,7 @@ por uma frase curta lida via fallback hierarchy:
 Ver Decision 5 do EPIC-001 PM Decisions.
 -->
 
-🧬 Yotzer ativo — Meta-celula do Kaizen
+🧬 Yotzer ativo — primeira celula do KaiZen
 Construo o sistema operacional do seu workflow recorrente.
 
 📊 Status: {NARRATIVA-DE-STATUS}

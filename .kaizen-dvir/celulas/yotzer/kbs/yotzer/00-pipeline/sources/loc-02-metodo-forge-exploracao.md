@@ -80,7 +80,7 @@ método-forge/
 │   ├── risk-mapper              ← NOVO
 │   ├── prioritizer              ← NOVO
 │   ├── contract-builder         ← híbrido
-│   ├── progressive-systemizer   ← NOVO
+│   ├── flow-architect   ← NOVO
 │   └── loop-instrumenter        ← NOVO
 └── shared/
     ├── schemas/                 ← de creator

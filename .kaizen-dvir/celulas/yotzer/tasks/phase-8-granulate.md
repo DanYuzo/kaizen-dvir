@@ -12,6 +12,7 @@ hierarchy:
   - workflow
   - task
   - action
+# fallback — usado apenas se expert nao escolher entre detalhado/sintetico no Step 1
 granularity_max_actions: 7
 emit_action_md: false
 actions_inline_contract: true
@@ -95,40 +96,66 @@ antes de fechar a fase.
 
 ## Regra de granularidade
 
-Task com mais de 5 a 7 Actions dispara split em duas Tasks OU
-extracao de skill reusavel. Task com 8 ou mais Actions sem split nem
-extracao pausa a fase com pedido das duas escolhas.
+A regra varia conforme o nivel escolhido pelo expert no Step 1:
+
+- **detalhado** (4 a 7 acoes por Tarefa): Task com mais de 7 Actions
+  dispara split em duas Tasks OU extracao de skill reusavel. Task com
+  8 ou mais Actions sem split nem extracao pausa a fase com pedido
+  das duas escolhas.
+- **sintetico** (1 a 3 acoes por Tarefa): Task com mais de 3 Actions
+  dispara split em duas Tasks OU extracao de skill reusavel. Task com
+  4 ou mais Actions sem split nem extracao pausa a fase com pedido
+  das duas escolhas.
 
 A skill extraida fica registrada como prosa em pt-BR. Skill fica fora
 do escopo de Yotzer; a forma fica registrada para reuso futuro.
 
 ## Passos da fase
 
-1. Task-granulator le `mvp-backlog.yaml` via
+## Step 1 — Bloco de descoberta — preferencia de granularidade
+
+Antes de o task-granulator decompor as Tarefas, voce escolhe o nivel de detalhe. Duas opcoes em pt-BR:
+
+- **detalhado** — 4 a 7 acoes por Tarefa. Maximo controle. Cada passo registrado.
+- **sintetico** — 1 a 3 acoes por Tarefa. Maxima autonomia. Cada Tarefa concentra mais decisao em quem executa.
+
+Pergunta ao expert: `voce prefere granularidade detalhada ou sintetica?`
+
+Aplique o nivel escolhido. Se o expert nao responder, use o limite frontmatter `granularity_max_actions: 7` como fallback — declarando em pt-BR: "estou supondo detalhado por padrao — confirma?" e registre via `ost-writer.appendChangeLog(celulaPath, '@task-granulator', '[SUPOSICAO] descoberta F8: detalhado por fallback')`.
+
+2. Task-granulator le `mvp-backlog.yaml` via
    `handoff-engine.readLatest('task-granulator')`. O handoff carrega
    ponteiros para `mvp-backlog.yaml` e a revisao corrente do `OST.md`.
-2. Para cada PU do MVP, task-granulator decompoe em uma ou mais
+3. Para cada PU do MVP, task-granulator decompoe em uma ou mais
    Tasks. Cada Task fica em arquivo `tasks/<task-id>.md` com
    frontmatter EN e corpo pt-BR. Cada Task carrega `id`, `pu_pai`,
    `solution_id` (Solution ligada no OST), `executor_hint`,
    `estimated_effort`, e secao `## Actions` com Actions inline.
-3. Task-granulator garante: nenhum arquivo `action-*.md` e criado.
+4. Task-granulator garante: nenhum arquivo `action-*.md` e criado.
    Actions ficam exclusivamente como markdown na Task.
-4. Task-granulator valida cada Action por comportamento observavel.
+5. Task-granulator valida cada Action por comportamento observavel.
    Adjetivo inferencial pausa a fase com pedido de reescrita em pt-BR.
-5. Task-granulator aplica regra de granularidade. Task com mais de 5
-   a 7 Actions vira split ou skill. Task com 8 ou mais sem
-   tratamento pausa a fase com pedido das duas escolhas.
-6. Task-granulator liga cada Task a uma Solution no `OST.md` via
+6. Task-granulator aplica regra de granularidade conforme nivel
+   escolhido no Step 1. Sintetico: Task com mais de 3 Actions vira
+   split ou skill. Detalhado: Task com mais de 7 Actions vira split
+   ou skill. Task acima do limite escolhido sem tratamento pausa a
+   fase com pedido das duas escolhas.
+7. Task-granulator liga cada Task a uma Solution no `OST.md` via
    `ost-writer.appendChangeLog()`. A linha registra:
    ```
    - <iso-timestamp> — @task-granulator — ligou TASK-XXX a SOL-YYY (PU-ZZZ).
    ```
-7. Task-granulator gera handoff F8→F9 via
+8. Task-granulator gera handoff F8→F9 via
    `handoff-engine.generate()` + `persist()`. O payload carrega
    ponteiros para `tasks/` da celula gerada e a revisao corrente do
    `OST.md` com Tasks ligadas. Fica abaixo de 500 tokens.
-8. Chief apresenta a checagem da fase 8. F8 nao e critica: fecha
+8a. Task-granulator roda
+   `post-condition-checker.checkArtefacts(celulaPath,
+   ['tasks/', 'OST.md'], { phase: 8 })` antes da apresentacao do
+   gate. O verificador pausa a etapa quando `tasks/` nao existe ou
+   esta vazio. Mesma checagem roda em modo interativo e em modo
+   automatico.
+9. Chief apresenta a checagem da fase 8. F8 nao e critica: fecha
    sozinha em modo automatico quando nao ha pendencia. A checagem
    invoca o checklist `action-observability.md`. Situacoes nao ideais
    surgem ao expert em qualquer modo, sempre com escolha clara.
@@ -159,7 +186,7 @@ diretorio `tasks/` da celula gerada apos rodada de F8.
 |----|------------|----------|
 | F8-ACTIONS-INLINE | critical | nenhum arquivo `action-*.md` emitido (AC-119) |
 | F8-OBSERVABLE-ACTIONS | critical | toda Action descreve comportamento observavel (AC-108B) |
-| F8-GRANULARITY-RULE | critical | mais de 7 Actions vira split ou skill |
+| F8-GRANULARITY-RULE | critical | respeita o limite por nivel — sintetico: mais de 3 Actions vira split ou skill; detalhado: mais de 7 Actions vira split ou skill |
 | F8-OST-LINK | critical | toda Task ligada a uma Solution no OST (AC-117) |
 | F8-PU-PAI | critical | toda Task carrega `pu_pai` |
 | F8-RC21 | high | hierarquia respeitada — Role > Workflow > Task > Action |
@@ -174,6 +201,8 @@ Action inferencial. Task-granulator nao deixa Task sem `pu_pai`.
 Task-granulator nao deixa Task sem Solution ligada no OST.
 Task-granulator nao deixa Task com mais de 5 a 7 Actions sem split
 nem skill extraida.
+Task-granulator nao comeca a decompor Tarefas antes da preferencia de
+granularidade ser confirmada pelo expert (ou fallback auto-mode declarado).
 
 ## pt-BR — mensagens padrao
 

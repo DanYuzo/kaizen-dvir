@@ -166,7 +166,7 @@ Documentadas em VOL-10 seção 15:
 1. **Unidade atômica:** PU (recomendado) ou conceito próprio?
 2. **Output canônico:** YAML humanizado vs JSON Schema vs híbrido (recomendado)?
 3. ~~**Cliente do método-forge:** interno ou self-service?~~ **RESOLVIDA** — staged rollout (RC-18)
-4. **Lente dos 5 agentes novos** (stress-tester, risk-mapper, prioritizer, progressive-systemizer, loop-instrumenter): internos ou entregáveis?
+4. **Lente dos 5 agentes novos** (stress-tester, risk-mapper, prioritizer, flow-architect, loop-instrumenter): internos ou entregáveis?
 
 ---
 

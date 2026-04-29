@@ -19,16 +19,17 @@ Chief renderiza a mensagem de boas-vindas e a pergunta de modo.
 
 ## O que esta task faz
 
-Abre a sessao Yotzer. Yotzer constroi o sistema operacional vivo do
-workflow recorrente do expert. Cada celula gerada e esse SO em uso —
-acompanha o workflow, registra o que funciona, corta o que nao funciona,
-melhora a cada iteracao. Chief apresenta tres caminhos e pergunta o modo
-antes de comecar.
+Abre a sessao Yotzer. Yotzer constroi o sistema operacional do seu
+workflow recorrente. Cada celula gerada (um pacote pronto que cuida de
+um workflow recorrente seu de ponta a ponta) e esse sistema operacional
+em uso. A celula acompanha o workflow. Registra o que funciona. Corta o
+que nao funciona. Melhora a cada ciclo. Chief apresenta tres caminhos.
+Chief pergunta o modo antes de comecar.
 
 ## Passos
 
 1. Chief carrega `templates/welcome-message-tmpl.md` (secao
-   "Welcome — Yotzer (entrada da meta-celula)").
+   "Welcome — Yotzer (entrada da celula)").
 2. Chief resolve o placeholder `{NARRATIVA-DE-STATUS}` via fallback
    hierarchy (Decision 5 do EPIC-001 PM Decisions):
    1. Tenta `mode-engine.getMode()` se invocavel a partir do contexto

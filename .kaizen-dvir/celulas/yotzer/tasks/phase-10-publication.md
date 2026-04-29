@@ -1,7 +1,7 @@
 ---
 task_id: phase-10-publication
 agents:
-  - progressive-systemizer
+  - flow-architect
   - publisher
 phase: 10
 elicit: true
@@ -21,6 +21,7 @@ post_condition:
   - success_examples_validator_pass: true
   - hook_model_four_components_instrumented: true
   - cli_kaizen_nome_activates: true
+  - automation_plan_written: celulas/{nome}/automation-plan.md
   - quality_gate_f10_pass: true
 api:
   schema_gate: [validate]
@@ -33,77 +34,115 @@ templates:
   - celula-blueprint-tmpl.yaml
   - welcome-message-tmpl.md
   - workflow-tmpl.yaml
+  - automation-reflection-tmpl.md
 checklists:
-  - progressive-levels-coherence.md
+  - automation-reflection-completeness.md
 ---
 
-# F10 — Publication (sub-agente a + sub-agente b — invariante critico)
+# F10 — Publication (sub-agente a + sub-agente b — etapa que sempre pausa)
 
 <!--
 Machine frontmatter EN. Corpo pt-BR para o expert.
-Sub-agente a: progressive-systemizer planeja 4 tiers por Task MVP.
+Sub-agente a: flow-architect reflete cada Tarefa da etapa 8 e
+classifica como manual, tech ou ai com plano de evolucao.
 Sub-agente b: publisher instrumenta Hook Model, valida 4 vezes,
-publica.
-F10 e invariante critico (AC-102): Playback Gate sempre pausa,
+materializa `celulas/{nome}/automation-plan.md` a partir da reflexao
+e publica.
+F10 e etapa que sempre pausa (AC-102): Playback Gate sempre pausa,
 independente do modo. M3.4 playback-gate honra
 `criticalInvariant: true`.
 Schema Gate sob 500ms para o manifesto final (NFR-003).
 Erros em pt-BR com guia de recuperacao (NFR-101).
+
+M9.6: sub-agente a passa a ser o flow-architect.
+DNA novo: reflexao por Tarefa, classificacao em tres modos
+(manual/tech/ai), plano de evolucao em pt-BR, confirmacao do expert
+antes do ponto de passagem ao publisher (D-v2.0-03).
 -->
 
 ## O que esta fase faz
 
-F10 fecha a celula. Sub-agente a (progressive-systemizer) planeja a
-sistematizacao em quatro tiers por Task MVP. Sub-agente b (publisher)
-instrumenta o Hook Model, configura o CLI da celula gerada, valida
-quatro pre-publicacoes, valida o manifesto via Schema Gate, materializa
+F10 fecha a celula. Sub-agente a (flow-architect) reflete sobre cada
+Tarefa que saiu da etapa 8: classifica como `manual`, `tech` ou
+`ai` e propoe um plano de evolucao em pt-BR. A reflexao e foto do
+momento, nao contrato eterno. Sub-agente b (publisher) instrumenta o
+Hook Model, configura o CLI da celula gerada, escreve o
+`automation-plan.md` a partir da reflexao, valida quatro
+pre-publicacoes, valida o manifesto via Schema Gate, materializa
 `celulas/{nome}/` com a estrutura AC-118 e inicia o CHANGELOG em
 `1.0.0`.
 
-F10 e invariante critico (AC-102). Playback Gate sempre pausa para o
-expert, em qualquer modo. Modo automatico nao auto-aprova. A regra
-e load-bearing.
+F10 e etapa que sempre pausa (AC-102). Playback Gate sempre pausa
+para o expert, em qualquer modo. Modo automatico nao auto-aprova. A
+regra e load-bearing.
 
 ## Pre-condicao
 
 - F9 fechada sem pendencia.
-- `contracts/` da celula gerada populado com contrato YAML por Task que
-  confere no Schema Gate sem pendencia.
+- `contracts/` da celula gerada populado com contrato YAML por Tarefa
+  que confere no Schema Gate sem pendencia.
 
-## Sub-agente a (progressive-systemizer) — instrucoes pt-BR
+## Sub-agente a (flow-architect) — instrucoes pt-BR
 
-Para cada Task MVP listada nos contratos de F9:
+Para cada Tarefa que saiu da etapa 8 (lista vinda dos contratos da
+etapa 9):
 
-1. Defina os quatro tiers em ordem fixa: manual, simplificado, batch,
-   automatizado.
-2. Documente `expected_learning` em pt-BR para cada tier.
-3. Documente `rationale` ligando o tier <N> ao aprendizado do tier
-   <N-1>.
-4. Identifique pontos de aprendizado que ancoram cada componente do
-   Hook Model: tier 1 → Trigger; tier 2 → Action; tier 3 → Variable
-   Reward; tier 4 → Investment.
-5. Rode o checklist `progressive-levels-coherence.md` antes do
-   handoff.
-6. Em pulo de tier sem `waiver_rationale`, pause a fase com mensagem
-   em pt-BR nomeando o tier ofensor.
-7. Em `expected_learning` ausente, pause a fase com mensagem em pt-BR
-   nomeando a Task e o tier.
-8. Quando o plano fecha sem pendencia, gere handoff F10a→F10b via
-   `handoff-engine.generate('progressive-systemizer', 'publisher',
-   ...)`. O payload carrega ponteiros para o plano e o resultado do
-   checklist. Fica abaixo de 500 tokens.
+1. Apresente a Tarefa ao expert em pt-BR. Uma Tarefa por vez, sem
+   batch.
+2. Proponha um modo: `manual`, `tech` ou `ai`. A proposta sai com
+   base na conversa do expert ate aqui ou, em modo automatico, com
+   base na heuristica do `VOL-09-padroes-de-ia.md` (consulta em
+   leitura).
+3. Proponha um plano de evolucao em uma frase pt-BR. Linguagem leiga.
+   Sem jargao. Exemplo: `hoje manual; quando o volume passar de X
+   por semana, migrar para tech via planilha automatizada`.
+4. Em modo interativo, pause. Espere a resposta do expert. Aceite
+   confirmacao, troca de modo ou ajuste do plano.
+5. Em modo automatico, marque a classificacao como
+   `confirmado_pelo_expert: false` e adicione a nota `auto-suposto,
+   expert nao confirmou`. Publisher exibe a marca no
+   `automation-plan.md` para o expert revisar na pausa final.
+6. Sempre lembre que a classificacao pode mudar depois. Cada prompt
+   inclui linguagem como `pode mudar depois` ou equivalente.
+7. Em Tarefa sem classificacao ao final da rodada, pause a etapa com
+   mensagem em pt-BR nomeando a Tarefa.
+8. Em Tarefa com modo invalido (qualquer valor fora de `manual`,
+   `tech`, `ai`), pause a etapa com mensagem em pt-BR nomeando o
+   valor recebido.
+9. Em Tarefa com plano de evolucao vazio, pause a etapa com mensagem
+   em pt-BR pedindo a frase em pt-BR.
+10. Antes do ponto de passagem ao publisher, rode o checklist
+    `automation-reflection-completeness.md`. Pendencia bloqueia o
+    ponto de passagem.
+11. Quando a reflexao fecha sem pendencia, gere ponto de passagem
+    F10a→F10b via `handoff-engine.generate('flow-architect',
+    'publisher', ...)`. O payload carrega o array
+    `automation_classifications` (campo obrigatorio do schema
+    `phase-10-handoff-v1`). Cada item: `{task, mode, evolution_plan,
+    expert_confirmed}`. Fica abaixo de 500 tokens.
 
 Mensagens padrao:
 
-- pulo de tier: `o plano pulou direto para o tier <N> sem justificar o aprendizado do tier <N-1>. a ordem e fixa: manual, simplificado, batch, automatizado.`
-- aprendizado ausente: `o tier <N> da Task <id> esta sem expected_learning. cada tier precisa do campo preenchido.`
-- handoff ao publisher: `plano fechado e validado. handoff enviado para o publisher, que instrumenta o Hook Model e publica.`
+- abertura: `vamos olhar Tarefa por Tarefa. para cada uma eu pergunto como ela roda hoje (manual, tech ou ai) e proponho um caminho de evolucao. sua resposta vale para esta foto — pode mudar depois.`
+- proposta por Tarefa: `Tarefa <id>: <nome>. parece rodar como <modo>. plano de evolucao: <plano>. faz sentido? voce pode confirmar, trocar de modo ou ajustar o plano.`
+- classificacao ausente: `a Tarefa <id> ainda nao tem classificacao. escolha entre manual, tech ou ai antes da gente seguir.`
+- modo invalido: `a Tarefa <id> esta com classificacao <valor>. o campo aceita apenas manual, tech ou ai.`
+- plano ausente: `a Tarefa <id> esta classificada como <modo> mas o plano de evolucao esta vazio. escreva uma frase em pt-BR descrevendo o caminho natural — pode ser bem simples.`
+- ponto de passagem ao publisher: `reflexao fechada. cada Tarefa tem modo e plano. envio para o publisher escrever o automation-plan.md em celulas/<nome>/.`
 
 ## Sub-agente b (publisher) — instrucoes pt-BR
 
-1. Le o handoff F10a→F10b via
-   `handoff-engine.readLatest('publisher')`.
-2. Instrumenta os quatro componentes do Hook Model na celula gerada.
+1. Le o ponto de passagem F10a→F10b via
+   `handoff-engine.readLatest('publisher')`. Le o campo
+   `automation_classifications` do payload.
+2. Materializa `celulas/{nome}/automation-plan.md` a partir do
+   template `automation-reflection-tmpl.md`. Cada item de
+   `automation_classifications` vira uma linha da tabela. Coluna
+   `Confirmado`: `sim` quando `expert_confirmed: true`, `nao`
+   quando `expert_confirmed: false`. Para linhas com `nao`, escreve
+   a nota `auto-suposto, expert nao confirmou` na secao apropriada
+   do documento.
+3. Instrumenta os quatro componentes do Hook Model na celula gerada.
    Escreve narrativa em pt-BR (um paragrafo por componente) no
    manifesto ou no README:
    - Trigger: gatilho externo (preferencial) + gatilho interno alvo.
@@ -111,7 +150,7 @@ Mensagens padrao:
    - Variable Reward: payoff fixo + payoff variavel.
    - Investment: mecanismo que retorna o expert a celula em sessoes
      seguintes (MEMORY.md, CHANGELOG, OST.md).
-3. Configura **um unico** `/Kaizen:{NomeDaCelula}` (entry point) no
+4. Configura **um unico** `/Kaizen:{NomeDaCelula}` (entry point) no
    manifesto da celula gerada. Esse slash carrega o chief; os
    `*comandos` internos sao mapeados sob o mesmo entry point e
    roteados pelo chief. Specialists (tier 2/3, sub-agentes) NAO
@@ -119,8 +158,8 @@ Mensagens padrao:
    (`@.kaizen-dvir/celulas/{nome}/agents/<id>.md`) e sao carregados
    internamente pelo chief. Regra invariante: 1 celula = 1 slash de
    superficie.
-4. Renderiza a mensagem de boas-vindas via `welcome-message-tmpl.md`.
-5. Roda os quatro validadores de pre-publicacao:
+5. Renderiza a mensagem de boas-vindas via `welcome-message-tmpl.md`.
+6. Roda os quatro validadores de pre-publicacao:
    - `actionsInlineValidator` — glob `**/action-*.md` em `tasks/`.
      Match bloqueia a publicacao com mensagem pt-BR citando D-v1.3-04
      (AC-119).
@@ -133,34 +172,38 @@ Mensagens padrao:
    - `successExamplesValidator` — abre `kbs/success-examples.md` e
      conta entradas. Menos de 3 ou ausencia bloqueia a publicacao com
      mensagem pt-BR citando D-v1.4-09.
-6. Quando os quatro validadores conferem sem pendencia, valida o
+7. Quando os quatro validadores conferem sem pendencia, valida o
    manifesto final via M3.4 Schema Gate contra `celula-schema.json`.
    Sob 500ms (NFR-003).
-7. Quando o Schema Gate confere sem pendencia, materializa
+8. Quando o Schema Gate confere sem pendencia, materializa
    `celulas/{nome}/` com:
    - `celula.yaml` (renderizado de `celula-blueprint-tmpl.yaml`)
    - `README.md` (descricao + Hook Model em pt-BR)
    - `CHANGELOG.md` (linha `1.0.0` com criacao)
    - `MEMORY.md` (placeholder)
    - `OST.md` (vivo)
+   - `automation-plan.md` (renderizado de `automation-reflection-tmpl.md`)
    - `agents/` (personas materializadas)
    - `tasks/` (Tasks com Actions inline)
    - `workflows/` (sempre presente, D-v1.4-07)
    - `templates/` (templates da celula)
    - `checklists/` (checklists da celula)
    - `kbs/` (incluindo `kbs/success-examples.md` com 3+ entradas)
-8. Inicia o CHANGELOG da celula gerada em `1.0.0` (FR-115). A primeira
+9. Inicia o CHANGELOG da celula gerada em `1.0.0` (FR-115). A primeira
    linha registra data ISO, autor (do `dvir-config.yaml`), agentes,
    tasks, templates, checklists, kbs.
-9. Fecha o OST como artefato vivo. Adiciona linha de Change Log via
-   `ost-writer.appendChangeLog('publisher', '<celula>', '<data ISO>
-   F10 fechou OST. celula publicada em 1.0.0.')`.
-10. Gera handoff F10→chief via `handoff-engine.generate('publisher',
-    'chief', ...)`. Payload carrega `published_path`, `version`,
-    `ost_closure_verdict`, `manifest_schema_verdict`. Sob 500 tokens.
-11. Chief apresenta a revisao final da fase 10. F10 pausa sempre.
+10. Fecha o OST como artefato vivo. Adiciona linha de Change Log via
+    `ost-writer.appendChangeLog('publisher', '<celula>', '<data ISO>
+    F10 fechou OST. celula publicada em 1.0.0.')`.
+11. Gera ponto de passagem F10→chief via
+    `handoff-engine.generate('publisher', 'chief', ...)`. Payload
+    carrega `published_path`, `version`, `ost_closure_verdict`,
+    `manifest_schema_verdict`, `automation_plan_path`. Sob 500 tokens.
+12. Chief apresenta a revisao final da etapa 10. F10 pausa sempre.
     Expert valida a celula publicada, manifesto, fechamento de OST,
-    ativacao via `/Kaizen:{NomeDaCelula}`.
+    ativacao via `/Kaizen:{NomeDaCelula}`, e o `automation-plan.md`
+    com as classificacoes (especialmente as marcadas como
+    `auto-suposto, expert nao confirmou`).
 
 Mensagens padrao:
 
@@ -168,12 +211,13 @@ Mensagens padrao:
 - bloqueio OST orfa: `o no <node-id> nao tem cadeia completa ate o Outcome. revise o link em OST.md.`
 - bloqueio workflows/: `o diretorio workflows/ esta ausente. toda celula gerada precisa dele (D-v1.4-07). crie o diretorio com um README.md.`
 - bloqueio success-examples: `kbs/success-examples.md tem <N> entradas — preciso de pelo menos 3 exemplos ancorados (D-v1.4-09).`
-- sucesso: `celula <nome> publicada em celulas/<nome>/. versao 1.0.0 registrada. ative com /Kaizen:<NomeDaCelula>.`
+- bloqueio automation-plan: `nao recebi automation_classifications no ponto de passagem. flow-architect precisa fechar a reflexao antes da publicacao.`
+- sucesso: `celula <nome> publicada em celulas/<nome>/. versao 1.0.0 registrada. ative com /Kaizen:<NomeDaCelula>. revise o automation-plan.md, especialmente as Tarefas marcadas como auto-suposto.`
 
-## Playback Gate F10 — CRITICAL INVARIANT (AC-102, AC-111)
+## Playback Gate F10 — etapa que sempre pausa (AC-102, AC-111)
 
-F10 e invariante critico. Playback Gate sempre pausa para o expert,
-qualquer que seja o modo. M3.4 playback-gate honra
+F10 e etapa que sempre pausa. Playback Gate sempre pausa para o
+expert, qualquer que seja o modo. M3.4 playback-gate honra
 `criticalInvariant: true` consultando
 `mode-engine.isCriticalInvariant(manifest, "phase-10-publication")`.
 Modo automatico nao auto-aprova F10.
@@ -190,8 +234,9 @@ Narrativa apresentada ao expert:
 
 `F10 fechou. publiquei a celula em celulas/<nome>/. versao 1.0.0 no
 CHANGELOG. OST fechado. os quatro validadores conferiram. Schema Gate
-conferiu sob <ms>ms. /Kaizen:<NomeDaCelula> ativa. confirma a
-publicacao?`
+conferiu sob <ms>ms. /Kaizen:<NomeDaCelula> ativa. automation-plan.md
+escrito com <N> Tarefas (<M> marcadas como auto-suposto, expert nao
+confirmou). confirma a publicacao?`
 
 Opcoes do expert: `sim` (encerra Yotzer), `ajustar` (volta ao agente
 da fase responsavel pela mudanca), `nao` (HALT com motivo registrado).
@@ -199,28 +244,35 @@ da fase responsavel pela mudanca), `nao` (HALT com motivo registrado).
 ## Post-condicao
 
 - celula publicada em `celulas/{nome}/` com estrutura AC-118 completa.
+- `automation-plan.md` escrito em `celulas/{nome}/automation-plan.md`
+  com uma linha por Tarefa da etapa 8.
 - manifesto confere no Schema Gate sob 500ms.
 - CHANGELOG iniciado em `1.0.0`.
 - quatro validadores conferem sem pendencia.
 - Hook Model com quatro componentes instrumentados.
 - `/Kaizen:{Nome}` ativa em sessao limpa.
 - OST fechado como artefato vivo.
-- Checagem da fase 10 fechada sem pendencia.
+- Checagem da etapa 10 fechada sem pendencia.
 
 ## Schemas consumidos
 
 | Schema | Uso |
 |--------|-----|
 | `.kaizen-dvir/dvir/schemas/celula-schema.json` | manifesto da celula gerada (validado por publisher) |
-| `.kaizen-dvir/dvir/schemas/handoff-schema.json` | F10a→F10b e F10→chief |
+| `.kaizen-dvir/dvir/schemas/handoff-schema.json` | ponto de passagem F10a→F10b e F10→chief — campo `automation_classifications` obrigatorio em F10a→F10b (schema `phase-10-handoff-v1`) |
 
 ## Quality Gate F10 — criterios
 
 | Id | Severidade | Verifica |
 |----|------------|----------|
 | F10-PLAYBACK-PAUSES | critical | playback-gate pausa em modo automatico (AC-102) |
-| F10-TIER-ORDER | critical | plano em ordem manual → simplificado → batch → automatizado |
-| F10-LEARNING-PER-TIER | critical | cada tier carrega `expected_learning` em pt-BR |
+| F10a-REFLECTION-COVERAGE | critical | toda Tarefa da etapa 8 tem linha na reflexao do flow-architect |
+| F10a-MODE-VALID | critical | a `Classificacao` de cada Tarefa e exatamente `manual`, `tech` ou `ai` |
+| F10a-PLAN-NON-EMPTY | critical | cada Tarefa tem `Plano de evolucao` em pt-BR, nao vazio |
+| F10a-CONFIRMATION-FLAG | critical | cada Tarefa tem `Confirmado` valido (`sim` em interativo, `nao` em automatico, sem nulo) |
+| F10a-CHECKLIST-PASS | critical | `automation-reflection-completeness.md` em PASS |
+| F10a-NO-EXECUTION | high | flow-architect nao executou nenhuma Tarefa — apenas refletiu |
+| F10-AUTOMATION-PLAN-WRITTEN | critical | `celulas/{nome}/automation-plan.md` materializado por publisher |
 | F10-ACTIONS-INLINE | critical | sem `action-*.md` em `tasks/` (D-v1.3-04, AC-119) |
 | F10-OST-CLOSURE | critical | toda Task chega ao Outcome (AC-117) |
 | F10-WORKFLOWS-DIR | critical | `workflows/` presente (D-v1.4-07) |
@@ -236,8 +288,9 @@ F10 nao roda sem F9 fechada. F10 nao publica celula com `action-*.md`
 em `tasks/`. F10 nao publica celula com aresta orfa no OST. F10 nao
 publica celula sem `workflows/`. F10 nao publica celula com menos de 3
 exemplos em `kbs/success-examples.md`. F10 nao publica manifesto que
-o Schema Gate identifica como problema. F10 nao fecha sozinha em modo
-automatico — sempre pausa para o expert.
+o Schema Gate identifica como problema. F10 nao publica celula sem
+`automation-plan.md`. F10 nao fecha sozinha em modo automatico —
+sempre pausa para o expert.
 
 ## pt-BR — mensagens padrao
 

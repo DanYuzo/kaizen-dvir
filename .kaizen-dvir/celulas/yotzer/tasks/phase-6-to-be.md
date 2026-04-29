@@ -75,6 +75,12 @@ dois handoffs.
 9. Archaeologist gera handoff F6 para F7 via `handoff-engine.generate()`
    + `persist()`. O handoff lista Solutions por id, Links, caminho do
    process map To-be. Fica abaixo de 500 tokens.
+9a. Archaeologist roda
+    `post-condition-checker.checkArtefacts(celulaPath,
+    ['process-map-to-be.yaml', 'OST.md'], { phase: 6 })` antes da
+    apresentacao do gate. Falta de qualquer arquivo pausa a etapa com
+    mensagem em pt-BR. Mesma checagem roda em modo interativo e em
+    modo automatico.
 10. Chief apresenta a revisao de fechamento da fase 6 em pt-BR. F6 nao
     e critica: fecha sozinha em modo automatico quando o checklist
     `playback-completeness.md` confere e nao ha pendencia.

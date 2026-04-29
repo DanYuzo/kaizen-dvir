@@ -200,7 +200,7 @@ escrevendo no OST via `agents/_shared/ost-writer.js`.
 
 | Item | Como faz |
 |------|----------|
-| Consumir plano do progressive-systemizer | le handoff F10a→F10b via `handoff-engine.readLatest('publisher')` |
+| Consumir reflexao do flow-architect | le handoff F10a→F10b via `handoff-engine.readLatest('publisher')` |
 | Instrumentar Hook Model | escreve narrativa em pt-BR no manifesto ou README |
 | Configurar CLI | adiciona **1 unico** `/Kaizen:{Nome}` (entry point) + `*comandos` internos ao manifesto. Specialists nao recebem slash proprio — ficam em engine path e sao carregados pelo chief |
 | Escrever welcome | renderiza `welcome-message-tmpl.md` em pt-BR |

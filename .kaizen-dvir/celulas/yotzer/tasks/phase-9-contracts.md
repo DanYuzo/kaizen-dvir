@@ -122,6 +122,13 @@ Exemplos:
    `handoff-engine.generate()` + `persist()`. O payload carrega
    ponteiros para `contracts/` da celula gerada. Fica abaixo de 500
    tokens.
+8a. Contract-builder roda
+   `post-condition-checker.checkArtefacts(celulaPath,
+   ['contracts/'], { phase: 9 })` antes da apresentacao do gate. O
+   verificador pausa a etapa quando `contracts/` nao existe ou esta
+   vazio. A validacao de schema continua sendo feita pelo Schema
+   Gate sobre cada arquivo do diretorio. Mesma checagem roda em modo
+   interativo e em modo automatico.
 9. Chief apresenta a checagem da fase 9. F9 nao e critica: fecha
    sozinha em modo automatico quando todos os contratos passam no
    Schema Gate sem pendencia. Orcamento estourado surge ao expert com

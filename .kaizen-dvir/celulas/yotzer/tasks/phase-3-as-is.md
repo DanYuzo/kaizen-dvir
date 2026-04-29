@@ -44,38 +44,56 @@ Opportunities no OST.
 
 ## Passos
 
-1. Archaeologist abre entrevista baseada em historia. Pergunta em
+## Step 1 — Bloco de descoberta — descreva o seu jeito antes do mapa
+
+Antes de o archaeologist mapear o seu processo, voce conta com as suas palavras. Sem ordem, sem estrutura. Como vem na cabeca.
+
+1. `me descreva o seu processo com as suas palavras, sem ordem, do jeito que vem na sua cabeca.`
+2. `o que voce faz que voce nao ve outras pessoas fazendo?`
+3. `o que voce faz que parece pequeno, mas faz toda a diferenca?`
+
+Espere a narrativa do expert antes de extrair Pacotes Uteis.
+
+**Modo automatico:** o agente pode usar o handoff de F1 e o Ikigai como proxy. Declara: "estou supondo X — confirma?" e registra via `ost-writer.appendChangeLog(celulaPath, '@archaeologist', '[SUPOSICAO] descoberta F3: X')`.
+
+2. Archaeologist abre entrevista baseada em historia. Pergunta em
    pt-BR: `me conta como voce faz hoje, do inicio ao fim.`
-2. Expert narra. Archaeologist escuta e grava. Pergunta detalhes
+3. Expert narra. Archaeologist escuta e grava. Pergunta detalhes
    quando a historia salta passo. Exemplos de pergunta:
    - `o que acontece antes disso?`
    - `quem recebe esse artefato?`
    - `o que trava esse passo?`
-3. Quando possivel, archaeologist observa o processo em execucao
+4. Quando possivel, archaeologist observa o processo em execucao
    (Gemba). Fora do alcance Gemba, archaeologist valida com segunda
    passada de entrevista.
-4. Archaeologist extrai PUs usando `templates/pu-tmpl.yaml`. Cada PU
+5. Archaeologist extrai PUs usando `templates/pu-tmpl.yaml`. Cada PU
    carrega id, name, phase, description, inputs, outputs,
    dependencies, executor_hint, estimated_effort, status.
-5. Archaeologist monta o grafo de dependencias. Escreve em mermaid
+6. Archaeologist monta o grafo de dependencias. Escreve em mermaid
    com rotulos em pt-BR. Exemplo:
    ```mermaid
    graph TD
      PU-001[coleta de briefing] --> PU-002[definicao de escopo]
      PU-002 --> PU-003[producao]
    ```
-6. Archaeologist escreve `process-map-as-is.yaml` usando
+7. Archaeologist escreve `process-map-as-is.yaml` usando
    `templates/process-map-tmpl.yaml`. O arquivo lista PUs + pares de
    dependencia + destino da renderizacao mermaid.
-7. Archaeologist identifica dores, gargalos e gaps. Para cada ponto,
+8. Archaeologist identifica dores, gargalos e gaps. Para cada ponto,
    chama `ost-writer.appendOpportunity(celulaPath, opportunity)`. Cada
    Opportunity referencia pelo menos uma PU.
-8. Archaeologist registra rodada no Change Log via
+9. Archaeologist registra rodada no Change Log via
    `ost-writer.appendChangeLog()`.
-9. Archaeologist gera handoff F3 para F4 via `handoff-engine.generate()`
-   + `persist()`. O handoff lista PUs por id, pontos de dor, caminho
-   do process map. Fica abaixo de 500 tokens.
-10. Chief apresenta a revisao de fechamento da fase 3 em pt-BR. F3 nao
+10. Archaeologist gera handoff F3 para F4 via `handoff-engine.generate()`
+    + `persist()`. O handoff lista PUs por id, pontos de dor, caminho
+    do process map. Fica abaixo de 500 tokens.
+11. Archaeologist roda
+    `post-condition-checker.checkArtefacts(celulaPath,
+    ['process-map-as-is.yaml', 'OST.md'], { phase: 3 })` antes da
+    apresentacao do gate. Falta de qualquer arquivo pausa a etapa com
+    mensagem em pt-BR nomeando o arquivo. Mesma checagem roda em modo
+    interativo e em modo automatico.
+12. Chief apresenta a revisao de fechamento da fase 3 em pt-BR. F3 nao
     e critica: fecha sozinha em modo automatico quando o checklist
     `playback-completeness.md` confere e nao ha pendencia.
 
@@ -91,6 +109,8 @@ Opportunities no OST.
 Archaeologist nao inventa PU. Toda PU sai do relato do expert.
 Archaeologist nao marca Opportunity sem referencia a PU.
 Archaeologist nao usa rotulo em ingles no mermaid.
+Archaeologist nao comeca a extrair Pacotes Uteis antes da narrativa do
+expert (ou suposicao auto-mode declarada).
 
 ## pt-BR — mensagens padrao
 

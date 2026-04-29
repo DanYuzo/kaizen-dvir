@@ -32,3 +32,9 @@ dist/
 # narrowed this rule to track CI fixtures, but the canonical intent
 # is that tests are not version-controlled in this repository.
 tests/
+
+# User-generated cells (M9.5 D-v2.0-02) — publisher writes to celulas/ at
+# project root for user-generated cells. Framework cells live in
+# .kaizen-dvir/celulas/. The top-level celulas/ is runtime output, not
+# framework artifact, and should never be committed.
+celulas/

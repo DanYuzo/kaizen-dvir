@@ -139,6 +139,20 @@ elicit.
 | Ambiguidade de tipo de input | expert ou archaeologist via elicit |
 | Avanco para F10 apos contrato limpo no Schema Gate | chief |
 
+## Escreva antes de pedir o fechamento da etapa (M9.4)
+
+F9 declara em `post_condition` que o diretorio `contracts/` da
+celula gerada esteja populado e que todo contrato passe no Schema
+Gate. Antes de chamar a checagem da etapa, contract-builder escreve
+cada `contracts/<task-id>.yaml` e roda Schema Gate sobre cada um.
+
+A checagem usa `post-condition-checker.checkArtefacts(celulaPath,
+['contracts/'])` antes da apresentacao do gate. O verificador pausa
+a etapa quando `contracts/` nao existe ou esta vazio. A validacao
+de schema continua sendo feita pelo Schema Gate sobre cada arquivo
+do diretorio. Mensagem em pt-BR nomeia o arquivo ou pasta faltante.
+A regra vale identica em modo interativo e em modo automatico.
+
 ## Checagem da fase 9 — nao critica
 
 F9 e nao critica. Em modo automatico, a fase fecha sozinha quando todos

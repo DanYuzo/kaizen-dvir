@@ -270,7 +270,7 @@ Registradas em `loc-02-metodo-forge-exploracao.md`:
 1. Unidade atômica: PU ou conceito próprio?
 2. Output canônico: YAML, JSON Schema, ou híbrido?
 3. ~~Cliente do método-forge: Danilo interno ou self-service?~~ **RESOLVIDA** — staged rollout (RC-18): interno Danilo → cliente em fase 2. Industry pattern validado (LangChain 2026, insight #8).
-4. Lente dos 5 agentes novos (stress-tester, risk-mapper, prioritizer, progressive-systemizer, loop-instrumenter): internos ou entregáveis?
+4. Lente dos 5 agentes novos (stress-tester, risk-mapper, prioritizer, flow-architect, loop-instrumenter): internos ou entregáveis?
 
 **Tratamento na KB:** decisões 1, 2, 4 aparecem em VOL-10 como "decisões abertas do Moreh" — a KB não responde, mas documenta trade-offs. Decisão 3 vira caso de aplicação do RC-18.
 

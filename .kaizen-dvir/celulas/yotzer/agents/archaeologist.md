@@ -109,6 +109,29 @@ append-only. A ordem de escrita por fase:
 Archaeologist nunca reescreve uma entrada. Toda correcao entra como nova
 linha no Change Log.
 
+## Escreva antes de pedir o fechamento da etapa (M9.4)
+
+Toda etapa em que archaeologist atua tem arquivos de saida declarados
+no `post_condition` da task. Antes de chamar a checagem da etapa,
+archaeologist materializa cada arquivo via `ost-writer.js` (para o
+`OST.md`) e via escrita direta (para `outcome-statement.yaml`,
+`process-map-as-is.yaml`, `process-map-to-be.yaml`).
+
+A checagem da etapa pausa quando algum arquivo declarado em
+`post_condition` nao existe em disco. O verificador
+`post-condition-checker.checkArtefacts(celulaPath, expectedFiles)`
+roda antes da apresentacao do gate. Mensagem em pt-BR descreve o
+arquivo faltante e pede a escrita antes de fechar a etapa.
+
+| Etapa | Arquivos a escrever ANTES do gate |
+|-------|-----------------------------------|
+| F1 | `outcome-statement.yaml` + raiz do `OST.md` (via `writeRoot`) |
+| F3 | `process-map-as-is.yaml` + Opportunities no `OST.md` (via `appendOpportunity` + `appendChangeLog`) |
+| F6 | `process-map-to-be.yaml` + Solutions e Links no `OST.md` (via `appendSolution`, `linkSolutionToOpportunity`, `appendChangeLog`) |
+
+A regra vale identica em modo interativo e em modo automatico. O modo
+automatico nao pula a checagem.
+
 ## Invariantes criticos
 
 F1 e F2 sao invariantes criticos. O Playback Gate pausa em modo

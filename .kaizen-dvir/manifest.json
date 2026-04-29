@@ -1,8 +1,43 @@
 {
   "version": "1.8.0",
-  "generatedAt": "2026-04-27T16:24:31.392Z",
+  "generatedAt": "2026-04-29T12:18:08.873Z",
   "generator": "build-canonical-manifest@1",
   "files": {
+    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/CHANGELOG.md": {
+      "hash": "sha256:fba6249843d2d73c9a0a3a5280d0237bf7b26452eadc5de7e90d689620092052",
+      "layer": "L2",
+      "size": 301
+    },
+    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/MEMORY.md": {
+      "hash": "sha256:2800970bf895ffbed1977038db77164468e9d78d652ed5ad481b6384e384a9e3",
+      "layer": "L2",
+      "size": 104
+    },
+    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/OST.md": {
+      "hash": "sha256:17d218f6d686f18763c8bb4e8cbbce85c91adc59fa35d92c53697f0f6e806c4a",
+      "layer": "L2",
+      "size": 465
+    },
+    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/README.md": {
+      "hash": "sha256:c7262538ce66705b07f199f58ca065e38d8b745d267d3e2c7f276ebff04b09b6",
+      "layer": "L2",
+      "size": 752
+    },
+    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/celula.yaml": {
+      "hash": "sha256:c4fd9af21e35a1ffa614f32ebc6ae0761b9c50d2ed235a697a681ff4c01726e4",
+      "layer": "L2",
+      "size": 525
+    },
+    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/kbs/success-examples.md": {
+      "hash": "sha256:051e30df6255ba241e9e669a37c3d61e2c33f9094b8b4392ba7f46c01bdb50db",
+      "layer": "L2",
+      "size": 1610
+    },
+    ".kaizen-dvir/celulas/celula-m95-bundled-untouched-1777464504247/workflows/README.md": {
+      "hash": "sha256:7e76cc1e6b9abaf8c82a0a2c957b790879cde43fcb4bd6702ca393ccd465a2bd",
+      "layer": "L2",
+      "size": 270
+    },
     ".kaizen-dvir/celulas/yotzer/CHANGELOG.md": {
       "hash": "sha256:4f9b27743994aa42f6ae6dc10ed78add7e8f784214ef9d3e9cb3ab701544657b",
       "layer": "L2",
@@ -14,9 +49,9 @@
       "size": 1367
     },
     ".kaizen-dvir/celulas/yotzer/README.md": {
-      "hash": "sha256:a412ef74e8d059b42929da555d7776fe0ae26b99a696e3c3e72f046d4526a4b9",
+      "hash": "sha256:36b42c4731ad2e600f312ee8135661683a5013242a7333ab839178cd48e7b85d",
       "layer": "L2",
-      "size": 1510
+      "size": 1894
     },
     ".kaizen-dvir/celulas/yotzer/agents/_shared/ost-writer.js": {
       "hash": "sha256:7c9972db6ca99b85fbc61035ba73dd637e7f21badad992b5e620495f565d4bcb",
@@ -24,64 +59,69 @@
       "size": 15463
     },
     ".kaizen-dvir/celulas/yotzer/agents/_shared/publisher.js": {
-      "hash": "sha256:2222541c86c896d1807f55badd3412520aa20916ddee0e14430266fe39f2fb4a",
+      "hash": "sha256:ee0d88d0fe92892b24e16e124e654ad25a495e9be61e0a20407e29308c88d57e",
       "layer": "L2",
-      "size": 36451
+      "size": 38651
     },
     ".kaizen-dvir/celulas/yotzer/agents/archaeologist.md": {
-      "hash": "sha256:8212eed1ca47cc7e1b710702c38b212a90e8e80d08a6738175a02db83c973ff6",
+      "hash": "sha256:7eff0dc56715d97580f89101bb3226b15c2cab9f2afe3b0984dad7fc03169299",
       "layer": "L2",
-      "size": 5713
+      "size": 7074
     },
     ".kaizen-dvir/celulas/yotzer/agents/chief.md": {
-      "hash": "sha256:123d956e615235bc46f117b42fdc4a3703581321aa282bf5103ac2d755bac042",
+      "hash": "sha256:d32d97dd143679aaed4f26f4a252f5b0f55657f9308105c0ad65786fe3792062",
       "layer": "L2",
-      "size": 4757
+      "size": 5543
     },
     ".kaizen-dvir/celulas/yotzer/agents/contract-builder.md": {
-      "hash": "sha256:ad90907df62a570943c5116c10c5596675a916b466ca5cf7e82687cd368dd919",
+      "hash": "sha256:161dd7bf559d4888b58c4a9ce9f5e61ff85605b30172899f319a7f60290b2d2a",
       "layer": "L2",
-      "size": 6649
+      "size": 7553
+    },
+    ".kaizen-dvir/celulas/yotzer/agents/flow-architect.md": {
+      "hash": "sha256:271a5987a278b98db466706c8e3586e19341f53e18585efa5faa368bb551adad",
+      "layer": "L2",
+      "size": 10843
     },
     ".kaizen-dvir/celulas/yotzer/agents/prioritizer.md": {
-      "hash": "sha256:bbf1ab9006bc798feb80229d2691431aecdd41ea04b4180100905ea2e2f94c19",
+      "hash": "sha256:3d23fc6df67802e92056af829b249d8c3f5dd10c93a22192240071aef7880fd7",
       "layer": "L2",
-      "size": 6797
-    },
-    ".kaizen-dvir/celulas/yotzer/agents/progressive-systemizer.md": {
-      "hash": "sha256:c793ad3e652096e28c4be96c79c5383122120ac031865a833db46811634c5c5c",
-      "layer": "L2",
-      "size": 7590
+      "size": 7652
     },
     ".kaizen-dvir/celulas/yotzer/agents/publisher.md": {
-      "hash": "sha256:baa37e9b14cfdb98223b8383620ddcb7caf45f0c182ba8e85378a5e871c6dd65",
+      "hash": "sha256:78f1f906e1df848566b4754a2cedc260ed20e36ba89b326554e3335981bdbe6e",
       "layer": "L2",
-      "size": 12286
+      "size": 12565
     },
     ".kaizen-dvir/celulas/yotzer/agents/risk-mapper.md": {
-      "hash": "sha256:66b78f1df9ea24680d73b08faec28c75ef75d8718eda5e48ac7ad116079307cf",
+      "hash": "sha256:3ae36d0ec20dd326b1ff658703a39d9f9214f788a61ed7184fcaa6ea3bc52f1f",
       "layer": "L2",
-      "size": 9652
+      "size": 10853
     },
     ".kaizen-dvir/celulas/yotzer/agents/stress-tester.md": {
-      "hash": "sha256:6816a9f6cac1adc14e99ee820805c4dce0e56f99fef56bd012c14dde17e18b6a",
+      "hash": "sha256:bb920c7cace5329e32057d8fc409743d0af58df34e17378ac9c9fa216590b99a",
       "layer": "L2",
-      "size": 8161
+      "size": 8978
     },
     ".kaizen-dvir/celulas/yotzer/agents/task-granulator.md": {
-      "hash": "sha256:20b51e35dabc5d103c8ddf1f88fc73a77b6fc7632ed5c856046198f1abec6483",
+      "hash": "sha256:d57b37b9e4ff7da7f8fc83f4a303bd3d4009a376c4b669c9c4d5afdbde102309",
       "layer": "L2",
-      "size": 8395
+      "size": 9342
     },
     ".kaizen-dvir/celulas/yotzer/celula.yaml": {
-      "hash": "sha256:c698d9398f4b56b7b58c6615bf37e5a3bf4a34c6e5e9e91d21a6da878a1c8db4",
+      "hash": "sha256:f900c26b04086bf8301f6a0d1e09ce21ece838bda19640b7a647ff1bf3330cf5",
       "layer": "L2",
-      "size": 3434
+      "size": 3586
     },
     ".kaizen-dvir/celulas/yotzer/checklists/action-observability.md": {
       "hash": "sha256:5c4700c72509b9bb20ae9a5b4ee5c8e07e3dd3aad7cc8ce7c7b2109fdba33ca7",
       "layer": "L2",
       "size": 2738
+    },
+    ".kaizen-dvir/celulas/yotzer/checklists/automation-reflection-completeness.md": {
+      "hash": "sha256:c2003f9079cd3d83af75439573e44ed107027314b36269f7c00235ebb84853fc",
+      "layer": "L2",
+      "size": 4686
     },
     ".kaizen-dvir/celulas/yotzer/checklists/mvp-vs-roadmap-separation.md": {
       "hash": "sha256:f92dff37826d516a96bc418594fb1f62ca8b70c378ca1f7b78635b4a2f283909",
@@ -92,11 +132,6 @@
       "hash": "sha256:c8e994dcd14f3b28ceb203416e61d5011dd543e771c20a4af59c39a691a63b1e",
       "layer": "L2",
       "size": 2579
-    },
-    ".kaizen-dvir/celulas/yotzer/checklists/progressive-levels-coherence.md": {
-      "hash": "sha256:1319a5ca709d70d7dadd34432142f138b926bbdb2e57abc0094b6efd790d41da",
-      "layer": "L2",
-      "size": 3789
     },
     ".kaizen-dvir/celulas/yotzer/checklists/pu-reduction-justified.md": {
       "hash": "sha256:f93b2611ffc76eb2ddda82bb0b756bf5b3e2dc6440e9d9d105ec3eda965fad04",
@@ -114,9 +149,9 @@
       "size": 18055
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/00-pipeline/MAPA-TERRITORIAL.md": {
-      "hash": "sha256:828be4442dfa978fa46a1fafbf03fbcbde9ac50c3e97950a10f677dd79f6712b",
+      "hash": "sha256:7291e5259b0aa963cfdcfda3a19fde78422b9a2ec715d4c1e4066d611dd9a72c",
       "layer": "L2",
-      "size": 28492
+      "size": 28795
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/00-pipeline/PLANO-ETL.md": {
       "hash": "sha256:810ba107eb46a8232697a6b9ea48d2173a66c2610eeb71b61daa06f1df3a98bc",
@@ -149,9 +184,9 @@
       "size": 6154
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/00-pipeline/sources/loc-00-leia-me.md": {
-      "hash": "sha256:fa5873d5b929f20db3cc4a03dc419c5e4a3c69d850727e2e20c3804d72cb776f",
+      "hash": "sha256:1900609fde3e74f3de78dcf14889280e25cfb0f77cb71c86472e2d1e4d934219",
       "layer": "L2",
-      "size": 7697
+      "size": 7813
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/00-pipeline/sources/loc-01-danilo-diretrizes-escrita.md": {
       "hash": "sha256:a60d1182b76b4aa8f2ceb92c5f1c6566254f5c46625926fd3371ac3e30416626",
@@ -189,9 +224,9 @@
       "size": 3118
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/00-pipeline/sources/loc-02-metodo-forge-exploracao.md": {
-      "hash": "sha256:461ac97b3a14cd189c341c2860913703106b57c93552736eb6912a4843707960",
+      "hash": "sha256:4a8776125f97e2977a55271734662fb2b1b73377c5734658220315ea9e111ffd",
       "layer": "L2",
-      "size": 7900
+      "size": 8036
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/00-pipeline/sources/loc-03-framework-7-artefatos.md": {
       "hash": "sha256:3cb1cf4146d00f4732da147455367c278103c2acf1f89b6e9f2e3c8c9ba77195",
@@ -459,9 +494,9 @@
       "size": 28737
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/README.md": {
-      "hash": "sha256:e998bccc5f3494a34dd8e86a9d11f98f4fa839bfcbe7165c507781bb60f4affd",
+      "hash": "sha256:14f72e3b5f03afb51578405d61d17bc343e933ac57ec65e4ade4c1fe0914b427",
       "layer": "L2",
-      "size": 10485
+      "size": 10681
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/REGRAS-CARDINAIS.md": {
       "hash": "sha256:c6c8ef439e49b32ec5286433284190b6a03516e1d0f163f7769b2bda3baad8fa",
@@ -519,9 +554,9 @@
       "size": 30139
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/VOL-10-governance-evolucao-meta-squads.md": {
-      "hash": "sha256:af94c2aedb8580e287785dd9d423952a097090c88faac607e667946e5b6c10d9",
+      "hash": "sha256:b230994814a005210834bffefaba4813b01467d23d79ce5001812f67224e8f17",
       "layer": "L2",
-      "size": 36181
+      "size": 37164
     },
     ".kaizen-dvir/celulas/yotzer/kbs/yotzer/VOL-11-descoberta-oferta-engajamento.md": {
       "hash": "sha256:c36232d17ebbdbb34d2fecf12c4cb90454905585cdc420da11d3c86e52b72fe8",
@@ -539,19 +574,19 @@
       "size": 979
     },
     ".kaizen-dvir/celulas/yotzer/tasks/explain-method.md": {
-      "hash": "sha256:f407674b5fa1a8ef3bfdece07682ee8ea6092488ed52f65f23f21fced1b9ff6a",
+      "hash": "sha256:aeafd01538e3f04c7128f0d864bd972fd21468c6aeb8386b99c57b66ce6593e1",
       "layer": "L2",
-      "size": 1507
+      "size": 1934
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-1-objective.md": {
-      "hash": "sha256:98b7230b3bb83d391eb084c6fb13c983813baccb8e553723cbd8d598a6755fff",
+      "hash": "sha256:5e55fa4831d5dd9dfb724fa759deff812b97d9fdc78759f030eb406d898f7a75",
       "layer": "L2",
-      "size": 6103
+      "size": 7287
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-10-publication.md": {
-      "hash": "sha256:2c0e6d65d37df1e6010a95c16bbb9c50980afb981ccbb9229c25b54511b2b32b",
+      "hash": "sha256:72b9ad78bf0129e606752d9627f83ba9688dc046a2e9b53a3a04c34e12e04a13",
       "layer": "L2",
-      "size": 11522
+      "size": 15798
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-2-sources-and-examples.md": {
       "hash": "sha256:c702c59efd8d5d5a8af0e93a1939184995246b90b1fba08730207c89438a90f8",
@@ -559,39 +594,39 @@
       "size": 5333
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-3-as-is.md": {
-      "hash": "sha256:bcb3ab01b0fcfb089c49829c406b3a8532588428310d4d9cb71889d911e1558b",
+      "hash": "sha256:50561fe738110ea911cd9fb38c2c3e5e42ee4e43cbd03b676a79c0396376f4d0",
       "layer": "L2",
-      "size": 3699
+      "size": 4977
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-4-stress-test.md": {
-      "hash": "sha256:0fbb0a75dba6dbe40d12632db3f969812781a638596f72dddee3f3a50019c829",
+      "hash": "sha256:a8b406d9c6fc286d0c0c026db4c99ef06cbce30e41bf54137e4aa7991f60837a",
       "layer": "L2",
-      "size": 8736
+      "size": 9247
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-5-risk-map.md": {
-      "hash": "sha256:06b5ceb302d34774eb5345292194b0f288f3a17d63d65f23adcc1bb6e863d19f",
+      "hash": "sha256:cb5917ad18cb930595341c14c23221b08f47636ac7d8da47e4fac6a458d6f1c4",
       "layer": "L2",
-      "size": 8013
+      "size": 8533
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-6-to-be.md": {
-      "hash": "sha256:ecc054ffb1cd0bb86ef8d18fd6e98d25cc969aa8c3389c8a254393ed1c709ec7",
+      "hash": "sha256:3bb4141fab766c1c585bfa7a6bca645aca695eb04d85a43968c01527ad8e788e",
       "layer": "L2",
-      "size": 3816
+      "size": 4228
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-7-prioritize.md": {
-      "hash": "sha256:9021cedc0dc2d43ffa39bff951c5b43f2dd77411b804fc127f795454338fc1f0",
+      "hash": "sha256:22db3144243801fd904bd34b7e50c8a567d75016ae8c3b304b8fb3af06d4ccd1",
       "layer": "L2",
-      "size": 6574
+      "size": 7061
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-8-granulate.md": {
-      "hash": "sha256:47d0b07e8ef7fef20b6dc883001052929226eaf6ede4169e496a313fe6a7ed8e",
+      "hash": "sha256:7abd509f6b81e3f83222faa51edc22e3f0f7507cb6789291670ee208fc8816cc",
       "layer": "L2",
-      "size": 7960
+      "size": 10025
     },
     ".kaizen-dvir/celulas/yotzer/tasks/phase-9-contracts.md": {
-      "hash": "sha256:9c2d160c61e457308959856c206af1090bd85f1580970db6116eaacd8e3b19a5",
+      "hash": "sha256:9641cf632c1f79a664d8e5293d1f4249eb41a3841fdaffd97c6489eaf709e618",
       "layer": "L2",
-      "size": 6953
+      "size": 7519
     },
     ".kaizen-dvir/celulas/yotzer/tasks/resume.md": {
       "hash": "sha256:08e71006e7a9bf2270235727abfee53256e1a4078ab0e46362ab2c2a6944d5d0",
@@ -599,14 +634,14 @@
       "size": 1204
     },
     ".kaizen-dvir/celulas/yotzer/tasks/start.md": {
-      "hash": "sha256:9331e7a259a06b1d41ca9f711e2efc551ba00e5ade588cee1cc5a3868b95d383",
+      "hash": "sha256:fba719f1095b7774e473d46fa468fae89ee5d7321ad714fc6dd7f467e5823018",
       "layer": "L2",
-      "size": 2485
+      "size": 2636
     },
     ".kaizen-dvir/celulas/yotzer/tasks/status.md": {
-      "hash": "sha256:f467febcab999ab0152f603b9de1e52d1897a4f100691f2652b38f534c154cc2",
+      "hash": "sha256:464844bdd42b81806e41cac63f66b820e478060176e60a1a4ce06df3e0e52d5e",
       "layer": "L2",
-      "size": 940
+      "size": 3104
     },
     ".kaizen-dvir/celulas/yotzer/tasks/switch-mode.md": {
       "hash": "sha256:efddd9cfd2340e69a4a893266b42626ae66bebca1b2a54e52773379e8ae6225d",
@@ -622,6 +657,11 @@
       "hash": "sha256:89a3e81c7f3a4e9bd375221e6e54b596e8c62a8333d8fa73d0e30ee2db739b93",
       "layer": "L2",
       "size": 2652
+    },
+    ".kaizen-dvir/celulas/yotzer/templates/automation-reflection-tmpl.md": {
+      "hash": "sha256:8ae09baaab82bc94601e20688671f96e52396ec9b218f9483ca0e5667dbfb578",
+      "layer": "L2",
+      "size": 3011
     },
     ".kaizen-dvir/celulas/yotzer/templates/celula-blueprint-tmpl.yaml": {
       "hash": "sha256:d1eaa61ddf76fecbe4d9c825eef893c72fdcf67194d2193e6f3a77b6dcd771f5",
@@ -659,9 +699,14 @@
       "size": 2361
     },
     ".kaizen-dvir/celulas/yotzer/templates/welcome-message-tmpl.md": {
-      "hash": "sha256:b50be42f2dd3da8ff7ea44aa348c5c9e5993f53812718a6f69ca62e0b73400a8",
+      "hash": "sha256:ce2b97902a8911f09c0cb16637ed1dd38de6b11e5826b079421fd95763205d03",
       "layer": "L2",
-      "size": 5529
+      "size": 5528
+    },
+    ".kaizen-dvir/celulas/yotzer/templates/workflow-progress-tmpl.md": {
+      "hash": "sha256:448e6f0536bc88d00773b049636414262ae58fa38e129a2cee29a8d3f97f15aa",
+      "layer": "L2",
+      "size": 4999
     },
     ".kaizen-dvir/celulas/yotzer/templates/workflow-tmpl.yaml": {
       "hash": "sha256:f8efde89de92d69f38cb095eddc0f7650c6abe5f6e45abde2c6bc9bb56fc92f3",
@@ -674,9 +719,9 @@
       "size": 4010
     },
     ".kaizen-dvir/celulas/yotzer/workflows/wf-yotzer-generate-celula.yaml": {
-      "hash": "sha256:73992623c08344f6582dad1f154ab6dd95bbecd9e8e40016f551d5e19bb79957",
+      "hash": "sha256:c4d9c6b2490d130cc105e639a1a046cc845700a43c514a4efe4d118c24465c16",
       "layer": "L2",
-      "size": 4327
+      "size": 4446
     },
     ".kaizen-dvir/commandments.md": {
       "hash": "sha256:5cd2c1ed61cfd5eed4327e83209d1c673c474776536fc8723b288bd9229ef192",
@@ -704,9 +749,9 @@
       "size": 13724
     },
     ".kaizen-dvir/dvir/doctor/cells-reporter.js": {
-      "hash": "sha256:5a2ad6e3015c7b573eafb219b35765c0528bd113d556fbc26354767f49e36cf9",
+      "hash": "sha256:01dc81d5e6dabc518b32f091d418517ef6d76ea39f890d0ccc9bcbe757e28475",
       "layer": "L1",
-      "size": 18647
+      "size": 22549
     },
     ".kaizen-dvir/dvir/doctor/gates-reporter.js": {
       "hash": "sha256:929c265191d3bcf88842f26854df4c3a7f05e9b2b638c20e3fbacaf0482aefe2",
@@ -747,6 +792,11 @@
       "hash": "sha256:ec7ad79cd6b3301e9d8176b1d9dd9e30f1d2aa45495f6da474846373b4738902",
       "layer": "L1",
       "size": 9060
+    },
+    ".kaizen-dvir/dvir/gates/post-condition-checker.js": {
+      "hash": "sha256:904f894fdb69a6f2574be226d297b1b4dafbdf2334418c2c15a90611cb2e667a",
+      "layer": "L1",
+      "size": 6974
     },
     ".kaizen-dvir/dvir/gates/quality-gate.js": {
       "hash": "sha256:96d74cd3fede58dd483a34ee66706f1f6677cc234904c399e282dea83dcecca7",
@@ -848,6 +898,11 @@
       "layer": "L1",
       "size": 2769
     },
+    ".kaizen-dvir/dvir/schemas/phase-10-handoff-v1.json": {
+      "hash": "sha256:c1d0cf4c3668de7737b84cefda16cb809d2898aa35d924e3e840b408f95d86e9",
+      "layer": "L1",
+      "size": 3510
+    },
     ".kaizen-dvir/dvir/schemas/task-contract-schema.json": {
       "hash": "sha256:a0507a6511f795356b88fe2c8c0f8d7f38e4e65030f107eb30bf89b5bb87dcc7",
       "layer": "L1",
@@ -924,9 +979,9 @@
       "size": 4812
     },
     ".kaizen-dvir/instructions/templates/rules/yotzer.md": {
-      "hash": "sha256:5c140b440d12a434ead3dc9616001714f5162b5b8d4128f5e6cb432c63d505ba",
+      "hash": "sha256:b825301b760f1cd995dcede21763186ba101bc1ab12c13a353a5b540229008a9",
       "layer": "L2",
-      "size": 6975
+      "size": 6988
     },
     "bin/build-canonical-manifest.js": {
       "hash": "sha256:9bad5cd082fa2fb96ce7a5b54cac1df4f20338d31e7c50410cb095e5c3bd9344",

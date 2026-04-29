@@ -135,6 +135,12 @@ de seguir.`
     `persist()`. O payload carrega ponteiros para `as-is-filtered.yaml`,
     `cut-log.yaml` e a revisao corrente do `OST.md`. Fica abaixo de
     500 tokens.
+11a. Stress-tester roda
+    `post-condition-checker.checkArtefacts(celulaPath,
+    ['as-is-filtered.yaml', 'cut-log.yaml', 'OST.md'], { phase: 4 })`
+    antes da apresentacao do gate. Falta de qualquer arquivo pausa a
+    etapa com mensagem em pt-BR. Mesma checagem roda em modo
+    interativo e em modo automatico.
 12. Chief apresenta a checagem da fase 4. F4 nao e critica: fecha
     sozinha em modo automatico quando nao ha pendencia. Situacoes nao
     ideais surgem ao expert em qualquer modo, sempre com escolha clara.

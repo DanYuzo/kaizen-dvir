@@ -122,6 +122,12 @@ dividir o passo. (D-v1.2-03)`
    `persist()`. O payload carrega ponteiros para `mvp-backlog.yaml`,
    `roadmap.yaml` e a revisao corrente do `OST.md` com marcacoes. Fica
    abaixo de 500 tokens.
+9a. Prioritizer roda
+   `post-condition-checker.checkArtefacts(celulaPath,
+   ['mvp-backlog.yaml', 'roadmap.yaml', 'OST.md'], { phase: 7 })`
+   antes da apresentacao do gate. Falta de qualquer arquivo pausa a
+   etapa com mensagem em pt-BR. Mesma checagem roda em modo interativo
+   e em modo automatico.
 10. Chief apresenta a checagem da fase 7. F7 nao e critica: fecha
     sozinha em modo automatico quando nao ha pendencia. Situacoes nao
     ideais surgem ao expert em qualquer modo, sempre com escolha

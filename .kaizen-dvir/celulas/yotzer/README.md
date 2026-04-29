@@ -1,11 +1,10 @@
-# Yotzer — meta-celula geradora de celulas
+# Yotzer — geradora de celulas
 
 <!--
 Documento pt-BR. Expert le isto. Sem induzir criacao (CON-105).
 -->
 
-Yotzer e a primeira celula do KaiZen. Yotzer gera celulas novas em 10 fases
-organizadas em 3 Atos.
+Yotzer e a primeira celula (um pacote pronto que cuida de um workflow recorrente seu de ponta a ponta) do KaiZen. Yotzer gera celulas novas em 10 etapas organizadas em 3 Atos.
 
 ## O que o Yotzer faz
 
@@ -36,7 +35,7 @@ Chief abre a sessao. Apresenta tres caminhos.
 | `*editar` | entra em modo de edicao |
 | `*metodo` | explica o metodo das 10 fases |
 | `*modo` | alterna modo interativo ou automatico |
-| `*resume` | retoma a partir do ultimo handoff |
+| `*resume` | retoma a partir do ultimo ponto de passagem |
 | `*status` | relata fase atual e ultimo veredito |
 
 ## O metodo
@@ -44,10 +43,16 @@ Chief abre a sessao. Apresenta tres caminhos.
 Ver `tasks/explain-method.md` para a descricao completa das 10 fases em 3
 Atos.
 
-## Invariantes criticos
+## Etapas que sempre pausam
 
 F1, F2 e F10 sempre pausam. Mesmo em modo automatico, chief aguarda
-julgamento do expert nessas fases.
+julgamento do expert nessas etapas.
+
+## Onde ficam as celulas que voce gera
+
+Celulas que voce gera vao pra `celulas/` no seu projeto. Se voce e
+contribuidor do framework e quer entregar a celula junto com o framework,
+mova a pasta manualmente depois pra `.kaizen-dvir/celulas/`.
 
 ## Governanca
 

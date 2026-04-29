@@ -118,7 +118,7 @@ steps:
 
   - id: "phase-10-publication"
     agents:
-      - "progressive-systemizer"
+      - "flow-architect"
       - "publisher"
     gate_type: "playback"
     critical_invariant: true

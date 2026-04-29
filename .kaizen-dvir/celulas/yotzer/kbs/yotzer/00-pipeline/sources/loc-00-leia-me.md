@@ -104,7 +104,7 @@ Ao construir os workflows, saiba que estas 4 perguntas **ainda não foram respon
 1. **Unidade atômica:** PU (reuso do forge) ou conceito próprio?
 2. **Output canônico:** YAML (forge-style), JSON Schema (creator-style) ou híbrido?
 3. **Cliente do método-forge:** uso interno do Danilo ou self-service pro cliente da consultoria?
-4. **Lente dos 5 agentes novos** (stress-tester, risk-mapper, prioritizer, progressive-systemizer, loop-instrumenter): ferramentas internas ou entregáveis pro cliente?
+4. **Lente dos 5 agentes novos** (stress-tester, risk-mapper, prioritizer, flow-architect, loop-instrumenter): ferramentas internas ou entregáveis pro cliente?
 
 A IA pode propor respostas e levar pro Danilo validar.
 

@@ -35,22 +35,30 @@ mitigacoes.
 **F5. Priorizacao.** Prioritizer separa MVP de roadmap. Decide o que entra
 no primeiro ciclo.
 
-**F6. Granulacao de tasks.** Task-granulator quebra o MVP em tasks com
-input e output definidos.
+**F6. Granulacao em Pacotes Uteis.** Cada Pacote Util (uma etapa
+documentada do seu workflow), abreviado como PU, tem entrada e saida
+definidas. Task-granulator quebra o MVP em PUs.
 
 **F7. Contratos.** Contract-builder escreve os contratos entre sub-agentes.
 Define quem entrega o que para quem.
 
 ## Ato 3 — Construcao
 
-**F8. Sistematizacao progressiva.** Progressive-systemizer conecta os
-niveis de sofisticacao. Monta a escada da celula.
+**F8. Sistematizacao progressiva.** O especialista desta etapa conecta
+como a celula vai funcionar nos diferentes niveis de uso. Monta a escada
+da celula.
 
 **F9. Revisao de integracao.** Chief revisa o conjunto antes da publicacao.
 
 **F10. Publicacao.** Publisher publica a celula. Chief apresenta o
 Playback final. Expert julga.
 
-## Invariantes criticos
+## Onde a celula gerada vai parar
 
-F1, F2 e F10 sempre pausam. Nao existem atalhos para essas fases.
+Celulas que voce gera vao pra `celulas/` no seu projeto. Se voce e
+contribuidor do framework e quer entregar a celula junto com o framework,
+mova a pasta manualmente depois pra `.kaizen-dvir/celulas/`.
+
+## Etapas que sempre pausam
+
+F1, F2 e F10 sempre pausam. Nao existem atalhos para essas etapas.

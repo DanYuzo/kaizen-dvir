@@ -190,6 +190,25 @@ de corte. Risk-mapper executa o mapeamento.
 | Avanco para F6 apos fase fechada | chief |
 | Tentativa de granularizar passo do processo | pausa a fase com pedido de reabrir sem dividir; redireciona para fase 8 |
 
+## Escreva antes de pedir o fechamento da etapa (M9.4)
+
+F5 declara em `post_condition` os arquivos `risk-map.yaml`,
+`risk-reversal-guarantees.yaml` e o crescimento do `OST.md` com
+Opportunities residuais e Solutions ligadas. Antes de chamar a
+checagem da etapa, risk-mapper escreve cada arquivo:
+
+| Arquivo | Como escrever |
+|---------|---------------|
+| `risk-map.yaml` | escrita direta apos mapear riscos por PU |
+| `risk-reversal-guarantees.yaml` | escrita direta com os quatro padroes em pt-BR |
+| `OST.md` (residual + solutions + links) | `ost-writer.appendOpportunity`, `appendSolution`, `linkSolutionToOpportunity`, `appendChangeLog` |
+
+A checagem usa `post-condition-checker.checkArtefacts(celulaPath,
+['risk-map.yaml', 'risk-reversal-guarantees.yaml', 'OST.md'])` antes
+da apresentacao do gate. Falta de qualquer arquivo pausa a etapa com
+mensagem em pt-BR nomeando o arquivo faltante. A regra vale identica
+em modo interativo e em modo automatico.
+
 ## Checagem da fase 5 — nao critico
 
 F5 e nao critico. Em modo automatico, a fase fecha sozinha quando nao ha

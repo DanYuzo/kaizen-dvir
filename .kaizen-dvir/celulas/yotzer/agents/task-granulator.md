@@ -173,6 +173,21 @@ via elicit.
 | Tentativa de emitir action-*.md | pausa a fase com pedido de mover as Actions inline (mensagem em pt-BR) |
 | Adjetivo inferencial em Action | pausa a fase com pedido de reescrita observavel (mensagem em pt-BR) |
 
+## Escreva antes de pedir o fechamento da etapa (M9.4)
+
+F8 declara em `post_condition` que o diretorio `tasks/` da celula
+gerada esteja populado, com Tasks que carregam Actions inline (sem
+`action.md` separado), e o `OST.md` ligando Tasks a Solutions.
+Antes de chamar a checagem da etapa, task-granulator materializa
+cada Task em `tasks/<task-id>.yaml` e registra a ligacao no OST via
+`ost-writer.appendChangeLog()`.
+
+A checagem usa `post-condition-checker.checkArtefacts(celulaPath,
+['tasks/', 'OST.md'])` antes da apresentacao do gate. O verificador
+pausa a etapa quando `tasks/` nao existe ou esta vazio. Mensagem em
+pt-BR nomeia o arquivo ou pasta faltante. A regra vale identica em
+modo interativo e em modo automatico.
+
 ## Checagem da fase 8 — nao critica
 
 F8 e nao critica. Em modo automatico, a fase fecha sozinha quando nao ha

@@ -150,6 +150,20 @@ Prioritizer ordena e separa.
 | Avanco para F8 apos fase fechada | chief |
 | Tentativa de granularizar passo do processo | pausa a fase com pedido de reabrir sem dividir; redireciona para fase 8 |
 
+## Escreva antes de pedir o fechamento da etapa (M9.4)
+
+F7 declara em `post_condition` os arquivos `mvp-backlog.yaml`,
+`roadmap.yaml` e a marcacao do `OST.md` (mvp ou roadmap por
+Solution). Antes de chamar a checagem da etapa, prioritizer escreve
+cada arquivo. A marcacao no OST entra via
+`ost-writer.appendChangeLog()` registrando o destino por Solution.
+
+A checagem usa `post-condition-checker.checkArtefacts(celulaPath,
+['mvp-backlog.yaml', 'roadmap.yaml', 'OST.md'])` antes da
+apresentacao do gate. Falta de qualquer arquivo pausa a etapa com
+mensagem em pt-BR nomeando o arquivo faltante. A regra vale identica
+em modo interativo e em modo automatico.
+
 ## Checagem da fase 7 — nao critica
 
 F7 e nao critica. Em modo automatico, a fase fecha sozinha quando nao ha

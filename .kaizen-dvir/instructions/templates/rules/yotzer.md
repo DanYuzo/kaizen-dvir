@@ -53,7 +53,7 @@ Os specialists não aparecem como slash commands na superfície default — o `c
 @.kaizen-dvir/celulas/yotzer/agents/archaeologist.md          → análise de fonte e exemplos
 @.kaizen-dvir/celulas/yotzer/agents/contract-builder.md       → contratos de tasks/specialists
 @.kaizen-dvir/celulas/yotzer/agents/prioritizer.md            → priorização de escopo MVP
-@.kaizen-dvir/celulas/yotzer/agents/progressive-systemizer.md → sistematização incremental
+@.kaizen-dvir/celulas/yotzer/agents/flow-architect.md         → reflexão de automação (manual/tech/ai)
 @.kaizen-dvir/celulas/yotzer/agents/publisher.md              → publicação final da célula
 @.kaizen-dvir/celulas/yotzer/agents/risk-mapper.md            → mapa de riscos do processo
 @.kaizen-dvir/celulas/yotzer/agents/stress-tester.md          → stress-test do processo

@@ -66,6 +66,14 @@
  *       Materializes the AC-118 directory layout:
  *         celula.yaml, README.md, CHANGELOG.md, MEMORY.md, OST.md,
  *         agents/, tasks/, workflows/, templates/, checklists/, kbs/.
+ *       Story M9.5 (D-v2.0-02): cellPath is ALWAYS computed as
+ *       `path.join(PROJECT_ROOT, 'celulas', cellName)`. The
+ *       `targetCelulasRoot` argument is @deprecated and ignored for path
+ *       resolution. It remains in the signature for backward compatibility
+ *       with callers (e.g. `runYotzerPublish` in `bin/kaizen.js`) that
+ *       still pass it positionally. No environment detection, flag
+ *       parsing, cwd inspection, or branching decides the destination —
+ *       this is a SIMPLIFICATION (Commandment III: No Invention).
  *       When `options.claudeCommandsDir` is provided AND the materialized
  *       cell has at least one persona file under agents/, the publisher
  *       delegates to `dvir/cell-registry.registerCellSkills()` to write
@@ -773,7 +781,32 @@ function emitYaml(manifest) {
   return lines.join('\n') + '\n';
 }
 
+/**
+ * Materialize a generated cell at `PROJECT_ROOT/celulas/{cellName}/`.
+ *
+ * Story M9.5 (D-v2.0-02): the destination is always the project root
+ * `celulas/` directory. `targetCelulasRoot` is kept in the signature for
+ * backward compatibility (callers like `runYotzerPublish` still pass it),
+ * but the value is ignored for path resolution. Framework contributors
+ * who want to bundle a generated cell under `.kaizen-dvir/celulas/` move
+ * the directory manually after publication.
+ *
+ * @param {object} spec                Cell spec (must include `name`).
+ * @param {string} [targetCelulasRoot] @deprecated Ignored after M9.5; the
+ *                                     publisher always materializes at
+ *                                     `PROJECT_ROOT/celulas/{spec.name}`.
+ *                                     Kept in the signature so existing
+ *                                     callers do not break.
+ * @param {object} [options]           `claudeCommandsDir` enables the M8.5
+ *                                     skill-registration delegation.
+ * @returns {{celulaPath: string, manifest: object, manifestPath: string,
+ *            skillRegistration: object|null}}
+ */
 function materializeCell(spec, targetCelulasRoot, options) {
+  // Argument `targetCelulasRoot` retained for backward compatibility
+  // (Story M9.5 / D-v2.0-02) — referenced here so static analyzers do
+  // not flag it as unused.
+  void targetCelulasRoot;
   if (!spec || typeof spec !== 'object') {
     const err = new Error('publisher: spec invalido para materializeCell.');
     err.code = 'MATERIALIZE_SPEC_INVALID';
@@ -785,13 +818,15 @@ function materializeCell(spec, targetCelulasRoot, options) {
     err.code = 'MATERIALIZE_NAME_MISSING';
     throw err;
   }
-  if (typeof targetCelulasRoot !== 'string' || targetCelulasRoot.length === 0) {
-    const err = new Error('publisher: targetCelulasRoot ausente.');
-    err.code = 'MATERIALIZE_ROOT_MISSING';
-    throw err;
-  }
   const opts = options || {};
-  const cellPath = path.join(targetCelulasRoot, cellName);
+  // Story M9.5 / D-v2.0-02 — destination is hard-coded to
+  // PROJECT_ROOT/celulas/{cellName}. No conditional path logic, no env
+  // detection, no flag. Framework contributors move bundled cells
+  // manually after publication. Commandment III (No Invention): the fix
+  // is the removal of branching, not smarter branching.
+  const celulasRoot = path.join(PROJECT_ROOT, 'celulas');
+  fs.mkdirSync(celulasRoot, { recursive: true });
+  const cellPath = path.join(celulasRoot, cellName);
   fs.mkdirSync(cellPath, { recursive: true });
 
   // Required AC-118 directories.
