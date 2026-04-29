@@ -1,3 +1,9 @@
+# Development docs (epics, stories, decisions, PRDs) live OUTSIDE this repo,
+# at the workspace-level `docs/` folder. Anything under `docs/` here is a
+# LOCAL-ONLY artifact (working drafts, scratch notes) and must never be
+# distributed via the package nor tracked in version control.
+docs/
+
 # KaiZen runtime directory — ephemeral, never committed (CON-004)
 # Criado pelo `kaizen init` no workspace do usuário; logs/handoffs lá são
 # histórico LOCAL da instância de uso, não do framework. Não distribuir.

@@ -1460,7 +1460,7 @@ function _isInsideFrameworkSourceRepo(cwd) {
   return false;
 }
 
-function _maybeAutoRouteInitToUpdate() {
+function _maybeAutoRouteInitToUpdate(forwardedArgs) {
   const cwd = process.cwd();
   const manifestPath = path.join(cwd, '.kaizen-dvir', 'manifest.json');
   if (!fs.existsSync(manifestPath)) return null;
@@ -1471,7 +1471,36 @@ function _maybeAutoRouteInitToUpdate() {
     '(politica em camadas L1/L2/L3/L4 preserva 100% do seu trabalho).\n'
   );
   const updateCmd = require('./kaizen-update.js');
-  return updateCmd.runUpdate([]);
+  // M9.8 — forward known update flags from `init` so `npx kaizen-dvir@latest
+  // init --allow-major` works for existing installs that need the cross-major
+  // opt-in. We forward only flags that `kaizen update` accepts; unknown flags
+  // are dropped silently to keep the init contract narrow. If the user wants
+  // the full update flag surface, the documented escape hatch is to call
+  // `kaizen update <flags>` directly.
+  const args = Array.isArray(forwardedArgs) ? forwardedArgs : [];
+  const FORWARDED_FLAGS = new Set([
+    '--allow-major',
+    '--dry-run',
+    '-n',
+    '--force',
+  ]);
+  const passthrough = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (FORWARDED_FLAGS.has(a)) {
+      passthrough.push(a);
+    } else if (a === '--canonical-root') {
+      // Two-token flag — preserve value.
+      passthrough.push(a);
+      if (args[i + 1] !== undefined) {
+        passthrough.push(args[i + 1]);
+        i++;
+      }
+    } else if (a.startsWith('--canonical-root=')) {
+      passthrough.push(a);
+    }
+  }
+  return updateCmd.runUpdate(passthrough);
 }
 
 function main(argv) {
@@ -1490,7 +1519,7 @@ function main(argv) {
 
   switch (cmd) {
     case 'init': {
-      const routed = _maybeAutoRouteInitToUpdate();
+      const routed = _maybeAutoRouteInitToUpdate(args.slice(1));
       if (routed !== null) return routed;
       const initCmd = require('./kaizen-init.js');
       return initCmd(args.slice(1));
@@ -1502,7 +1531,7 @@ function main(argv) {
       // `kaizen install <celula>` = instalação de célula específica (M4 — não implementado).
       const subArgs = args.slice(1);
       if (subArgs.length === 0) {
-        const routed = _maybeAutoRouteInitToUpdate();
+        const routed = _maybeAutoRouteInitToUpdate([]);
         if (routed !== null) return routed;
         const initCmd = require('./kaizen-init.js');
         return initCmd([]);

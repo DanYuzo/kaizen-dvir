@@ -181,6 +181,10 @@ function parseArgs(args) {
     force: false,
     help: false,
     canonicalRoot: null,
+    // M9.8 — explicit opt-in escape hatch for cross-major updates. Default
+    // behavior (no flag) MUST remain blocked by CON-010's N-1 gate; the
+    // flag bypasses ONLY the `major_change` reason, never the others.
+    allowMajor: false,
   };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
@@ -197,6 +201,8 @@ function parseArgs(args) {
       i++;
     } else if (a.startsWith('--canonical-root=')) {
       out.canonicalRoot = a.slice('--canonical-root='.length);
+    } else if (a === '--allow-major') {
+      out.allowMajor = true;
     }
     // Unknown flags are ignored quietly — the CLI dispatcher in bin/kaizen.js
     // is the canonical authority for unknown commands. Tolerating unknown
@@ -219,6 +225,13 @@ const HELP_TEXT_PT_BR = [
   '  --continue        Retoma um update interrompido por conflito em L3',
   '  --force           Forca operacoes mesmo quando haveria aviso (uso reservado)',
   '  --canonical-root  Caminho do pacote canonico (uso de teste)',
+  '  --allow-major     Permite atualizacao cross-major com aviso explicito.',
+  '                    CUIDADO: mudancas breaking podem aplicar. Consulte',
+  '                    release notes do alvo antes de prosseguir.',
+  '                    Nota: `kaizen init` em projeto ja inicializado roteia',
+  '                    para `kaizen update` com argumentos vazios — para',
+  '                    cross-major em projeto existente, rode',
+  '                    `kaizen update --allow-major` diretamente.',
   '  --help            Mostra esta ajuda',
   '',
   'Em caso de conflito em arquivos L3:',
@@ -855,18 +868,65 @@ function runUpdate(args) {
       logger.flush();
       return 0;
     }
-    const msg = migrationsLib.formatN1AbortMessage({
-      installed: fromVersion,
-      target: toVersion,
-      result: n1,
-    });
-    process.stderr.write(msg);
-    logger.append(
-      'update_abort_n1',
-      'verificacao N-1 falhou (' + (n1.reason || 'desconhecido') + ').'
-    );
-    logger.flush();
-    return 2;
+    // M9.8 — `--allow-major` opt-in escape hatch.
+    //
+    // The M9 epic shipped v2.0.0 as a release-tag visibility decision
+    // (epic-m9-yotzer-ux-v2.md, decisions D-v2.0-01..04 affect
+    // framework-dev workflow only — NOT typical expert installs). CON-010's
+    // N-1 gate correctly classifies any 1.x → 2.x bump as `major_change`
+    // and aborts. For existing 1.8.0 installs that need to opt into the
+    // cross-major update with eyes open, the expert passes `--allow-major`
+    // and we emit a prominent multi-line warning, then fall through to the
+    // normal layered-policy update flow.
+    //
+    // The flag bypasses ONLY `major_change` — `same_version`, `downgrade`,
+    // `jump`, and `invalid` continue to abort as before.
+    if (opts.allowMajor && n1.reason === 'major_change') {
+      process.stdout.write(
+        '\n' +
+        '============================================================\n' +
+        'AVISO: ATUALIZACAO CROSS-MAJOR (--allow-major)\n' +
+        '============================================================\n' +
+        '  Instalada: ' + fromVersion + '\n' +
+        '  Alvo:      ' + toVersion + '\n' +
+        '\n' +
+        'Voce optou explicitamente por uma atualizacao cross-major.\n' +
+        'Mudancas BREAKING podem aplicar — consulte as release notes do\n' +
+        'alvo no GitHub antes de prosseguir em producao:\n' +
+        '  https://github.com/DanYuzo/kaizen-dvir/releases\n' +
+        '\n' +
+        'A politica em camadas continua preservando seu trabalho:\n' +
+        '  - L4 (celulas de expert, refs/) intocado.\n' +
+        '  - L3 (.claude/, .gitignore) merge automatico.\n' +
+        '  - L1/L2 atualizados para a versao alvo.\n' +
+        '  - MEMORY.md de cada celula preservado byte-a-byte (D-v1.1-09).\n' +
+        '\n' +
+        'Caso algo de errado, use `kaizen rollback` para voltar ao snapshot\n' +
+        'criado pelo proprio update.\n' +
+        '============================================================\n' +
+        '\n'
+      );
+      logger.append(
+        'update_allow_major',
+        'cross-major bypass autorizado pelo expert: ' +
+          fromVersion + ' -> ' + toVersion + ' (--allow-major)'
+      );
+      // Fall through to the normal update flow (snapshot, migration,
+      // layered apply, etc). Do NOT return early.
+    } else {
+      const msg = migrationsLib.formatN1AbortMessage({
+        installed: fromVersion,
+        target: toVersion,
+        result: n1,
+      });
+      process.stderr.write(msg);
+      logger.append(
+        'update_abort_n1',
+        'verificacao N-1 falhou (' + (n1.reason || 'desconhecido') + ').'
+      );
+      logger.flush();
+      return 2;
+    }
   }
 
   // Step 4 — snapshot (skipped on dry-run).
