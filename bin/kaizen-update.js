@@ -807,9 +807,15 @@ function runUpdate(args) {
   const fromVersion = typeof local.version === 'string' ? local.version : '';
 
   // Step 2 — resolve canonical manifest.
+  // INSTALL_ROOT is passed as `installRoot` so npx invocations (where the
+  // running binary lives in the npx cache extract path, NOT under
+  // <projectRoot>/node_modules/) can still locate the canonical manifest
+  // shipped with the package. See M9.7 fix in
+  // `.kaizen-dvir/dvir/update/manifest.js` resolver.
   const canon = manifestLib.resolveCanonicalManifest({
     projectRoot: root,
     canonicalRoot: opts.canonicalRoot || null,
+    installRoot: INSTALL_ROOT,
   });
   if (!canon) {
     process.stderr.write(
@@ -1253,9 +1259,11 @@ function runContinue(ctx) {
   );
 
   // Re-resolve canonical for hash refresh later.
+  // INSTALL_ROOT threaded through for npx invocations — see M9.7 fix.
   const canon = manifestLib.resolveCanonicalManifest({
     projectRoot: root,
     canonicalRoot: canonicalRoot,
+    installRoot: INSTALL_ROOT,
   });
   if (!canon) {
     process.stderr.write(

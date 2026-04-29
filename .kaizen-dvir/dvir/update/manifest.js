@@ -8,7 +8,7 @@
  * Loader / writer for the LOCAL manifest at `<projectRoot>/.kaizen-dvir/manifest.json`.
  * Pairs with the CANONICAL manifest (built by `bin/build-canonical-manifest.js`,
  * shipped inside the npm tarball at
- * `node_modules/@DanYuzo/kaizen-dvir/.kaizen-dvir/manifest.json`) to drive the
+ * `node_modules/kaizen-dvir/.kaizen-dvir/manifest.json`) to drive the
  * layered update policy implemented by `bin/kaizen-update.js`.
  *
  * Schema (single source of truth — kept aligned with the canonical builder)
@@ -57,11 +57,12 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 
 const LOCAL_MANIFEST_REL = path.join('.kaizen-dvir', 'manifest.json');
-const CANONICAL_PACKAGE_REL = path.join(
-  'node_modules',
-  '@DanYuzo',
-  'kaizen-dvir'
-);
+const CANONICAL_PACKAGE_REL = path.join('node_modules', 'kaizen-dvir');
+// Canonical manifests are emitted by `bin/build-canonical-manifest.js` with
+// this generator string. Used as a guard so a project's LOCAL manifest (which
+// is written by `kaizen-update@1` / `kaizen-init@1`) is never mistaken for
+// the canonical source — the bug fixed by M9.7.
+const CANONICAL_GENERATOR_PREFIX = 'build-canonical-manifest';
 
 /**
  * Compute the canonical sha256 hex digest of a file with the "sha256:" prefix
@@ -157,10 +158,21 @@ function writeManifest(projectRoot, data) {
  *   1. opts.canonicalRoot (explicit override — used by tests).
  *   2. process.env.KAIZEN_CANONICAL_ROOT (explicit override — used by
  *      tests that swap a fixture between init and update).
- *   3. `<projectRoot>/node_modules/@DanYuzo/kaizen-dvir/`.
- *   4. The framework checkout itself (when projectRoot IS the kaizen-dvir
+ *   3. opts.installRoot (the running binary's own package root — critical
+ *      for npx invocations where the framework code lives in the npx cache
+ *      and `<projectRoot>/node_modules/kaizen-dvir/` does NOT exist).
+ *   4. `<projectRoot>/node_modules/kaizen-dvir/` (local install path).
+ *   5. The framework checkout itself (when projectRoot IS the kaizen-dvir
  *      repo; this lets the dev tree run `kaizen update` against itself
  *      during integration tests).
+ *
+ * Generator guard: a candidate is only accepted when its manifest's
+ * `generator` field starts with `build-canonical-manifest`. This prevents
+ * the project's own LOCAL manifest (written by `kaizen-update@1` /
+ * `kaizen-init@1`) from being mistaken for the canonical source — the
+ * exact bug fixed by M9.7 where npx invocations fell through every other
+ * candidate and silently read the local manifest as canonical, producing
+ * a no-op `installed === target` even when a real upgrade was published.
  *
  * The return shape carries the full parsed manifest plus the absolute path
  * of the canonical root so the caller can resolve per-file content for
@@ -179,6 +191,14 @@ function resolveCanonicalManifest(opts) {
     process.env.KAIZEN_CANONICAL_ROOT.length > 0
   ) {
     candidates.push(process.env.KAIZEN_CANONICAL_ROOT);
+  }
+  // installRoot is the package root of the running binary (the directory
+  // where bin/kaizen-update.js lives, resolved via path.resolve(__dirname,
+  // '..')). Under npx that's the npx cache extract path; under a local
+  // npm install it's `<projectRoot>/node_modules/kaizen-dvir/` (covered
+  // again below as candidate #4 for clarity).
+  if (typeof opts.installRoot === 'string' && opts.installRoot.length > 0) {
+    candidates.push(opts.installRoot);
   }
   candidates.push(path.join(projectRoot, CANONICAL_PACKAGE_REL));
   // Self-checkout fallback: kaizen-dvir repo is its own canonical source.
@@ -201,6 +221,17 @@ function resolveCanonicalManifest(opts) {
     }
     // Sanity guard — must look like a canonical manifest.
     if (!parsed || typeof parsed !== 'object' || !parsed.files) continue;
+    // Generator guard (M9.7): only accept manifests emitted by the
+    // canonical builder. LOCAL manifests written by kaizen-update@1 /
+    // kaizen-init@1 must never be served as canonical, even if the
+    // candidate path happens to host one (e.g., projectRoot fallback when
+    // every higher-priority candidate misses).
+    if (
+      typeof parsed.generator !== 'string' ||
+      parsed.generator.indexOf(CANONICAL_GENERATOR_PREFIX) !== 0
+    ) {
+      continue;
+    }
     return {
       manifestPath: manifestPath,
       manifest: parsed,
@@ -232,3 +263,16 @@ module.exports = {
 //   KAIZEN_CANONICAL_ROOT env -> node_modules/@DanYuzo/kaizen-dvir/ ->
 //   project-root self-checkout fallback (latter enables dev-tree integration
 //   tests without a real npm install).
+// 2026-04-29 — @dev (Dex) — M9.7: fix canonical-resolution-via-npx bug.
+//   (a) CANONICAL_PACKAGE_REL changed from `node_modules/@DanYuzo/kaizen-dvir`
+//   to unscoped `node_modules/kaizen-dvir` (package is published unscoped on
+//   npm; `npm view @DanYuzo/kaizen-dvir` returns 404). (b) resolveCanonicalManifest
+//   accepts opts.installRoot — the running binary's own package root —
+//   inserted as the third-priority candidate so npx invocations (where
+//   INSTALL_ROOT is the npx cache extract path, NOT under projectRoot) can
+//   find their bundled canonical manifest. (c) Generator guard: candidates
+//   are now rejected unless `manifest.generator` starts with
+//   `build-canonical-manifest`. Prevents the projectRoot self-checkout
+//   fallback from silently serving the user's LOCAL manifest as canonical
+//   — the exact failure mode that caused `installed=1.8.0, target=1.8.0`
+//   reports against a published 2.0.1 release.
